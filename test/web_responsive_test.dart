@@ -916,6 +916,71 @@ void main() {
       );
     });
 
+    testWidgets('appBar: enlaces en el app bar y grupos en dropdown', (
+      tester,
+    ) async {
+      String? selected;
+      await pumpScaffold(
+        tester,
+        tablet,
+        responsive: const WRValue(md: WRNavStyle(type: WRNavigation.appBar)),
+        onRouteSelected: (id) => selected = id,
+      );
+      expect(find.byType(NavigationRail), findsNothing);
+      expect(find.byType(NavigationBar), findsNothing);
+      final appBar = find.byType(AppBar);
+      expect(
+        find.descendant(of: appBar, matching: find.text('Reportes')),
+        findsOneWidget,
+      );
+      // Las subrutas no se ven hasta abrir el dropdown.
+      expect(visibleText('Pedidos'), findsNothing);
+
+      await tester.tap(find.text('Inicio'));
+      expect(selected, 'inicio');
+
+      await tester.tap(find.text('Ventas'));
+      await tester.pumpAndSettle();
+      await tester.tap(visibleText('Clientes'));
+      await tester.pumpAndSettle();
+      expect(selected, 'ventas/clientes');
+      expect(visibleText('Clientes'), findsNothing);
+    });
+
+    testWidgets('appBar: el título queda y los enlaces van después', (
+      tester,
+    ) async {
+      tester.view.physicalSize = tablet;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        MaterialApp(
+          home: WRScaffold(
+            appBar: AppBar(
+              title: const Text('Mi app'),
+              actions: const [Icon(Icons.notifications)],
+            ),
+            currentRoute: 'inicio',
+            onRouteSelected: (_) {},
+            destinations: destinations,
+            responsive: const WRValue(
+              md: WRNavStyle(type: WRNavigation.appBar),
+            ),
+            body: const Text('cuerpo'),
+          ),
+        ),
+      );
+      final title = tester.getTopRight(find.text('Mi app'));
+      final link = tester.getTopLeft(find.text('Inicio'));
+      expect(link.dx, greaterThan(title.dx));
+      expect(link.dy, lessThan(56));
+      expect(find.byIcon(Icons.notifications), findsOneWidget);
+      expect(
+        WRScaffold.of(tester.element(find.text('cuerpo'))).isMenuOpen,
+        isFalse,
+      );
+    });
+
     testWidgets('WRScaffold.of abre el menú', (tester) async {
       await pumpScaffold(tester, tablet);
       WRScaffold.of(tester.element(find.text('cuerpo'))).openMenu();

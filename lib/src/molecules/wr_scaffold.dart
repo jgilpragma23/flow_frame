@@ -92,7 +92,7 @@ class WRScaffoldState extends State<WRScaffold> {
 
   /// Si el menú completo (con textos) está abierto.
   bool get isMenuOpen => switch (_navigation) {
-    WRNavigation.bottom => false,
+    WRNavigation.bottom || WRNavigation.appBar => false,
     WRNavigation.drawer => _scaffoldKey.currentState?.isDrawerOpen ?? false,
     WRNavigation.rail =>
       _expandMode == WRRailExpand.overlay
@@ -106,7 +106,7 @@ class WRScaffoldState extends State<WRScaffold> {
 
   void _setMenu(bool open) {
     switch (_navigation) {
-      case WRNavigation.bottom:
+      case WRNavigation.bottom || WRNavigation.appBar:
         break;
       case WRNavigation.drawer:
         open
@@ -142,9 +142,11 @@ class WRScaffoldState extends State<WRScaffold> {
 
     return Scaffold(
       key: _scaffoldKey,
-      appBar: _navigation == WRNavigation.drawer
-          ? widget.appBar ?? AppBar()
-          : widget.appBar,
+      appBar: switch (_navigation) {
+        WRNavigation.drawer => widget.appBar ?? AppBar(),
+        WRNavigation.appBar => _appBarWithNav(items),
+        _ => widget.appBar,
+      },
       backgroundColor: widget.backgroundColor,
       floatingActionButton: widget.floatingActionButton,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
@@ -267,6 +269,151 @@ class WRScaffoldState extends State<WRScaffold> {
                     : label,
               ),
             ),
+    );
+  }
+
+  /// El app bar del usuario con los enlaces después del título. Si no es un
+  /// `AppBar`, los enlaces van en una franja debajo.
+  PreferredSizeWidget _appBarWithNav(List<WRDestination> items) {
+    final source = widget.appBar ?? AppBar();
+    final nav = Align(
+      alignment: Alignment.centerLeft,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: [
+            for (final d in items)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 2),
+                child: d.isGroup ? _appBarGroup(d) : _appBarLink(d),
+              ),
+          ],
+        ),
+      ),
+    );
+
+    if (source is! AppBar) {
+      return PreferredSize(
+        preferredSize: Size.fromHeight(
+          source.preferredSize.height + kToolbarHeight,
+        ),
+        child: Column(
+          children: [
+            source,
+            Material(
+              color: _color(_style.backgroundColor),
+              child: SizedBox(height: kToolbarHeight, child: nav),
+            ),
+          ],
+        ),
+      );
+    }
+
+    final title = source.title;
+    return AppBar(
+      key: source.key,
+      leading: source.leading,
+      automaticallyImplyLeading: source.automaticallyImplyLeading,
+      title: Row(
+        children: [
+          if (title != null) ...[title, const SizedBox(width: 24)],
+          Expanded(child: nav),
+        ],
+      ),
+      actions: source.actions,
+      actionsPadding: source.actionsPadding,
+      flexibleSpace: source.flexibleSpace,
+      bottom: source.bottom,
+      elevation: source.elevation,
+      scrolledUnderElevation: source.scrolledUnderElevation,
+      shadowColor: source.shadowColor,
+      surfaceTintColor: source.surfaceTintColor,
+      shape: source.shape,
+      backgroundColor: source.backgroundColor ?? _color(_style.backgroundColor),
+      foregroundColor: source.foregroundColor,
+      iconTheme: source.iconTheme,
+      actionsIconTheme: source.actionsIconTheme,
+      primary: source.primary,
+      centerTitle: false,
+      titleSpacing: source.titleSpacing,
+      toolbarHeight: source.toolbarHeight,
+      leadingWidth: source.leadingWidth,
+      toolbarTextStyle: source.toolbarTextStyle,
+      titleTextStyle: source.titleTextStyle,
+      systemOverlayStyle: source.systemOverlayStyle,
+      forceMaterialTransparency: source.forceMaterialTransparency,
+      clipBehavior: source.clipBehavior,
+    );
+  }
+
+  ButtonStyle _linkStyle({required bool selected}) {
+    final scheme = Theme.of(context).colorScheme;
+    return TextButton.styleFrom(
+      foregroundColor: selected
+          ? _color(_style.selectedLabelColor) ?? scheme.onSecondaryContainer
+          : _color(_style.labelColor) ?? scheme.onSurfaceVariant,
+      iconColor: selected
+          ? _color(_style.selectedIconColor) ?? scheme.onSecondaryContainer
+          : _color(_style.iconColor) ?? scheme.onSurfaceVariant,
+      backgroundColor: selected
+          ? _color(_style.selectedBackgroundColor) ?? scheme.secondaryContainer
+          : null,
+      shape: const StadiumBorder(),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+    );
+  }
+
+  Widget _appBarLink(WRDestination d) {
+    final selected = d.id == widget.currentRoute;
+    return TextButton(
+      style: _linkStyle(selected: selected),
+      onPressed: () => widget.onRouteSelected(d.id),
+      child: Text(d.label),
+    );
+  }
+
+  /// Un grupo: botón con ▾ que abre un dropdown con sus subrutas.
+  Widget _appBarGroup(WRDestination d) {
+    final scheme = Theme.of(context).colorScheme;
+    final selected = d.children.any((c) => c.id == widget.currentRoute);
+    return MenuAnchor(
+      alignmentOffset: const Offset(0, 4),
+      builder: (context, controller, _) => TextButton(
+        style: _linkStyle(selected: selected),
+        onPressed: () =>
+            controller.isOpen ? controller.close() : controller.open(),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(d.label),
+            const SizedBox(width: 4),
+            AnimatedRotation(
+              turns: controller.isOpen ? 0.5 : 0,
+              duration: _duration,
+              child: const Icon(Icons.expand_more, size: 18),
+            ),
+          ],
+        ),
+      ),
+      menuChildren: [
+        for (final c in d.children)
+          MenuItemButton(
+            leadingIcon: c.id == widget.currentRoute
+                ? c.selectedIcon ?? c.icon
+                : c.icon,
+            style: c.id == widget.currentRoute
+                ? MenuItemButton.styleFrom(
+                    foregroundColor:
+                        _color(_style.selectedLabelColor) ?? scheme.primary,
+                    iconColor:
+                        _color(_style.selectedIconColor) ?? scheme.primary,
+                    backgroundColor: _color(_style.selectedBackgroundColor),
+                  )
+                : null,
+            onPressed: () => widget.onRouteSelected(c.id),
+            child: Text(c.label),
+          ),
+      ],
     );
   }
 

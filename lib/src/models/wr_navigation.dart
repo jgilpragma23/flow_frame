@@ -17,6 +17,11 @@ enum WRNavigation {
 
   /// Menú oculto que sale desde el lado al tocar ☰ en el app bar.
   drawer,
+
+  /// Enlaces dentro del app bar, después del título, como en un sitio web.
+  /// Un grupo es un botón con ▾ que abre un dropdown con sus subrutas.
+  /// Pensado para pantallas medianas y grandes.
+  appBar,
 }
 
 /// Cómo se abre el menú completo (con textos y acordeón) desde el rail.
@@ -48,7 +53,7 @@ class WRNavStyle {
     this.selectedLabelColor,
   });
 
-  /// Barra abajo, rail o drawer.
+  /// Barra abajo, rail, drawer o enlaces en el app bar.
   final WRNavigation? type;
 
   /// Con rail, si el menú completo se abre encima o como sidebar.
@@ -62,7 +67,8 @@ class WRNavStyle {
   /// `WRDestination.alwaysOpen` tiene prioridad.
   final bool? subRoutesAlwaysVisible;
 
-  /// Fondo de la barra, el rail y el menú.
+  /// Fondo de la barra, el rail y el menú. Con [WRNavigation.appBar], fondo
+  /// del app bar si este no define el suyo.
   final WRColor? backgroundColor;
   final WRColor? iconColor;
   final WRColor? labelColor;
