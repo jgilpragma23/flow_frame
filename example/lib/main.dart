@@ -60,7 +60,8 @@ const label = WRStyle(
 /// La app con su navegación: barra abajo en teléfono, rail en tablet (el
 /// menú se abre encima) y menú abierto en escritorio (empuja el contenido).
 ///
-/// Para los screenshots: ?nav=drawer usa drawer en teléfono, `?sel=id`
+/// Para los screenshots: ?nav=drawer usa drawer en teléfono, ?nav=top
+/// usa enlaces en el app bar desde md, `?sel=id`
 /// elige la ruta inicial y ?open=1 abre el menú al iniciar.
 class ExampleShell extends StatefulWidget {
   const ExampleShell({super.key});
@@ -130,7 +131,9 @@ class _ExampleShellState extends State<ExampleShell> {
 
   @override
   Widget build(BuildContext context) {
-    final drawer = Uri.base.queryParameters['nav'] == 'drawer';
+    final nav = Uri.base.queryParameters['nav'];
+    final drawer = nav == 'drawer';
+    final top = nav == 'top';
     return WRScaffold(
       appBar: AppBar(title: const Text('web_responsive')),
       backgroundColor: AppColors.background.resolve(context),
@@ -147,8 +150,8 @@ class _ExampleShellState extends State<ExampleShell> {
           selectedIconColor: AppColors.primary,
           selectedLabelColor: AppColors.primary,
         ),
-        md: const WRNavStyle(
-          type: WRNavigation.rail,
+        md: WRNavStyle(
+          type: top ? WRNavigation.appBar : WRNavigation.rail,
           expandMode: WRRailExpand.overlay,
         ),
         lg: const WRNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
