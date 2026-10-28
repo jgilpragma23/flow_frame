@@ -1,4 +1,4 @@
-## 0.0.1 (sin publicar)
+## 0.0.1 - 2026-10-28
 
 * Breakpoints `xs`/`sm`/`md`/`lg`/`xl`, configurables con `WRBreakpoints.current`.
 * `WRValue<T>`: valores por breakpoint con cascada mobile-first.
