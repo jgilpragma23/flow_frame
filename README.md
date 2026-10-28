@@ -383,11 +383,11 @@ class _HomeState extends State<Home> {
 
 | Campo | Qué hace |
 |---|---|
-| `type` | `WRNavigation.bottom`, `rail` o `drawer` |
+| `type` | `WRNavigation.bottom`, `rail`, `drawer` o `appBar` |
 | `expandMode` | Con rail, cómo se abre el menú completo: `WRRailExpand.overlay` o `sidebar` |
 | `expanded` | Con `sidebar`, si el menú empieza abierto |
 | `subRoutesAlwaysVisible` | Todos los grupos siempre abiertos, sin flecha |
-| `backgroundColor` | Fondo de la barra, el rail y el menú |
+| `backgroundColor` | Fondo de la barra, el rail y el menú; con `appBar`, fondo del app bar si este no tiene uno |
 | `iconColor`, `labelColor` | Íconos y textos sin seleccionar |
 | `selectedBackgroundColor` | Fondo del destino seleccionado |
 | `selectedIconColor`, `selectedLabelColor` | Ícono y texto del destino seleccionado |
@@ -400,6 +400,14 @@ class _HomeState extends State<Home> {
 - `bottom`: barra abajo con íconos y textos (`NavigationBar`).
 - `rail`: barra lateral de íconos con un botón ☰ arriba que abre el menú completo (íconos, textos y subrutas).
 - `drawer`: menú oculto que sale desde el lado al tocar ☰ en el app bar; se cierra al elegir una opción. Si no pasas `appBar`, se pone uno vacío para que exista el botón.
+- `appBar`: enlaces dentro del app bar, después del título, como en un sitio web. Un grupo es un botón con ▾ que abre un dropdown con sus subrutas. Pensado para `md` en adelante: en pantallas angostas los enlaces que no caben se desplazan de lado. Tu `AppBar` conserva su título, `leading` y `actions`; si pasas otro `PreferredSizeWidget`, los enlaces van en una franja debajo.
+
+```dart
+responsive: const WRValue(
+  xs: WRNavStyle(type: WRNavigation.bottom),
+  md: WRNavStyle(type: WRNavigation.appBar),
+),
+```
 
 **Cómo se abre el menú desde el rail (`WRRailExpand`)**
 - `overlay`: el menú sale encima del contenido, como un drawer, con fondo oscuro. Se cierra al elegir una opción o al tocar fuera.
@@ -409,6 +417,7 @@ class _HomeState extends State<Home> {
 - Un destino con `children` es un grupo: no es una página, solo agrupa. Un solo nivel.
 - En el menú completo (sidebar, overlay y drawer) se muestra como acordeón. El grupo que tiene la ruta actual se abre solo.
 - `alwaysOpen: true` deja ese grupo abierto y sin flecha; tiene prioridad sobre `subRoutesAlwaysVisible`.
+- En el app bar, cada grupo es un dropdown con sus subrutas.
 - En la barra abajo y en el rail cerrado solo se ven los grupos. En la barra, tocar un grupo lleva a su última subruta visitada (o a la primera). En el rail cerrado, abre el menú con ese grupo desplegado.
 
 **Destinos por breakpoint**

@@ -8,4 +8,4 @@
 * `WRContainer`: contenedor con ancho máximo centrado.
 * `WRFlex`: fila o columna con dirección, separación y alineación por breakpoint; en horizontal arma filas y baja lo que no cabe.
 * `WRItem`: elemento con `col`, `fill`, `order` y `style`; los ocultos no dejan separación.
-* `WRScaffold`: `Scaffold` con navegación por breakpoint (barra abajo, rail o drawer), ruta por `id` (`currentRoute`/`onRouteSelected`), subrutas en acordeón, destinos con `visible` por breakpoint y `WRNavStyle` en cascada para tipo, menú del rail encima (`overlay`) o como `sidebar`, grupos siempre abiertos y colores; el menú se abre desde código con `WRScaffold.of(context)`.
+* `WRScaffold`: `Scaffold` con navegación por breakpoint (barra abajo, rail, drawer o enlaces en el app bar con grupos en dropdown), ruta por `id` (`currentRoute`/`onRouteSelected`), subrutas en acordeón, destinos con `visible` por breakpoint y `WRNavStyle` en cascada para tipo, menú del rail encima (`overlay`) o como `sidebar`, grupos siempre abiertos y colores; el menú se abre desde código con `WRScaffold.of(context)`.
