@@ -430,3 +430,54 @@ responsive: const WRValue(
 - Se usa un solo tipo por breakpoint.
 - Si el usuario abre o cierra el menú con ☰, se respeta mientras siga en el mismo breakpoint. Al cambiar de breakpoint vuelve al valor de `expanded`.
 - La ruta actual (`currentRoute`) no cambia al cambiar de navegación.
+
+## `WRActions`: acciones del app bar
+
+Cada acción decide por breakpoint si se ve con ícono y texto, solo con ícono, dentro del menú ⋮ o si no aparece. Va en `AppBar.actions` (con o sin `WRScaffold`) o en cualquier fila.
+
+```dart
+AppBar(
+  title: const Text('Pedidos'),
+  actions: [
+    WRActions(
+      actions: [
+        WRAction(
+          icon: const Icon(Icons.add),
+          label: 'Nuevo pedido',
+          onPressed: _nuevo,
+          display: const WRValue(xs: WRActionDisplay.icon, md: WRActionDisplay.full),
+        ),
+        WRAction(
+          icon: const Icon(Icons.download_outlined),
+          label: 'Exportar',
+          onPressed: _exportar,
+          display: const WRValue(xs: WRActionDisplay.menu, lg: WRActionDisplay.full),
+        ),
+        WRAction(
+          icon: const Icon(Icons.print_outlined),
+          label: 'Imprimir',
+          onPressed: _imprimir,
+          display: const WRValue(xs: WRActionDisplay.hidden, md: WRActionDisplay.menu),
+        ),
+      ],
+    ),
+  ],
+)
+```
+
+| | Nuevo pedido | Exportar | Imprimir |
+|---|---|---|---|
+| `xs`, `sm` | Ícono | En ⋮ | No aparece |
+| `md` | Ícono y texto | En ⋮ | En ⋮ |
+| `lg`, `xl` | Ícono y texto | Ícono y texto | En ⋮ |
+
+**`WRActionDisplay`**
+- `full`: ícono y texto, como botón.
+- `icon`: solo el ícono; el texto queda como tooltip.
+- `menu`: dentro del menú ⋮, con ícono y texto.
+- `hidden`: no se muestra.
+
+**Detalles**
+- `display` funciona en cascada. Sin `display`, la acción se muestra solo con el ícono.
+- El ⋮ aparece solo si alguna acción está en `menu` en ese breakpoint. `menuIcon` y `menuTooltip` cambian su ícono y su tooltip.
+- `onPressed: null` muestra la acción deshabilitada.
