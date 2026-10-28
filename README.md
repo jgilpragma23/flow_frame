@@ -16,11 +16,13 @@ WRContainer(
     gap: const WRValue(xs: 16, md: 24),
     children: [
       WRItem(
-        flex: const WRValue(md: 1),
-        style: const WRStyle(visible: WRValue(xs: false, sm: true)),
+        style: const WRStyle(
+          width: WRValue(md: 280),
+          visible: WRValue(xs: false, sm: true),
+        ),
         child: Sidebar(),
       ),
-      WRItem(flex: const WRValue(md: 3), child: Content()),
+      WRItem(fill: const WRValue(md: true), child: Content()),
     ],
   ),
 )
@@ -48,7 +50,7 @@ Cada valor aplica desde su breakpoint hacia arriba hasta que otro lo reemplace (
 
 ```dart
 const gap = WRValue(xs: 8, md: 16); // 8 en xs/sm, 16 en md/lg/xl
-const flex = WRValue(md: 1);        // null en xs/sm, 1 desde md
+const fill = WRValue(md: true);     // null en xs/sm, true desde md
 const same = WRValue.all(12);       // 12 en todos
 
 gap.resolve(context.breakpoint);
@@ -223,16 +225,64 @@ Sin `maxSize` ocupa todo el ancho.
 
 `WRFlex` es una fila o columna que cambia por breakpoint (como `d-flex flex-column flex-md-row`). `WRItem` es cada elemento.
 
+### Grilla: filas que se acomodan solas
+
+En horizontal, `WRFlex` funciona como un `row` de Bootstrap: cada hijo dice cuánto ocupa y lo que no cabe baja a la siguiente fila.
+
+```dart
+WRFlex(
+  direction: const WRValue.all(Axis.horizontal),
+  gap: const WRValue.all(16), // entre elementos y entre filas
+  children: [
+    for (final p in products)
+      WRItem(col: const WRValue(xs: 12, md: 6, lg: 4), child: ProductCard(p)),
+  ],
+)
+```
+
+| Breakpoint | `col` | Resultado con 5 productos |
+|---|---|---|
+| `xs`, `sm` | 12 | 1 por fila, 5 filas |
+| `md` | 6 | 2 por fila: 1-2, 3-4, 5 |
+| `lg`, `xl` | 4 | 3 por fila: 1-2-3, 4-5 |
+
+Cada hijo puede medirse de tres formas:
+
+| `WRItem` | Ancho | En Bootstrap |
+|---|---|---|
+| `col: WRValue(md: 6)` | 6 de 12 columnas | `col-md-6` |
+| `fill: WRValue(md: true)` | Lo que sobra en su fila | `col` |
+| Ninguno | Su tamaño natural | `col-auto` |
+
+Se pueden mezclar en la misma fila:
+
+```dart
+WRFlex(
+  direction: const WRValue.all(Axis.horizontal),
+  gap: const WRValue.all(16),
+  children: [
+    WRItem(col: const WRValue(xs: 12, md: 3), child: Filtros()),
+    WRItem(fill: const WRValue.all(true), child: Buscador()),
+    IconButton(icon: const Icon(Icons.tune), onPressed: () {}),
+  ],
+)
+```
+
+En `md` van los tres en una fila: filtros en 3/12, el ícono con su tamaño y el buscador con el resto. En `xs` los filtros ocupan la fila completa y el buscador y el ícono bajan a la siguiente.
+
+Si un `WRItem` tiene `col` y `fill`, gana el que esté definido en el breakpoint más cercano al actual. Con `col: WRValue(xs: 12)` y `fill: WRValue(md: true)`: fila completa en `xs`/`sm` y lo que sobra desde `md`. Si están en el mismo breakpoint, gana `col`.
+
+### Vertical
+
+En vertical los elementos se apilan. Por defecto ocupan todo el ancho, `col` se ignora y `fill` reparte la altura que sobra (solo si el `WRFlex` tiene un alto limitado).
+
 ```dart
 WRFlex(
   direction: const WRValue(xs: Axis.vertical, md: Axis.horizontal),
   gap: const WRValue(xs: 12, md: 16),
-  mainAxisAlignment: const WRValue(md: MainAxisAlignment.spaceBetween),
-  crossAxisAlignment: const WRValue(md: CrossAxisAlignment.center),
-  style: const WRStyle(padding: WRSpacing(all: WRValue(xs: 8))),
   children: [
-    WRItem(flex: const WRValue(md: 1), style: card, child: Card1()),
-    WRItem(flex: const WRValue(md: 2), style: card, child: Card2()),
+    WRItem(fill: const WRValue(md: true), style: card, child: Card1()),
+    WRItem(fill: const WRValue(md: true), style: card, child: Card2()),
     WRItem(
       order: const WRValue(xs: -1, md: 0), // primero en móvil, en su lugar desde md
       child: Image(...),
@@ -241,20 +291,25 @@ WRFlex(
 )
 ```
 
+### Referencia
+
 **`WRFlex`**
 - `direction`: por defecto vertical.
-- `gap`: separación entre elementos.
-- `mainAxisAlignment`: por defecto `start`.
-- `crossAxisAlignment`: por defecto `stretch` en vertical (los elementos ocupan todo el ancho) y `start` en horizontal.
+- `gap`: separación entre elementos y, en horizontal, también entre filas.
+- `mainAxisAlignment`: por defecto `start`. En horizontal se aplica a cada fila.
+- `crossAxisAlignment`: por defecto `stretch` en vertical (los elementos ocupan todo el ancho) y `start` en horizontal. En horizontal se aplica dentro de cada fila; `stretch` iguala la altura de la fila.
 - `style`: un `WRStyle` para el contenedor.
-- `children`: pueden ser `WRItem` o cualquier widget.
+- `children`: pueden ser `WRItem` o cualquier widget (este toma su tamaño natural).
 
 **`WRItem`**
-- `flex`: parte del espacio libre que ocupa. Sin valor en un breakpoint, toma su tamaño natural.
+- `col`: cuántas de las 12 columnas ocupa (de 1 a 12). Solo en horizontal.
+- `fill`: `true` hace que ocupe el espacio que sobra en su fila; si varios lo tienen, se lo reparten en partes iguales. `false` o sin valor: toma su tamaño natural. Puede cambiar por breakpoint, por ejemplo `WRValue(xs: false, sm: true, lg: false)`.
 - `order`: posición dentro del `WRFlex`; los menores van primero (por defecto 0).
 - `style`: un `WRStyle`. Con `visible: false` el elemento se quita y no deja separación.
 
 **Detalles:**
-- Si el `WRFlex` está en un eje sin límite (por ejemplo, vertical dentro de un `SingleChildScrollView`), `flex` se ignora en vez de dar error.
+- Cada hijo se mide una vez, como en un `Row` o un `Wrap`, así que no pesa más que ellos. Como ellos, construye todos sus hijos aunque no se vean; para listas de cientos de elementos conviene `GridView.builder`.
+- Si el `WRFlex` no tiene un límite en su eje (por ejemplo, vertical dentro de un `SingleChildScrollView`), `fill` y `col` se ignoran en vez de dar error.
 - Cambiar `order` o ocultar un elemento no hace perder el estado de los demás.
-- Fuera de un `WRFlex`, `WRItem` ignora `flex` y `order` y solo aplica su `style`. Sirve como un `div` con clases.
+- Respeta `TextDirection.rtl`.
+- Fuera de un `WRFlex`, `WRItem` ignora `col`, `fill` y `order` y solo aplica su `style`. Sirve como un `div` con clases.

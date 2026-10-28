@@ -6,21 +6,31 @@ import '../utils/wr_style_builder.dart';
 
 /// Un elemento con estilo responsive, como un `div` con clases.
 ///
-/// Dentro de un `WRFlex`, [flex] reparte el espacio libre y [order] cambia
-/// la posición. Fuera de un `WRFlex` esos dos se ignoran y solo se aplica
+/// Dentro de un `WRFlex`, [col] y [fill] definen su ancho y [order] cambia
+/// la posición. Fuera de un `WRFlex` esos tres se ignoran y solo se aplica
 /// [style].
+///
+/// Si en un breakpoint hay [col] y [fill], gana el que esté definido en el
+/// breakpoint más cercano al actual; si están en el mismo, gana [col].
 class WRItem extends StatelessWidget {
   const WRItem({
     super.key,
-    this.flex,
+    this.col,
+    this.fill,
     this.order,
     this.style,
     required this.child,
   });
 
-  /// Parte del espacio libre que ocupa en el eje del `WRFlex`. Sin valor en
-  /// un breakpoint, el elemento toma su tamaño natural.
-  final WRValue<int>? flex;
+  /// Cuántas de las 12 columnas ocupa en un `WRFlex` horizontal (como
+  /// `col-md-6`). Lo que no cabe en la fila baja a la siguiente. Valores de
+  /// 1 a 12. En un `WRFlex` vertical se ignora.
+  final WRValue<int>? col;
+
+  /// `true`: ocupa el espacio libre en su fila (o en la columna, si el
+  /// `WRFlex` es vertical); si varios lo tienen, se lo reparten en partes
+  /// iguales. `false` o sin valor: toma su tamaño natural.
+  final WRValue<bool>? fill;
 
   /// Posición dentro del `WRFlex`; los menores van primero. Por defecto 0.
   final WRValue<int>? order;

@@ -354,12 +354,9 @@ void main() {
       direction: WRValue(xs: Axis.vertical, md: Axis.horizontal),
       gap: WRValue(xs: 8, md: 20),
       children: [
+        WRItem(child: SizedBox(key: Key('a'), width: 200, height: 10)),
         WRItem(
-          flex: WRValue(md: 1),
-          child: SizedBox(key: Key('a'), height: 10),
-        ),
-        WRItem(
-          flex: WRValue(md: 3),
+          fill: WRValue(md: true),
           child: SizedBox(key: Key('b'), height: 10),
         ),
       ],
@@ -374,13 +371,57 @@ void main() {
       expect(b.top, a.bottom + 8);
     });
 
-    testWidgets('en horizontal reparte el espacio con flex', (tester) async {
+    testWidgets('en horizontal fill ocupa el espacio que sobra', (
+      tester,
+    ) async {
       await pump(tester, tablet, layout());
       final a = rectOf(tester, 'a');
       final b = rectOf(tester, 'b');
-      expect(a.width, (1000 - 20) / 4);
-      expect(b.width, (1000 - 20) * 3 / 4);
+      expect(a.width, 200);
+      expect(b.width, 1000 - 20 - 200);
       expect(b.left, a.right + 20);
+    });
+
+    testWidgets('varios fill se reparten en partes iguales', (tester) async {
+      await pump(
+        tester,
+        tablet,
+        const WRFlex(
+          direction: WRValue.all(Axis.horizontal),
+          children: [
+            WRItem(
+              fill: WRValue.all(true),
+              child: SizedBox(key: Key('a'), height: 10),
+            ),
+            WRItem(
+              fill: WRValue.all(true),
+              child: SizedBox(key: Key('b'), height: 10),
+            ),
+          ],
+        ),
+      );
+      expect(rectOf(tester, 'a').width, 500);
+      expect(rectOf(tester, 'b').width, 500);
+    });
+
+    testWidgets('fill cambia por breakpoint', (tester) async {
+      const flex = WRFlex(
+        direction: WRValue.all(Axis.horizontal),
+        children: [
+          WRItem(
+            fill: WRValue(xs: false, sm: true, lg: false),
+            child: SizedBox(key: Key('a'), width: 100, height: 10),
+          ),
+        ],
+      );
+      await pump(tester, phone, flex);
+      expect(rectOf(tester, 'a').width, 100);
+
+      await pump(tester, const Size(700, 800), flex);
+      expect(rectOf(tester, 'a').width, 700);
+
+      await pump(tester, const Size(1300, 800), flex);
+      expect(rectOf(tester, 'a').width, 100);
     });
 
     testWidgets('los ocultos no dejan separación', (tester) async {
@@ -435,7 +476,173 @@ void main() {
       expect(tester.state<_CounterState>(find.byKey(const Key('b'))).value, 7);
     });
 
-    testWidgets('flex dentro de un scroll vertical no falla', (tester) async {
+    group('col', () {
+      Widget grid(int count) => WRFlex(
+        direction: const WRValue.all(Axis.horizontal),
+        gap: const WRValue.all(16),
+        children: [
+          for (var i = 0; i < count; i++)
+            WRItem(
+              col: const WRValue(xs: 12, md: 6, lg: 4),
+              child: SizedBox(key: Key('$i'), height: 10),
+            ),
+        ],
+      );
+
+      testWidgets('xs: col 12, uno por fila', (tester) async {
+        await pump(tester, phone, grid(3));
+        for (var i = 0; i < 3; i++) {
+          expect(rectOf(tester, '$i'), Rect.fromLTWH(0, i * 26.0, 400, 10));
+        }
+      });
+
+      testWidgets('md: col 6, dos por fila y el resto baja', (tester) async {
+        await pump(tester, tablet, grid(5));
+        const w = (1000 - 16) / 2;
+        expect(rectOf(tester, '0'), const Rect.fromLTWH(0, 0, w, 10));
+        expect(rectOf(tester, '1'), const Rect.fromLTWH(w + 16, 0, w, 10));
+        expect(rectOf(tester, '2'), const Rect.fromLTWH(0, 26, w, 10));
+        expect(rectOf(tester, '3'), const Rect.fromLTWH(w + 16, 26, w, 10));
+        expect(rectOf(tester, '4'), const Rect.fromLTWH(0, 52, w, 10));
+      });
+
+      testWidgets('lg: col 4, tres por fila', (tester) async {
+        await pump(tester, const Size(1300, 800), grid(4));
+        const w = (1300 - 32) / 3;
+        expect(rectOf(tester, '2').left, closeTo(2 * (w + 16), 0.001));
+        expect(rectOf(tester, '2').top, 0);
+        expect(rectOf(tester, '3').topLeft, const Offset(0, 26));
+        expect(rectOf(tester, '3').width, closeTo(w, 0.001));
+      });
+
+      testWidgets('col, fill y natural en la misma fila', (tester) async {
+        await pump(
+          tester,
+          tablet,
+          const WRFlex(
+            direction: WRValue.all(Axis.horizontal),
+            gap: WRValue.all(16),
+            children: [
+              WRItem(
+                col: WRValue.all(3),
+                child: SizedBox(key: Key('a'), height: 10),
+              ),
+              WRItem(
+                fill: WRValue.all(true),
+                child: SizedBox(key: Key('b'), height: 10),
+              ),
+              SizedBox(key: Key('c'), width: 40, height: 10),
+            ],
+          ),
+        );
+        const col3 = 3 / 12 * (1000 + 16) - 16;
+        expect(rectOf(tester, 'a').width, col3);
+        expect(rectOf(tester, 'b').width, 1000 - col3 - 40 - 32);
+        expect(rectOf(tester, 'c').left, 960);
+        expect(rectOf(tester, 'c').top, 0);
+      });
+
+      testWidgets('el breakpoint más cercano decide entre col y fill', (
+        tester,
+      ) async {
+        const flex = WRFlex(
+          direction: WRValue.all(Axis.horizontal),
+          children: [
+            SizedBox(key: Key('a'), width: 100, height: 10),
+            WRItem(
+              col: WRValue(xs: 12),
+              fill: WRValue(md: true),
+              child: SizedBox(key: Key('b'), height: 10),
+            ),
+          ],
+        );
+        await pump(tester, phone, flex);
+        expect(rectOf(tester, 'b'), const Rect.fromLTWH(0, 10, 400, 10));
+
+        await pump(tester, tablet, flex);
+        expect(rectOf(tester, 'b'), const Rect.fromLTWH(100, 0, 900, 10));
+      });
+
+      testWidgets('mainAxisAlignment se aplica a cada fila', (tester) async {
+        await pump(
+          tester,
+          tablet,
+          const WRFlex(
+            direction: WRValue.all(Axis.horizontal),
+            mainAxisAlignment: WRValue.all(MainAxisAlignment.center),
+            children: [
+              WRItem(
+                col: WRValue.all(12),
+                child: SizedBox(key: Key('a'), height: 10),
+              ),
+              SizedBox(key: Key('b'), width: 200, height: 10),
+            ],
+          ),
+        );
+        expect(rectOf(tester, 'b'), const Rect.fromLTWH(400, 10, 200, 10));
+      });
+
+      testWidgets('stretch iguala la altura de la fila', (tester) async {
+        await pump(
+          tester,
+          tablet,
+          const WRFlex(
+            direction: WRValue.all(Axis.horizontal),
+            crossAxisAlignment: WRValue.all(CrossAxisAlignment.stretch),
+            children: [
+              WRItem(
+                col: WRValue.all(6),
+                child: SizedBox(key: Key('a'), height: 10),
+              ),
+              WRItem(
+                col: WRValue.all(6),
+                child: SizedBox(key: Key('b'), height: 50),
+              ),
+            ],
+          ),
+        );
+        expect(rectOf(tester, 'a').height, 50);
+      });
+
+      testWidgets('respeta derecha a izquierda', (tester) async {
+        tester.view.physicalSize = tablet;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(
+          const Directionality(
+            textDirection: TextDirection.rtl,
+            child: WRFlex(
+              direction: WRValue.all(Axis.horizontal),
+              children: [
+                WRItem(
+                  col: WRValue.all(6),
+                  child: SizedBox(key: Key('a'), height: 10),
+                ),
+              ],
+            ),
+          ),
+        );
+        expect(rectOf(tester, 'a').left, 500);
+      });
+
+      testWidgets('col se ignora en vertical', (tester) async {
+        await pump(
+          tester,
+          tablet,
+          const WRFlex(
+            children: [
+              WRItem(
+                col: WRValue.all(6),
+                child: SizedBox(key: Key('a'), height: 10),
+              ),
+            ],
+          ),
+        );
+        expect(rectOf(tester, 'a').width, 1000);
+      });
+    });
+
+    testWidgets('fill dentro de un scroll vertical no falla', (tester) async {
       await pump(
         tester,
         phone,
@@ -443,7 +650,7 @@ void main() {
           child: WRFlex(
             children: [
               WRItem(
-                flex: WRValue.all(1),
+                fill: WRValue.all(true),
                 child: SizedBox(key: Key('a'), height: 10),
               ),
             ],
@@ -454,7 +661,9 @@ void main() {
       expect(rectOf(tester, 'a').height, 10);
     });
 
-    testWidgets('WRItem fuera de WRFlex solo aplica el estilo', (tester) async {
+    testWidgets('WRItem fuera de WRFlex ignora fill y aplica el estilo', (
+      tester,
+    ) async {
       await pump(
         tester,
         phone,
@@ -462,7 +671,7 @@ void main() {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             WRItem(
-              flex: WRValue.all(1),
+              fill: WRValue.all(true),
               style: WRStyle(padding: WRSpacing(all: WRValue(xs: 10))),
               child: SizedBox(key: Key('a'), height: 10),
             ),
