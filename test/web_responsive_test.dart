@@ -665,6 +665,264 @@ void main() {
       expect(rectOf(tester, 'a'), const Rect.fromLTWH(10, 10, 380, 10));
     });
   });
+
+  group('WRScaffold', () {
+    const destinations = [
+      WRDestination(id: 'inicio', icon: Icon(Icons.home), label: 'Inicio'),
+      WRDestination(
+        id: 'ventas',
+        icon: Icon(Icons.store),
+        label: 'Ventas',
+        children: [
+          WRDestination(
+            id: 'ventas/pedidos',
+            icon: Icon(Icons.receipt),
+            label: 'Pedidos',
+          ),
+          WRDestination(
+            id: 'ventas/clientes',
+            icon: Icon(Icons.people),
+            label: 'Clientes',
+          ),
+        ],
+      ),
+      WRDestination(
+        id: 'reportes',
+        icon: Icon(Icons.bar_chart),
+        label: 'Reportes',
+        visible: WRValue(xs: false, md: true),
+      ),
+    ];
+
+    Future<void> pumpScaffold(
+      WidgetTester tester,
+      Size screen, {
+      String currentRoute = 'inicio',
+      WRValue<WRNavStyle>? responsive,
+      ValueChanged<String>? onRouteSelected,
+      List<WRDestination> items = destinations,
+    }) {
+      tester.view.physicalSize = screen;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      return tester.pumpWidget(
+        MaterialApp(
+          home: WRScaffold(
+            destinations: items,
+            currentRoute: currentRoute,
+            onRouteSelected: onRouteSelected ?? (_) {},
+            responsive: responsive,
+            body: const Text('cuerpo'),
+          ),
+        ),
+      );
+    }
+
+    Finder visibleText(String text) => find.text(text).hitTestable();
+
+    testWidgets('xs: barra abajo sin subrutas ni ocultos', (tester) async {
+      await pumpScaffold(tester, phone);
+      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(visibleText('Ventas'), findsOneWidget);
+      expect(find.text('Pedidos'), findsNothing);
+      expect(find.text('Reportes'), findsNothing);
+    });
+
+    testWidgets('barra: un grupo va a su primera subruta', (tester) async {
+      String? selected;
+      await pumpScaffold(tester, phone, onRouteSelected: (id) => selected = id);
+      await tester.tap(find.text('Ventas'));
+      expect(selected, 'ventas/pedidos');
+    });
+
+    testWidgets('barra: un grupo recuerda la última subruta visitada', (
+      tester,
+    ) async {
+      String? selected;
+      await pumpScaffold(tester, phone, currentRoute: 'ventas/clientes');
+      await pumpScaffold(tester, phone, onRouteSelected: (id) => selected = id);
+      await tester.tap(find.text('Ventas'));
+      expect(selected, 'ventas/clientes');
+    });
+
+    testWidgets('md: rail cerrado; ☰ abre el menú encima', (tester) async {
+      await pumpScaffold(tester, tablet);
+      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(visibleText('Clientes'), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      // El rail sigue ahí: el menú está encima, no lo reemplaza.
+      expect(find.byType(NavigationRail), findsOneWidget);
+      expect(visibleText('Reportes'), findsWidgets);
+    });
+
+    testWidgets('overlay: elegir una subruta cierra el menú', (tester) async {
+      String? selected;
+      await pumpScaffold(
+        tester,
+        tablet,
+        onRouteSelected: (id) => selected = id,
+      );
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      await tester.tap(visibleText('Ventas').last);
+      await tester.pumpAndSettle();
+      await tester.tap(visibleText('Clientes'));
+      await tester.pumpAndSettle();
+      expect(selected, 'ventas/clientes');
+      expect(visibleText('Clientes'), findsNothing);
+    });
+
+    testWidgets('rail: tocar un grupo abre el menú con el grupo abierto', (
+      tester,
+    ) async {
+      await pumpScaffold(tester, tablet);
+      await tester.tap(find.byIcon(Icons.store));
+      await tester.pumpAndSettle();
+      expect(visibleText('Pedidos'), findsOneWidget);
+      expect(visibleText('Clientes'), findsOneWidget);
+    });
+
+    testWidgets('lg: sidebar abierto con acordeón, empuja el contenido', (
+      tester,
+    ) async {
+      await pumpScaffold(
+        tester,
+        const Size(1300, 800),
+        currentRoute: 'ventas/pedidos',
+      );
+      expect(find.byType(NavigationRail), findsNothing);
+      // El grupo de la selección empieza abierto.
+      expect(visibleText('Pedidos'), findsOneWidget);
+      expect(tester.getTopLeft(find.text('cuerpo')).dx, greaterThan(280));
+
+      // Cerrar el acordeón.
+      await tester.tap(visibleText('Ventas'));
+      await tester.pumpAndSettle();
+      expect(visibleText('Pedidos'), findsNothing);
+
+      // Cerrar el menú vuelve al rail.
+      await tester.tap(find.byIcon(Icons.menu_open));
+      await tester.pumpAndSettle();
+      expect(find.byType(NavigationRail), findsOneWidget);
+    });
+
+    testWidgets('alwaysOpen: el grupo no se puede cerrar', (tester) async {
+      await pumpScaffold(
+        tester,
+        const Size(1300, 800),
+        items: const [
+          WRDestination(id: 'inicio', icon: Icon(Icons.home), label: 'Inicio'),
+          WRDestination(
+            id: 'config',
+            icon: Icon(Icons.settings),
+            label: 'Config',
+            alwaysOpen: true,
+            children: [
+              WRDestination(
+                id: 'config/perfil',
+                icon: Icon(Icons.person),
+                label: 'Perfil',
+              ),
+            ],
+          ),
+        ],
+      );
+      expect(visibleText('Perfil'), findsOneWidget);
+      expect(find.byIcon(Icons.expand_more), findsNothing);
+      await tester.tap(visibleText('Config'));
+      await tester.pumpAndSettle();
+      expect(visibleText('Perfil'), findsOneWidget);
+    });
+
+    testWidgets('al cambiar de breakpoint vuelve al estado inicial', (
+      tester,
+    ) async {
+      await pumpScaffold(tester, const Size(1300, 800));
+      await tester.tap(find.byIcon(Icons.menu_open));
+      await tester.pumpAndSettle();
+      expect(find.byType(NavigationRail), findsOneWidget);
+
+      await pumpScaffold(tester, tablet);
+      await pumpScaffold(tester, const Size(1300, 800));
+      expect(find.byType(NavigationRail), findsNothing);
+    });
+
+    testWidgets('drawer: acordeón y se cierra al elegir', (tester) async {
+      String? selected;
+      await pumpScaffold(
+        tester,
+        phone,
+        responsive: const WRValue.all(WRNavStyle(type: WRNavigation.drawer)),
+        onRouteSelected: (id) => selected = id,
+      );
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      await tester.tap(visibleText('Ventas'));
+      await tester.pumpAndSettle();
+      await tester.tap(visibleText('Pedidos'));
+      await tester.pumpAndSettle();
+      expect(selected, 'ventas/pedidos');
+      expect(find.byType(Drawer), findsNothing);
+    });
+
+    testWidgets('responsive: cascada sobre los valores por defecto', (
+      tester,
+    ) async {
+      const style = WRValue(
+        xs: WRNavStyle(
+          backgroundColor: WRColor.fixed(Color(0xFF112233)),
+          iconColor: WRColor.fixed(Color(0xFF445566)),
+        ),
+        md: WRNavStyle(type: WRNavigation.drawer),
+      );
+      // xs: sigue siendo barra (por defecto) con los colores de xs.
+      await pumpScaffold(tester, phone, responsive: style);
+      final bar = tester.widget<NavigationBar>(find.byType(NavigationBar));
+      expect(bar.backgroundColor, const Color(0xFF112233));
+
+      // md: drawer, y hereda los colores de xs.
+      await pumpScaffold(tester, tablet, responsive: style);
+      await tester.tap(find.byIcon(Icons.menu));
+      await tester.pumpAndSettle();
+      final drawer = tester.widget<Drawer>(find.byType(Drawer));
+      expect(drawer.backgroundColor, const Color(0xFF112233));
+    });
+
+    testWidgets('subRoutesAlwaysVisible abre todos los grupos', (tester) async {
+      await pumpScaffold(
+        tester,
+        const Size(1300, 800),
+        responsive: const WRValue(lg: WRNavStyle(subRoutesAlwaysVisible: true)),
+      );
+      expect(visibleText('Pedidos'), findsOneWidget);
+      expect(find.byIcon(Icons.expand_more), findsNothing);
+    });
+
+    test('WRNavStyle.resolveMerged une desde xs', () {
+      const value = WRValue(
+        xs: WRNavStyle(type: WRNavigation.bottom, expanded: false),
+        md: WRNavStyle(type: WRNavigation.rail),
+        lg: WRNavStyle(expanded: true),
+      );
+      expect(
+        value.resolveMerged(Breakpoint.sm),
+        const WRNavStyle(type: WRNavigation.bottom, expanded: false),
+      );
+      expect(
+        value.resolveMerged(Breakpoint.xl),
+        const WRNavStyle(type: WRNavigation.rail, expanded: true),
+      );
+    });
+
+    testWidgets('WRScaffold.of abre el menú', (tester) async {
+      await pumpScaffold(tester, tablet);
+      WRScaffold.of(tester.element(find.text('cuerpo'))).openMenu();
+      await tester.pumpAndSettle();
+      expect(visibleText('Reportes'), findsWidgets);
+    });
+  });
 }
 
 class _Counter extends StatefulWidget {
