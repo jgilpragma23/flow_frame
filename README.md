@@ -2,7 +2,7 @@
 
 Herramientas para hacer interfaces responsive en Flutter con una idea parecida a Bootstrap: breakpoints mobile-first, estilos reutilizables y colores que cambian con el modo claro u oscuro.
 
-> En desarrollo. Ya están los breakpoints, `WRValue`, `WRSpacing`, `WRStyle`, los colores con modo oscuro, `WRContainer`, `WRFlex` y `WRItem`.
+> En desarrollo. Ya están los breakpoints, `WRValue`, `WRSpacing`, `WRStyle`, los colores con modo oscuro, `WRContainer`, `WRFlex`, `WRItem` y `WRScaffold`.
 
 ## Ejemplo completo
 
@@ -175,6 +175,8 @@ class AppColors {
   static const surface = WRColor.adaptive(light: Color(0xFFF5F5F5), dark: Color(0xFF1E1E1E));
   static const text = WRColor.adaptive(light: Color(0xFF111111), dark: Color(0xFFF5F5F5));
   static const muted = WRColor.adaptive(light: Color(0xFF666666), dark: Color(0xFF9E9E9E));
+  static const primary = WRColor.adaptive(light: Color(0xFF2563EB), dark: Color(0xFF60A5FA));
+  static const primarySoft = WRColor.adaptive(light: Color(0xFFDBEAFE), dark: Color(0xFF1E3A5F));
 }
 
 const card = WRStyle(backgroundColor: AppColors.surface, color: AppColors.text);
@@ -296,3 +298,135 @@ WRFlex(
 - Cambiar `order` o ocultar un elemento no hace perder el estado de los demás.
 - Respeta `TextDirection.rtl`.
 - Fuera de un `WRFlex`, `WRItem` ignora `col`, `fill` y `order` y solo aplica su `style`. Sirve como un `div` con clases.
+
+## `WRScaffold`: navegación según el breakpoint
+
+Funciona como un `Scaffold` (recibe `appBar`, `body`, `floatingActionButton`, `floatingActionButtonLocation` y `backgroundColor`), pero además arma la navegación según el breakpoint.
+
+![La app de ejemplo de 400 a 1800 px: barra abajo, rail y sidebar, con la grilla reacomodándose](doc/responsive.gif)
+
+```dart
+class Home extends StatefulWidget {
+  const Home({super.key});
+
+  @override
+  State<Home> createState() => _HomeState();
+}
+
+class _HomeState extends State<Home> {
+  String _route = 'inicio';
+
+  @override
+  Widget build(BuildContext context) {
+    return WRScaffold(
+      appBar: AppBar(title: const Text('Mi app')),
+      currentRoute: _route,
+      onRouteSelected: (id) => setState(() => _route = id),
+      destinations: const [
+        WRDestination(id: 'inicio', icon: Icon(Icons.home_outlined), label: 'Inicio'),
+        WRDestination(
+          id: 'ventas',
+          icon: Icon(Icons.storefront_outlined),
+          label: 'Ventas',
+          children: [
+            WRDestination(id: 'ventas/pedidos', icon: Icon(Icons.receipt_long_outlined), label: 'Pedidos'),
+            WRDestination(id: 'ventas/clientes', icon: Icon(Icons.people_outline), label: 'Clientes'),
+          ],
+        ),
+        // Solo desde md
+        WRDestination(
+          id: 'reportes',
+          icon: Icon(Icons.bar_chart_outlined),
+          label: 'Reportes',
+          visible: WRValue(xs: false, md: true),
+        ),
+        // Grupo siempre abierto, sin flecha
+        WRDestination(
+          id: 'config',
+          icon: Icon(Icons.settings_outlined),
+          label: 'Configuración',
+          alwaysOpen: true,
+          children: [
+            WRDestination(id: 'config/perfil', icon: Icon(Icons.person_outline), label: 'Perfil'),
+          ],
+        ),
+      ],
+
+      // Cada breakpoint pone solo lo que cambia; el resto lo hereda
+      responsive: const WRValue(
+        xs: WRNavStyle(
+          type: WRNavigation.bottom,
+          backgroundColor: AppColors.surface,
+          iconColor: AppColors.muted,
+          labelColor: AppColors.muted,
+          selectedBackgroundColor: AppColors.primarySoft,
+          selectedIconColor: AppColors.primary,
+          selectedLabelColor: AppColors.primary,
+        ),
+        md: WRNavStyle(type: WRNavigation.rail, expandMode: WRRailExpand.overlay),
+        lg: WRNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
+      ),
+
+      body: pages[_route]!,
+    );
+  }
+}
+```
+
+| Breakpoint | Con el ejemplo de arriba |
+|---|---|
+| `xs`, `sm` | Barra abajo con los colores de `xs`, sin Reportes |
+| `md` | Rail de íconos; ☰ abre el menú completo encima del contenido |
+| `lg`, `xl` | Menú completo abierto como sidebar, que empuja el contenido |
+
+**`WRNavStyle`**
+
+| Campo | Qué hace |
+|---|---|
+| `type` | `WRNavigation.bottom`, `rail`, `drawer` o `appBar` |
+| `expandMode` | Con rail, cómo se abre el menú completo: `WRRailExpand.overlay` o `sidebar` |
+| `expanded` | Con `sidebar`, si el menú empieza abierto |
+| `subRoutesAlwaysVisible` | Todos los grupos siempre abiertos, sin flecha |
+| `backgroundColor` | Fondo de la barra, el rail y el menú; con `appBar`, fondo del app bar si este no tiene uno |
+| `iconColor`, `labelColor` | Íconos y textos sin seleccionar |
+| `selectedBackgroundColor` | Fondo del destino seleccionado |
+| `selectedIconColor`, `selectedLabelColor` | Ícono y texto del destino seleccionado |
+
+- `responsive` funciona en cascada, como `WRStyle`: `lg` del ejemplo sigue siendo `rail` y usa los colores de `xs`.
+- Los colores son `WRColor`, así que cambian solos en modo oscuro. Los que no pongas usan los del `Theme`.
+- Lo que no definas sale de `WRScaffold.defaults`: barra abajo en `xs`/`sm`, rail con `overlay` en `md` y `sidebar` abierto desde `lg`.
+
+**Tipos de navegación (`WRNavigation`)**
+- `bottom`: barra abajo con íconos y textos (`NavigationBar`).
+- `rail`: barra lateral de íconos con un botón ☰ arriba que abre el menú completo (íconos, textos y subrutas).
+- `drawer`: menú oculto que sale desde el lado al tocar ☰ en el app bar; se cierra al elegir una opción. Si no pasas `appBar`, se pone uno vacío para que exista el botón.
+- `appBar`: enlaces dentro del app bar, después del título, como en un sitio web. Un grupo es un botón con ▾ que abre un dropdown con sus subrutas. Pensado para `md` en adelante: en pantallas angostas los enlaces que no caben se desplazan de lado. Tu `AppBar` conserva su título, `leading` y `actions`; si pasas otro `PreferredSizeWidget`, los enlaces van en una franja debajo.
+
+```dart
+responsive: const WRValue(
+  xs: WRNavStyle(type: WRNavigation.bottom),
+  md: WRNavStyle(type: WRNavigation.appBar),
+),
+```
+
+**Cómo se abre el menú desde el rail (`WRRailExpand`)**
+- `overlay`: el menú sale encima del contenido, como un drawer, con fondo oscuro. Se cierra al elegir una opción o al tocar fuera.
+- `sidebar`: el rail se ensancha y empuja el contenido. Queda abierto hasta cerrarlo con ☰.
+
+**Subrutas (`children`)**
+- Un destino con `children` es un grupo: no es una página, solo agrupa. Un solo nivel.
+- En el menú completo (sidebar, overlay y drawer) se muestra como acordeón. El grupo que tiene la ruta actual se abre solo.
+- `alwaysOpen: true` deja ese grupo abierto y sin flecha; tiene prioridad sobre `subRoutesAlwaysVisible`.
+- En el app bar, cada grupo es un dropdown con sus subrutas.
+- En la barra abajo y en el rail cerrado solo se ven los grupos. En la barra, tocar un grupo lleva a su última subruta visitada (o a la primera). En el rail cerrado, abre el menú con ese grupo desplegado.
+
+**Destinos por breakpoint**
+- `visible: WRValue(...)` oculta un destino o una subruta en los breakpoints que digas. Un grupo sin subrutas visibles se oculta.
+
+**Abrir el menú desde código**
+- `WRScaffold.of(context)` da `openMenu()`, `closeMenu()`, `toggleMenu()` e `isMenuOpen`. Sirve para el rail y el drawer.
+
+**Detalles**
+- Se usa un solo tipo por breakpoint.
+- Si el usuario abre o cierra el menú con ☰, se respeta mientras siga en el mismo breakpoint. Al cambiar de breakpoint vuelve al valor de `expanded`.
+- La ruta actual (`currentRoute`) no cambia al cambiar de navegación.
