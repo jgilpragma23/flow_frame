@@ -391,6 +391,8 @@ class _HomeState extends State<Home> {
 | `iconColor`, `labelColor` | Íconos y textos sin seleccionar |
 | `selectedBackgroundColor` | Fondo del destino seleccionado |
 | `selectedIconColor`, `selectedLabelColor` | Ícono y texto del destino seleccionado |
+| `shadow` | Sombra que separa la navegación del contenido: a la derecha del rail y del sidebar, y arriba de la barra. Por defecto no hay |
+| `shadowColor` | Color de la sombra; por defecto uno suave según el modo claro u oscuro |
 
 - `responsive` funciona en cascada, como `WRStyle`: `lg` del ejemplo sigue siendo `rail` y usa los colores de `xs`.
 - Los colores son `WRColor`, así que cambian solos en modo oscuro. Los que no pongas usan los del `Theme`.
