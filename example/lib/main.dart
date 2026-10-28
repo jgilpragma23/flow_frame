@@ -14,22 +14,34 @@ class ExampleApp extends StatelessWidget {
       themeMode: dark ? ThemeMode.dark : ThemeMode.light,
       theme: ThemeData(brightness: Brightness.light),
       darkTheme: ThemeData(brightness: Brightness.dark),
-      home: const WRTheme(
-        data: WRThemeData(
-          textStyle: WRValue(
-            xs: TextStyle(fontSize: 14, height: 1.4),
-            md: TextStyle(fontSize: 16),
-          ),
-        ),
-        child: ExamplePage(),
-      ),
+      home: const ExamplePage(),
     );
   }
 }
 
+/// Colores de esta página, con su versión clara y oscura.
+class AppColors {
+  static const background = WRColor.adaptive(
+    light: Color(0xFFFFFFFF),
+    dark: Color(0xFF0F0F0F),
+  );
+  static const surface = WRColor.adaptive(
+    light: Color(0xFFF5F5F5),
+    dark: Color(0xFF1E1E1E),
+  );
+  static const primary = WRColor.adaptive(
+    light: Color(0xFF2563EB),
+    dark: Color(0xFF60A5FA),
+  );
+  static const muted = WRColor.adaptive(
+    light: Color(0xFF666666),
+    dark: Color(0xFF9E9E9E),
+  );
+}
+
 const card = WRStyle(
   padding: WRSpacing(all: WRValue(xs: 12, md: 20)),
-  backgroundColor: WRColor.surface,
+  backgroundColor: AppColors.surface,
   height: WRValue.all(110),
 );
 
@@ -38,7 +50,7 @@ const label = WRStyle(
     xs: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
     md: TextStyle(fontSize: 22),
   ),
-  color: WRColor.primary,
+  color: AppColors.primary,
 );
 
 class ExamplePage extends StatelessWidget {
@@ -47,7 +59,7 @@ class ExamplePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: context.wrColors.background,
+      backgroundColor: AppColors.background.resolve(context),
       body: SingleChildScrollView(
         child: WRContainer(
           maxSize: 1280,
@@ -74,7 +86,7 @@ class ExamplePage extends StatelessWidget {
                 ),
               ),
               const WRItem(
-                style: WRStyle(color: WRColor.textMuted),
+                style: WRStyle(color: AppColors.muted),
                 child: Text(
                   'Grilla con col: WRValue(xs: 12, md: 6, lg: 4). '
                   'Uno por fila en xs, dos en md y tres en lg; '
@@ -94,7 +106,7 @@ class ExamplePage extends StatelessWidget {
                 ],
               ),
               const WRItem(
-                style: WRStyle(color: WRColor.textMuted),
+                style: WRStyle(color: AppColors.muted),
                 child: Text(
                   'Mezcla en una fila: col 3, fill y un ícono de tamaño natural. '
                   'En xs el col 12 ocupa toda la fila y los otros bajan.',
@@ -118,13 +130,13 @@ class ExamplePage extends StatelessWidget {
                     child: const _CardBody('Buscador', 'fill: true'),
                   ),
                   WRItem(
-                    style: const WRStyle(color: WRColor.primary),
+                    style: const WRStyle(color: AppColors.primary),
                     child: const Icon(Icons.tune, size: 32),
                   ),
                 ],
               ),
               const WRItem(
-                style: WRStyle(color: WRColor.textMuted),
+                style: WRStyle(color: AppColors.muted),
                 child: Text(
                   'WRFlex vertical en xs/sm y horizontal desde md. '
                   'La tarjeta B tiene visible: WRValue(xs: false, md: true).',
@@ -155,7 +167,7 @@ class ExamplePage extends StatelessWidget {
                 ],
               ),
               const WRItem(
-                style: WRStyle(color: WRColor.textMuted),
+                style: WRStyle(color: AppColors.muted),
                 child: Text(
                   'Sidebar de 260 px y el contenido llena el resto, desde md',
                 ),
@@ -207,7 +219,7 @@ class _CardBody extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           note,
-          style: const WRStyle(color: WRColor.textMuted).toTextStyle(context),
+          style: const WRStyle(color: AppColors.muted).toTextStyle(context),
         ),
       ],
     );

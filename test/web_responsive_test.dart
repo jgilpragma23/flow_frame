@@ -17,7 +17,6 @@ Future<void> pump(WidgetTester tester, Size screen, Widget child) {
 Future<BuildContext> pumpContext(
   WidgetTester tester,
   Size screen, {
-  WRThemeData? theme,
   ThemeData? material,
 }) async {
   late BuildContext result;
@@ -27,7 +26,6 @@ Future<BuildContext> pumpContext(
       return const SizedBox();
     },
   );
-  if (theme != null) child = WRTheme(data: theme, child: child);
   if (material != null) child = Theme(data: material, child: child);
   await pump(tester, screen, child);
   return result;
@@ -35,6 +33,12 @@ Future<BuildContext> pumpContext(
 
 const phone = Size(400, 800);
 const tablet = Size(1000, 800);
+
+const purple = Color(0xFF7C3AED);
+const lightPurple = Color(0xFFA78BFA);
+const gray = Color(0xFF666666);
+const brand = WRColor.adaptive(light: purple, dark: lightPurple);
+const muted = WRColor.fixed(gray);
 
 void main() {
   group('WRBreakpoints', () {
@@ -55,13 +59,12 @@ void main() {
       expect(Breakpoint.lg <= Breakpoint.md, isFalse);
     });
 
-    testWidgets('respeta breakpoints personalizados del tema', (tester) async {
-      final context = await pumpContext(
-        tester,
-        const Size(700, 800),
-        theme: const WRThemeData(breakpoints: WRBreakpoints(sm: 500, md: 650)),
-      );
+    testWidgets('respeta breakpoints personalizados', (tester) async {
+      WRBreakpoints.current = const WRBreakpoints(sm: 500, md: 650);
+      addTearDown(() => WRBreakpoints.current = const WRBreakpoints());
+      final context = await pumpContext(tester, const Size(700, 800));
       expect(context.breakpoint, Breakpoint.md);
+      expect(Breakpoint.fromWidth(550), Breakpoint.sm);
     });
   });
 
@@ -132,46 +135,29 @@ void main() {
   });
 
   group('WRColor', () {
-    testWidgets('los colores de la paleta siguen a themeMode', (tester) async {
+    testWidgets('adaptive sigue al Theme de la app', (tester) async {
       var context = await pumpContext(
         tester,
         phone,
-        theme: const WRThemeData(themeMode: ThemeMode.dark),
+        material: ThemeData(brightness: Brightness.dark),
       );
-      expect(WRColor.primary.resolve(context), WRPalette.dark.primary);
+      expect(brand.resolve(context), lightPurple);
 
       context = await pumpContext(
         tester,
         phone,
-        theme: const WRThemeData(themeMode: ThemeMode.light),
+        material: ThemeData(brightness: Brightness.light),
       );
-      expect(WRColor.primary.resolve(context), WRPalette.light.primary);
+      expect(brand.resolve(context), purple);
     });
 
-    testWidgets('sin themeMode sigue al Theme de Material', (tester) async {
-      const adaptive = WRColor.adaptive(
-        light: Color(0xFFFFFFFF),
-        dark: Color(0xFF000000),
-      );
+    testWidgets('fixed no cambia con el modo', (tester) async {
       final context = await pumpContext(
         tester,
         phone,
         material: ThemeData(brightness: Brightness.dark),
       );
-      expect(context.wrBrightness, Brightness.dark);
-      expect(adaptive.resolve(context), const Color(0xFF000000));
-    });
-
-    testWidgets('fixed no cambia con el tema', (tester) async {
-      final context = await pumpContext(
-        tester,
-        phone,
-        theme: const WRThemeData(themeMode: ThemeMode.dark),
-      );
-      expect(
-        const WRColor.fixed(Color(0xFF123456)).resolve(context),
-        const Color(0xFF123456),
-      );
+      expect(muted.resolve(context), gray);
     });
   });
 
@@ -182,7 +168,7 @@ void main() {
         md: TextStyle(fontSize: 28),
       ),
       fontWeight: WRValue(md: FontWeight.bold),
-      color: WRColor.primary,
+      color: brand,
     );
 
     testWidgets('toTextStyle aplica color y peso encima de la base', (
@@ -192,7 +178,7 @@ void main() {
       var style = title.toTextStyle(context);
       expect(style.fontSize, 20);
       expect(style.fontWeight, isNull);
-      expect(style.color, WRPalette.light.primary);
+      expect(style.color, purple);
 
       context = await pumpContext(tester, tablet);
       style = title.toTextStyle(context);
@@ -214,13 +200,13 @@ void main() {
       final resolved = const WRStyle(
         padding: WRSpacing(all: WRValue(xs: 8, md: 16)),
         margin: WRSpacing(top: WRValue(xs: 4)),
-        backgroundColor: WRColor.surface,
+        backgroundColor: muted,
         maxWidth: WRValue(md: 640),
         visible: WRValue(xs: false, md: true),
       ).resolve(context);
       expect(resolved.padding, const EdgeInsets.all(16));
       expect(resolved.margin, const EdgeInsets.only(top: 4));
-      expect(resolved.backgroundColor, WRPalette.light.surface);
+      expect(resolved.backgroundColor, gray);
       expect(resolved.maxWidth, 640);
       expect(resolved.visible, isTrue);
     });
@@ -229,7 +215,7 @@ void main() {
       const base = WRStyle(
         padding: WRSpacing(all: WRValue(xs: 8)),
         textStyle: WRValue(xs: TextStyle(fontSize: 14)),
-        color: WRColor.text,
+        color: muted,
       );
       final merged = base.merge(
         const WRStyle(
@@ -246,7 +232,7 @@ void main() {
         merged.textStyle!.resolveMerged(Breakpoint.xs),
         const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
       );
-      expect(merged.color, WRColor.text);
+      expect(merged.color, muted);
       expect(merged.visible, const WRValue(xs: false));
     });
   });
@@ -289,15 +275,13 @@ void main() {
       await pump(
         tester,
         phone,
-        WRTheme(
-          data: const WRThemeData(
-            textStyle: WRValue(xs: TextStyle(fontFamily: 'Inter')),
-          ),
+        DefaultTextStyle(
+          style: const TextStyle(fontFamily: 'Inter'),
           child: Builder(
             builder: (context) => WRContainer(
               style: const WRStyle(
                 textStyle: WRValue(xs: TextStyle(fontSize: 14)),
-                color: WRColor.textMuted,
+                color: muted,
               ),
               child: Column(
                 children: [
@@ -325,11 +309,11 @@ void main() {
       final a = styleOf('a');
       expect(a.fontSize, 14);
       expect(a.fontFamily, 'Inter');
-      expect(a.color, WRPalette.light.textMuted);
+      expect(a.color, gray);
 
       final b = styleOf('b');
       expect(b.fontSize, 14);
-      expect(b.color, WRPalette.light.textMuted);
+      expect(b.color, gray);
       expect(b.fontWeight, FontWeight.bold);
     });
 

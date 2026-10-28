@@ -44,6 +44,15 @@ El breakpoint se calcula con el ancho de la pantalla.
 if (context.breakpoint >= Breakpoint.md) { ... }
 ```
 
+Para cambiar las medidas, asígnalas una vez antes de `runApp`:
+
+```dart
+void main() {
+  WRBreakpoints.current = const WRBreakpoints(sm: 600, md: 900, lg: 1200, xl: 1600);
+  runApp(const MyApp());
+}
+```
+
 ## `WRValue`: un valor por breakpoint
 
 Cada valor aplica desde su breakpoint hacia arriba hasta que otro lo reemplace (mobile-first).
@@ -88,13 +97,13 @@ const card = WRStyle(
     xs: TextStyle(fontSize: 14, fontFamily: 'Inter'),
     md: TextStyle(fontSize: 16),
   ),
-  color: WRColor.text,
+  color: AppColors.text,
   fontWeight: WRValue(md: FontWeight.w600),
   fontSize: WRValue(xl: 18),
   lineHeight: WRValue(xs: 1.4),
   textAlign: WRValue(xs: TextAlign.center, md: TextAlign.start),
 
-  backgroundColor: WRColor.surface,
+  backgroundColor: AppColors.surface,
 
   width: WRValue(md: 480),
   minWidth: WRValue(md: 320),
@@ -128,7 +137,7 @@ Para varios textos, pon el estilo en un contenedor y los `Text` de adentro lo he
 WRContainer(
   style: const WRStyle(
     textStyle: WRValue(xs: TextStyle(fontSize: 14)),
-    color: WRColor.textMuted,
+    color: AppColors.muted,
   ),
   child: Column(
     children: [
@@ -152,58 +161,32 @@ Padding(padding: s.padding, child: ...)
 
 ## Colores y modo oscuro
 
-Un `WRColor` se resuelve al pintar, según el modo actual:
+La librería no tiene tema ni paleta propia: los colores se definen en tu código. Un `WRColor` puede tener versión clara y oscura:
 
 ```dart
-WRColor.primary                                   // de la paleta del tema
 WRColor.adaptive(light: Color(0xFFFFF7E6), dark: Color(0xFF3A2E14))
-WRColor.fixed(Color(0xFFFFFFFF))                  // no cambia
+WRColor.fixed(Color(0xFFFFFFFF)) // no cambia
 ```
 
-Colores de la paleta: `primary`, `secondary`, `background`, `surface`, `text`, `textMuted`, `border`, `error`, `success`, `warning`.
-
-Colores propios, sin tocar la librería:
+Lo práctico es juntarlos en una clase y usarlos en los estilos:
 
 ```dart
 class AppColors {
-  static const brand = WRColor.adaptive(light: Color(0xFF7C3AED), dark: Color(0xFFA78BFA));
+  static const surface = WRColor.adaptive(light: Color(0xFFF5F5F5), dark: Color(0xFF1E1E1E));
+  static const text = WRColor.adaptive(light: Color(0xFF111111), dark: Color(0xFFF5F5F5));
+  static const muted = WRColor.adaptive(light: Color(0xFF666666), dark: Color(0xFF9E9E9E));
 }
+
+const card = WRStyle(backgroundColor: AppColors.surface, color: AppColors.text);
 ```
 
-Fuera de un estilo:
+Fuera de un estilo, `resolve` devuelve el `Color` del modo actual:
 
 ```dart
-AppColors.brand.resolve(context);
-context.wrColors.primary;
+Scaffold(backgroundColor: AppColors.surface.resolve(context))
 ```
 
-**¿Cómo se sabe si está en modo oscuro?**
-1. Si `WRThemeData.themeMode` es `light`, `dark` o `system`, se usa eso.
-2. Si no está definido, se sigue al `Theme` de Material, que ya respeta el `themeMode` del `MaterialApp`.
-
-## Tema
-
-`WRTheme` es opcional. Sin él se usan los valores por defecto.
-
-```dart
-WRTheme(
-  data: WRThemeData(
-    breakpoints: const WRBreakpoints(sm: 600, md: 840, lg: 1200, xl: 1600),
-    colors: WRColorScheme(
-      light: WRPalette.light.copyWith(primary: const Color(0xFF7C3AED)),
-      dark: WRPalette.dark.copyWith(primary: const Color(0xFFA78BFA)),
-    ),
-    textStyle: const WRValue(
-      xs: TextStyle(fontFamily: 'Inter', fontSize: 14),
-      md: TextStyle(fontSize: 16),
-    ),
-    themeMode: null, // seguir al MaterialApp
-  ),
-  child: ...,
-)
-```
-
-`WRTheme` aplica su `textStyle` y el color `text` de la paleta a todos los textos de abajo.
+El modo claro u oscuro se lee del `Theme` de la app, así que sigue al `themeMode` de tu `MaterialApp` sin configurar nada.
 
 ## `WRContainer`
 

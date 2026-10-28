@@ -8,6 +8,9 @@ enum Breakpoint {
   lg,
   xl;
 
+  /// El breakpoint que corresponde a [width], según [WRBreakpoints.current].
+  static Breakpoint fromWidth(double width) => WRBreakpoints.current.of(width);
+
   bool operator >=(Breakpoint other) => index >= other.index;
   bool operator >(Breakpoint other) => index > other.index;
   bool operator <=(Breakpoint other) => index <= other.index;
@@ -16,7 +19,15 @@ enum Breakpoint {
 
 /// Ancho mínimo (en píxeles lógicos) desde el que empieza cada breakpoint.
 ///
-/// `xs` siempre empieza en 0.
+/// `xs` siempre empieza en 0. Para cambiar las medidas, asigna
+/// [current] una vez antes de `runApp`:
+///
+/// ```dart
+/// void main() {
+///   WRBreakpoints.current = const WRBreakpoints(md: 900);
+///   runApp(const MyApp());
+/// }
+/// ```
 @immutable
 class WRBreakpoints {
   const WRBreakpoints({
@@ -25,6 +36,9 @@ class WRBreakpoints {
     this.lg = 1200,
     this.xl = 1600,
   }) : assert(0 < sm && sm < md && md < lg && lg < xl);
+
+  /// Medidas que usa la librería. Por defecto 600 / 840 / 1200 / 1600.
+  static WRBreakpoints current = const WRBreakpoints();
 
   final double sm;
   final double md;

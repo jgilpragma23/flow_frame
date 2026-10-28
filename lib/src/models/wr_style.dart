@@ -76,7 +76,7 @@ class WRStyle {
   }
 
   /// `TextStyle` de Flutter con lo que define este estilo para el breakpoint
-  /// y el modo actuales. No incluye la base del tema ni lo heredado, así que
+  /// y el modo actuales. No incluye lo heredado de los contenedores, así que
   /// al usarlo en un `Text` se combina con el estilo del contenedor.
   TextStyle toTextStyle(BuildContext context) {
     final breakpoint = context.breakpoint;
