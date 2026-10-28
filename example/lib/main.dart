@@ -135,7 +135,48 @@ class _ExampleShellState extends State<ExampleShell> {
     final drawer = nav == 'drawer';
     final top = nav == 'top';
     return WRScaffold(
-      appBar: AppBar(title: const Text('web_responsive')),
+      appBar: AppBar(
+        title: const Text('web_responsive'),
+        actions: [
+          WRActions(
+            actions: [
+              WRAction(
+                icon: const Icon(Icons.add),
+                label: 'Nuevo pedido',
+                onPressed: () {},
+                display: const WRValue(
+                  xs: WRActionDisplay.icon,
+                  md: WRActionDisplay.full,
+                ),
+              ),
+              WRAction(
+                icon: const Icon(Icons.download_outlined),
+                label: 'Exportar',
+                onPressed: () {},
+                display: const WRValue(
+                  xs: WRActionDisplay.menu,
+                  lg: WRActionDisplay.full,
+                ),
+              ),
+              WRAction(
+                icon: const Icon(Icons.print_outlined),
+                label: 'Imprimir',
+                onPressed: () {},
+                display: const WRValue(
+                  xs: WRActionDisplay.hidden,
+                  md: WRActionDisplay.menu,
+                ),
+              ),
+              WRAction(
+                icon: const Icon(Icons.notifications_outlined),
+                label: 'Notificaciones',
+                onPressed: () {},
+              ),
+            ],
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       backgroundColor: AppColors.background.resolve(context),
       currentRoute: _selected,
       onRouteSelected: (id) => setState(() => _selected = id),
