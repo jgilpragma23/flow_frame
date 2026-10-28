@@ -988,6 +988,109 @@ void main() {
       expect(visibleText('Reportes'), findsWidgets);
     });
   });
+
+  group('WRActions', () {
+    Future<void> pumpActions(
+      WidgetTester tester,
+      Size screen, {
+      ValueChanged<String>? onPressed,
+    }) {
+      tester.view.physicalSize = screen;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      void tap(String id) => onPressed?.call(id);
+      return tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            appBar: AppBar(
+              actions: [
+                WRActions(
+                  actions: [
+                    WRAction(
+                      icon: const Icon(Icons.add),
+                      label: 'Nuevo',
+                      onPressed: () => tap('nuevo'),
+                      display: const WRValue(
+                        xs: WRActionDisplay.icon,
+                        md: WRActionDisplay.full,
+                      ),
+                    ),
+                    WRAction(
+                      icon: const Icon(Icons.download),
+                      label: 'Exportar',
+                      onPressed: () => tap('exportar'),
+                      display: const WRValue(
+                        xs: WRActionDisplay.menu,
+                        md: WRActionDisplay.full,
+                      ),
+                    ),
+                    WRAction(
+                      icon: const Icon(Icons.print),
+                      label: 'Imprimir',
+                      onPressed: () => tap('imprimir'),
+                      display: const WRValue(
+                        xs: WRActionDisplay.hidden,
+                        md: WRActionDisplay.menu,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    testWidgets('xs: ícono, menú y oculto', (tester) async {
+      String? pressed;
+      await pumpActions(tester, phone, onPressed: (id) => pressed = id);
+      expect(find.byIcon(Icons.add), findsOneWidget);
+      expect(find.text('Nuevo'), findsNothing);
+      expect(find.byIcon(Icons.print), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pumpAndSettle();
+      expect(find.text('Imprimir'), findsNothing);
+      await tester.tap(find.text('Exportar'));
+      await tester.pumpAndSettle();
+      expect(pressed, 'exportar');
+    });
+
+    testWidgets('md: ícono y texto; el resto en el menú', (tester) async {
+      String? pressed;
+      await pumpActions(tester, tablet, onPressed: (id) => pressed = id);
+      expect(find.text('Nuevo'), findsOneWidget);
+      expect(find.text('Exportar'), findsOneWidget);
+      await tester.tap(find.text('Nuevo'));
+      expect(pressed, 'nuevo');
+
+      await tester.tap(find.byIcon(Icons.more_vert));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Imprimir'));
+      await tester.pumpAndSettle();
+      expect(pressed, 'imprimir');
+    });
+
+    testWidgets('sin acciones en menú no hay ⋮', (tester) async {
+      tester.view.physicalSize = tablet;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: WRActions(
+              actions: [WRAction(icon: Icon(Icons.add), label: 'Nuevo')],
+            ),
+          ),
+        ),
+      );
+      expect(find.byIcon(Icons.more_vert), findsNothing);
+      // Sin display se muestra solo el ícono.
+      expect(find.text('Nuevo'), findsNothing);
+      expect(find.byTooltip('Nuevo'), findsOneWidget);
+    });
+  });
 }
 
 class _Counter extends StatefulWidget {
