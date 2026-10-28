@@ -345,4 +345,145 @@ void main() {
       expect(find.byKey(const Key('c')), findsOneWidget);
     });
   });
+
+  group('WRFlex', () {
+    Rect rectOf(WidgetTester tester, String key) =>
+        tester.getRect(find.byKey(Key(key)));
+
+    Widget layout() => const WRFlex(
+      direction: WRValue(xs: Axis.vertical, md: Axis.horizontal),
+      gap: WRValue(xs: 8, md: 20),
+      children: [
+        WRItem(
+          flex: WRValue(md: 1),
+          child: SizedBox(key: Key('a'), height: 10),
+        ),
+        WRItem(
+          flex: WRValue(md: 3),
+          child: SizedBox(key: Key('b'), height: 10),
+        ),
+      ],
+    );
+
+    testWidgets('en vertical apila y ocupa todo el ancho', (tester) async {
+      await pump(tester, phone, layout());
+      final a = rectOf(tester, 'a');
+      final b = rectOf(tester, 'b');
+      expect(a.width, 400);
+      expect(b.width, 400);
+      expect(b.top, a.bottom + 8);
+    });
+
+    testWidgets('en horizontal reparte el espacio con flex', (tester) async {
+      await pump(tester, tablet, layout());
+      final a = rectOf(tester, 'a');
+      final b = rectOf(tester, 'b');
+      expect(a.width, (1000 - 20) / 4);
+      expect(b.width, (1000 - 20) * 3 / 4);
+      expect(b.left, a.right + 20);
+    });
+
+    testWidgets('los ocultos no dejan separación', (tester) async {
+      await pump(
+        tester,
+        phone,
+        const WRFlex(
+          gap: WRValue.all(10),
+          children: [
+            SizedBox(key: Key('a'), height: 10),
+            WRItem(
+              style: WRStyle(visible: WRValue(xs: false)),
+              child: SizedBox(height: 10),
+            ),
+            SizedBox(key: Key('c'), height: 10),
+          ],
+        ),
+      );
+      expect(rectOf(tester, 'c').top, rectOf(tester, 'a').bottom + 10);
+    });
+
+    testWidgets('order cambia la posición por breakpoint', (tester) async {
+      const flex = WRFlex(
+        children: [
+          WRItem(child: SizedBox(key: Key('a'), height: 10)),
+          WRItem(
+            order: WRValue(xs: -1, md: 0),
+            child: SizedBox(key: Key('b'), height: 10),
+          ),
+        ],
+      );
+      await pump(tester, phone, flex);
+      expect(rectOf(tester, 'b').top, lessThan(rectOf(tester, 'a').top));
+
+      await pump(tester, tablet, flex);
+      expect(rectOf(tester, 'a').top, lessThan(rectOf(tester, 'b').top));
+    });
+
+    testWidgets('el orden no hace perder el estado', (tester) async {
+      Widget flex(int order) => WRFlex(
+        children: [
+          const WRItem(child: _Counter(key: Key('a'))),
+          WRItem(
+            order: WRValue.all(order),
+            child: const _Counter(key: Key('b')),
+          ),
+        ],
+      );
+      await pump(tester, phone, flex(0));
+      tester.state<_CounterState>(find.byKey(const Key('b'))).value = 7;
+      await pump(tester, phone, flex(-1));
+      expect(tester.state<_CounterState>(find.byKey(const Key('b'))).value, 7);
+    });
+
+    testWidgets('flex dentro de un scroll vertical no falla', (tester) async {
+      await pump(
+        tester,
+        phone,
+        const SingleChildScrollView(
+          child: WRFlex(
+            children: [
+              WRItem(
+                flex: WRValue.all(1),
+                child: SizedBox(key: Key('a'), height: 10),
+              ),
+            ],
+          ),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      expect(rectOf(tester, 'a').height, 10);
+    });
+
+    testWidgets('WRItem fuera de WRFlex solo aplica el estilo', (tester) async {
+      await pump(
+        tester,
+        phone,
+        const Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            WRItem(
+              flex: WRValue.all(1),
+              style: WRStyle(padding: WRSpacing(all: WRValue(xs: 10))),
+              child: SizedBox(key: Key('a'), height: 10),
+            ),
+          ],
+        ),
+      );
+      expect(rectOf(tester, 'a'), const Rect.fromLTWH(10, 10, 380, 10));
+    });
+  });
+}
+
+class _Counter extends StatefulWidget {
+  const _Counter({super.key});
+
+  @override
+  State<_Counter> createState() => _CounterState();
+}
+
+class _CounterState extends State<_Counter> {
+  int value = 0;
+
+  @override
+  Widget build(BuildContext context) => const SizedBox(height: 10);
 }

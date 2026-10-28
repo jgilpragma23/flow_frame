@@ -6,3 +6,5 @@
 * `WRStyle`: estilos reutilizables con `merge`, `toTextStyle` y `resolve`.
 * `WRColor`, `WRPalette` y `WRColorScheme`: colores que siguen al modo claro u oscuro.
 * `WRContainer`: contenedor con ancho máximo centrado.
+* `WRFlex`: fila o columna con dirección, separación y alineación por breakpoint.
+* `WRItem`: elemento con `flex`, `order` y `style`; los ocultos no dejan separación.

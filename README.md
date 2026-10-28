@@ -2,7 +2,29 @@
 
 Herramientas para hacer interfaces responsive en Flutter con una idea parecida a Bootstrap: breakpoints mobile-first, estilos reutilizables y colores que cambian con el modo claro u oscuro.
 
-> En desarrollo. Ya están los breakpoints, `WRValue`, `WRSpacing`, `WRStyle`, los colores con modo oscuro y `WRContainer`. Faltan `WRFlex` y `WRItem`.
+> En desarrollo. Ya están los breakpoints, `WRValue`, `WRSpacing`, `WRStyle`, los colores con modo oscuro, `WRContainer`, `WRFlex` y `WRItem`.
+
+## Ejemplo completo
+
+```dart
+WRContainer(
+  maxSize: 1280,
+  style: const WRStyle(padding: WRSpacing(horizontal: WRValue(xs: 16, md: 24))),
+  child: WRFlex(
+    // Sidebar arriba en móvil, a la izquierda desde md
+    direction: const WRValue(xs: Axis.vertical, md: Axis.horizontal),
+    gap: const WRValue(xs: 16, md: 24),
+    children: [
+      WRItem(
+        flex: const WRValue(md: 1),
+        style: const WRStyle(visible: WRValue(xs: false, sm: true)),
+        child: Sidebar(),
+      ),
+      WRItem(flex: const WRValue(md: 3), child: Content()),
+    ],
+  ),
+)
+```
 
 ## Breakpoints
 
@@ -196,3 +218,43 @@ WRContainer(
 ```
 
 Sin `maxSize` ocupa todo el ancho.
+
+## `WRFlex` y `WRItem`
+
+`WRFlex` es una fila o columna que cambia por breakpoint (como `d-flex flex-column flex-md-row`). `WRItem` es cada elemento.
+
+```dart
+WRFlex(
+  direction: const WRValue(xs: Axis.vertical, md: Axis.horizontal),
+  gap: const WRValue(xs: 12, md: 16),
+  mainAxisAlignment: const WRValue(md: MainAxisAlignment.spaceBetween),
+  crossAxisAlignment: const WRValue(md: CrossAxisAlignment.center),
+  style: const WRStyle(padding: WRSpacing(all: WRValue(xs: 8))),
+  children: [
+    WRItem(flex: const WRValue(md: 1), style: card, child: Card1()),
+    WRItem(flex: const WRValue(md: 2), style: card, child: Card2()),
+    WRItem(
+      order: const WRValue(xs: -1, md: 0), // primero en móvil, en su lugar desde md
+      child: Image(...),
+    ),
+  ],
+)
+```
+
+**`WRFlex`**
+- `direction`: por defecto vertical.
+- `gap`: separación entre elementos.
+- `mainAxisAlignment`: por defecto `start`.
+- `crossAxisAlignment`: por defecto `stretch` en vertical (los elementos ocupan todo el ancho) y `start` en horizontal.
+- `style`: un `WRStyle` para el contenedor.
+- `children`: pueden ser `WRItem` o cualquier widget.
+
+**`WRItem`**
+- `flex`: parte del espacio libre que ocupa. Sin valor en un breakpoint, toma su tamaño natural.
+- `order`: posición dentro del `WRFlex`; los menores van primero (por defecto 0).
+- `style`: un `WRStyle`. Con `visible: false` el elemento se quita y no deja separación.
+
+**Detalles:**
+- Si el `WRFlex` está en un eje sin límite (por ejemplo, vertical dentro de un `SingleChildScrollView`), `flex` se ignora en vez de dar error.
+- Cambiar `order` o ocultar un elemento no hace perder el estado de los demás.
+- Fuera de un `WRFlex`, `WRItem` ignora `flex` y `order` y solo aplica su `style`. Sirve como un `div` con clases.
