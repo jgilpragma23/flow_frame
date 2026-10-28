@@ -795,7 +795,10 @@ void main() {
       expect(find.byType(NavigationRail), findsNothing);
       // El grupo de la selección empieza abierto.
       expect(visibleText('Pedidos'), findsOneWidget);
-      expect(tester.getTopLeft(find.text('cuerpo')).dx, greaterThanOrEqualTo(280));
+      expect(
+        tester.getTopLeft(find.text('cuerpo')).dx,
+        greaterThanOrEqualTo(280),
+      );
 
       // Cerrar el acordeón.
       await tester.tap(visibleText('Ventas'));
@@ -979,6 +982,42 @@ void main() {
         WRScaffold.of(tester.element(find.text('cuerpo'))).isMenuOpen,
         isFalse,
       );
+    });
+
+    testWidgets('shadow: sombra solo donde está activa', (tester) async {
+      final gradient = find.byWidgetPredicate(
+        (w) =>
+            w is DecoratedBox &&
+            w.decoration is BoxDecoration &&
+            (w.decoration as BoxDecoration).gradient != null,
+      );
+      final boxShadow = find.byWidgetPredicate(
+        (w) =>
+            w is DecoratedBox &&
+            w.decoration is BoxDecoration &&
+            (w.decoration as BoxDecoration).boxShadow != null,
+      );
+      const style = WRValue(md: WRNavStyle(shadow: true));
+
+      // xs: barra sin sombra (solo se activa desde md).
+      await pumpScaffold(tester, phone, responsive: style);
+      expect(boxShadow, findsNothing);
+
+      // md: rail con sombra sobre el contenido.
+      await pumpScaffold(tester, tablet, responsive: style);
+      expect(gradient, findsOneWidget);
+
+      // Sin shadow no hay sombra.
+      await pumpScaffold(tester, tablet);
+      expect(gradient, findsNothing);
+
+      // Barra con sombra.
+      await pumpScaffold(
+        tester,
+        phone,
+        responsive: const WRValue(xs: WRNavStyle(shadow: true)),
+      );
+      expect(boxShadow, findsOneWidget);
     });
 
     testWidgets('WRScaffold.of abre el menú', (tester) async {
