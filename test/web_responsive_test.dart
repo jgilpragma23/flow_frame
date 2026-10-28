@@ -795,7 +795,7 @@ void main() {
       expect(find.byType(NavigationRail), findsNothing);
       // El grupo de la selección empieza abierto.
       expect(visibleText('Pedidos'), findsOneWidget);
-      expect(tester.getTopLeft(find.text('cuerpo')).dx, greaterThan(280));
+      expect(tester.getTopLeft(find.text('cuerpo')).dx, greaterThanOrEqualTo(280));
 
       // Cerrar el acordeón.
       await tester.tap(visibleText('Ventas'));

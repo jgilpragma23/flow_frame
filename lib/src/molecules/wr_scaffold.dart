@@ -441,7 +441,6 @@ class WRScaffoldState extends State<WRScaffold> {
                 )
               : _collapsedRail(items),
         ),
-        const VerticalDivider(width: 1, thickness: 1),
         Expanded(child: widget.body),
       ],
     );
