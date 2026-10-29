@@ -1,3 +1,3 @@
-# web_responsive_example
+# flow_frame_example
 
 A new Flutter project.

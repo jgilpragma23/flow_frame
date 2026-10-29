@@ -205,12 +205,16 @@ class _RenderWRFlex extends RenderBox
         ContainerRenderObjectMixin<RenderBox, _WRSlotParentData>,
         RenderBoxContainerDefaultsMixin<RenderBox, _WRSlotParentData> {
   _RenderWRFlex({
-    required this._direction,
-    required this._gap,
-    required this._mainAxisAlignment,
-    required this._crossAxisAlignment,
-    required this._textDirection,
-  });
+    required Axis direction,
+    required double gap,
+    required MainAxisAlignment mainAxisAlignment,
+    required CrossAxisAlignment crossAxisAlignment,
+    required TextDirection textDirection,
+  }) : _direction = direction,
+       _gap = gap,
+       _mainAxisAlignment = mainAxisAlignment,
+       _crossAxisAlignment = crossAxisAlignment,
+       _textDirection = textDirection;
 
   Axis get direction => _direction;
   Axis _direction;

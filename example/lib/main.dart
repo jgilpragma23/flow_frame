@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:web_responsive/web_responsive.dart';
+import 'package:flow_frame/flow_frame.dart';
 
 void main() => runApp(const ExampleApp());
 

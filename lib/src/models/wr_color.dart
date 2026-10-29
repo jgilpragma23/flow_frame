@@ -10,7 +10,9 @@ class WRColor {
   const WRColor.fixed(Color color) : this.adaptive(light: color, dark: color);
 
   /// Un color con su versión para el modo claro y para el oscuro.
-  const WRColor.adaptive({required this._light, required this._dark});
+  const WRColor.adaptive({required Color light, required Color dark})
+    : _light = light,
+      _dark = dark;
 
   final Color _light;
   final Color _dark;
