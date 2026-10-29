@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flow_frame/flow_frame.dart';
 
+import 'demos.dart';
+
 void main() => runApp(const ExampleApp());
 
 class ExampleApp extends StatelessWidget {
@@ -79,6 +81,34 @@ class _ExampleShellState extends State<ExampleShell> {
       icon: Icon(Icons.grid_view_outlined),
       selectedIcon: Icon(Icons.grid_view),
       label: 'Ejemplos',
+    ),
+    FFDestination(
+      id: 'libreria',
+      icon: Icon(Icons.auto_awesome_outlined),
+      selectedIcon: Icon(Icons.auto_awesome),
+      label: 'Librería',
+      children: [
+        FFDestination(
+          id: 'libreria/estilos',
+          icon: Icon(Icons.text_fields),
+          label: 'Estilos',
+        ),
+        FFDestination(
+          id: 'libreria/espaciado',
+          icon: Icon(Icons.padding_outlined),
+          label: 'Espaciado',
+        ),
+        FFDestination(
+          id: 'libreria/colores',
+          icon: Icon(Icons.palette_outlined),
+          label: 'Colores',
+        ),
+        FFDestination(
+          id: 'libreria/contenedor',
+          icon: Icon(Icons.crop_free),
+          label: 'Contenedor',
+        ),
+      ],
     ),
     FFDestination(
       id: 'ventas',
@@ -234,6 +264,10 @@ class _ExampleShellState extends State<ExampleShell> {
       body: switch (_selected) {
         'ejemplos' => const ExamplePage(),
         'ventas/pedidos' => const PedidosPage(),
+        'libreria/estilos' => const EstilosDemo(),
+        'libreria/espaciado' => const EspaciadoDemo(),
+        'libreria/colores' => const ColoresDemo(),
+        'libreria/contenedor' => const ContenedorDemo(),
         _ => _Placeholder(_selected),
       },
     );
