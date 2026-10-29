@@ -146,7 +146,7 @@ class WRScaffoldState extends State<FFScaffold> {
     final items = _visible(widget.destinations, breakpoint);
     _trackRoute(items);
 
-    return Scaffold(
+    final scaffold = Scaffold(
       key: _scaffoldKey,
       appBar: switch (_navigation) {
         FFNavigation.drawer => _appBarWithBrand(widget.appBar ?? AppBar()),
@@ -175,8 +175,22 @@ class WRScaffoldState extends State<FFScaffold> {
               ),
             )
           : null,
-      body: _navigation == FFNavigation.rail ? _railBody(items) : widget.body,
+      body: widget.body,
     );
+    // El rail y el sidebar van por fuera del Scaffold para ocupar toda la
+    // altura; el app bar queda solo sobre el contenido.
+    return _navigation == FFNavigation.rail
+        ? _railLayout(items, scaffold)
+        : scaffold;
+  }
+
+  /// Alto del app bar, para alinear el ☰ del rail y del menú con él.
+  double get _toolbarHeight {
+    final appBar = widget.appBar;
+    if (appBar is AppBar && appBar.toolbarHeight != null) {
+      return appBar.toolbarHeight!;
+    }
+    return Theme.of(context).appBarTheme.toolbarHeight ?? kToolbarHeight;
   }
 
   /// Quita los ocultos y los grupos que se quedan sin subrutas visibles.
@@ -481,7 +495,8 @@ class WRScaffoldState extends State<FFScaffold> {
     );
   }
 
-  Widget _railBody(List<FFDestination> items) {
+  Widget _railLayout(List<FFDestination> items, Widget content) {
+    final theme = Theme.of(context);
     final background = _color(_style.backgroundColor);
     final sidebarOpen =
         _expandMode == WRRailExpand.sidebar &&
@@ -496,19 +511,18 @@ class WRScaffoldState extends State<FFScaffold> {
           child: sidebarOpen
               ? Container(
                   width: _menuWidth,
-                  color: background,
-                  child: _menu(
-                    items,
-                    closeOnSelect: false,
-                    header: _menuHeader(),
-                  ),
+                  color: background ?? theme.colorScheme.surface,
+                  child: _menuWithHeader(items, closeOnSelect: false),
                 )
-              : _collapsedRail(items),
+              : ColoredBox(
+                  color: background ?? theme.colorScheme.surface,
+                  child: SafeArea(right: false, child: _collapsedRail(items)),
+                ),
         ),
         Expanded(
           child: Stack(
             children: [
-              Positioned.fill(child: widget.body),
+              Positioned.fill(child: content),
               // Encima del contenido, para que un fondo propio no la tape.
               if (_style.shadow ?? false)
                 Positioned(
@@ -534,52 +548,70 @@ class WRScaffoldState extends State<FFScaffold> {
         ),
       ],
     );
-    if (_expandMode == WRRailExpand.sidebar) return row;
+    if (_expandMode == WRRailExpand.sidebar) {
+      return Material(
+        color: widget.backgroundColor ?? theme.scaffoldBackgroundColor,
+        child: row,
+      );
+    }
 
-    final scheme = Theme.of(context).colorScheme;
-    return Stack(
-      children: [
-        Positioned.fill(child: row),
-        Positioned.fill(
-          child: IgnorePointer(
-            ignoring: !_overlayOpen,
-            child: AnimatedOpacity(
-              opacity: _overlayOpen ? 1 : 0,
-              duration: _duration,
-              child: GestureDetector(
-                onTap: closeMenu,
-                child: const ColoredBox(color: Colors.black38),
+    return Material(
+      color: widget.backgroundColor ?? theme.scaffoldBackgroundColor,
+      child: Stack(
+        children: [
+          Positioned.fill(child: row),
+          Positioned.fill(
+            child: IgnorePointer(
+              ignoring: !_overlayOpen,
+              child: AnimatedOpacity(
+                opacity: _overlayOpen ? 1 : 0,
+                duration: _duration,
+                child: GestureDetector(
+                  onTap: closeMenu,
+                  child: const ColoredBox(color: Colors.black38),
+                ),
               ),
             ),
           ),
-        ),
-        AnimatedPositioned(
-          duration: _duration,
-          curve: Curves.easeOut,
-          top: 0,
-          bottom: 0,
-          left: _overlayOpen ? 0 : -(_menuWidth + 24),
-          width: _menuWidth + 24,
-          child: Offstage(
-            offstage: !_overlayOpen,
-            child: Material(
-              elevation: 1,
-              color: background ?? scheme.surfaceContainerLow,
-              child: _menu(
-                items,
-                closeOnSelect: true,
-                header: _menuHeader(),
+          AnimatedPositioned(
+            duration: _duration,
+            curve: Curves.easeOut,
+            top: 0,
+            bottom: 0,
+            left: _overlayOpen ? 0 : -(_menuWidth + 24),
+            width: _menuWidth + 24,
+            child: Offstage(
+              offstage: !_overlayOpen,
+              child: Material(
+                elevation: 1,
+                color: background ?? theme.colorScheme.surfaceContainerLow,
+                child: _menuWithHeader(items, closeOnSelect: true),
               ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
+  /// El menú del sidebar y del overlay, con [_menuHeader] fijo arriba a la
+  /// altura del app bar.
+  Widget _menuWithHeader(
+    List<FFDestination> items, {
+    required bool closeOnSelect,
+  }) => SafeArea(
+    right: false,
+    child: Column(
+      children: [
+        SizedBox(height: _toolbarHeight, child: _menuHeader()),
+        Expanded(child: _menu(items, closeOnSelect: closeOnSelect)),
+      ],
+    ),
+  );
+
   /// ☰ para cerrar el menú, con la marca al lado.
   Widget _menuHeader() => Padding(
-    padding: const EdgeInsets.fromLTRB(4, 0, 0, 8),
+    padding: const EdgeInsets.only(left: 16, right: 12),
     child: Row(
       children: [
         IconButton(
@@ -711,11 +743,25 @@ class WRScaffoldState extends State<FFScaffold> {
       },
       leading: Column(
         children: [
-          IconButton(
-            tooltip: 'Abrir menú',
-            color: _color(_style.iconColor),
-            icon: const Icon(Icons.menu),
-            onPressed: openMenu,
+          // El rail ya deja 8 arriba; el ☰ (40 de alto) queda centrado con
+          // el título del app bar.
+          SizedBox(
+            height: _toolbarHeight - 8,
+            child: Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: EdgeInsets.only(
+                  top: (_toolbarHeight / 2 - 28).clamp(0, double.infinity),
+                ),
+                child: IconButton(
+                  tooltip: 'Abrir menú',
+                  visualDensity: VisualDensity.compact,
+                  color: _color(_style.iconColor),
+                  icon: const Icon(Icons.menu),
+                  onPressed: openMenu,
+                ),
+              ),
+            ),
           ),
           if (widget.brand?.logo case final logo?) ...[
             const SizedBox(height: 8),

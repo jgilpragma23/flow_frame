@@ -1,3 +1,7 @@
+## Sin publicar
+
+* `FFScaffold`: el rail y el sidebar ocupan toda la altura y el app bar queda solo sobre el contenido. El ☰ y el encabezado del menú se alinean con el app bar.
+
 ## 0.0.2 - 2026-10-29
 
 * **Cambio de nombre**: el paquete ahora es `flow_frame` (`import 'package:flow_frame/flow_frame.dart'`) y las clases usan el prefijo `FF` en vez de `WR` (`FFScaffold`, `FFValue`, `FFNavStyle`...).

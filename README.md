@@ -456,6 +456,7 @@ En el app bar solo se usa si el `AppBar` no tiene `title`: el título propio sie
 
 **Detalles**
 - Se usa un solo tipo por breakpoint.
+- El rail y el sidebar ocupan toda la altura de la pantalla, desde arriba. El `appBar` queda solo sobre el contenido, a su lado, y el ☰ se alinea con su título. El overlay se abre encima de todo, app bar incluido.
 - Si el usuario abre o cierra el menú con ☰, se respeta mientras siga en el mismo breakpoint. Al cambiar de breakpoint vuelve al valor de `expanded`.
 - La ruta actual (`currentRoute`) no cambia al cambiar de navegación.
 
