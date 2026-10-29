@@ -702,6 +702,8 @@ void main() {
       FFValue<FFNavStyle>? responsive,
       ValueChanged<String>? onRouteSelected,
       List<FFDestination> items = destinations,
+      FFBrand? brand,
+      PreferredSizeWidget? appBar,
     }) {
       tester.view.physicalSize = screen;
       tester.view.devicePixelRatio = 1;
@@ -713,6 +715,8 @@ void main() {
             currentRoute: currentRoute,
             onRouteSelected: onRouteSelected ?? (_) {},
             responsive: responsive,
+            brand: brand,
+            appBar: appBar,
             body: const Text('cuerpo'),
           ),
         ),
@@ -1026,6 +1030,111 @@ void main() {
       FFScaffold.of(tester.element(find.text('cuerpo'))).openMenu();
       await tester.pumpAndSettle();
       expect(visibleText('Reportes'), findsWidgets);
+    });
+
+    group('marca', () {
+      const brand = FFBrand(
+        logo: Icon(Icons.storefront, key: Key('logo')),
+        title: Text('Mi Tienda'),
+        subtitle: Text('Admin'),
+      );
+      Finder inAppBar(Finder f) =>
+          find.descendant(of: find.byType(AppBar), matching: f);
+
+      testWidgets('sidebar: logo, título y subtítulo junto al ☰', (
+        tester,
+      ) async {
+        await pumpScaffold(tester, const Size(1300, 800), brand: brand);
+        expect(visibleText('Mi Tienda'), findsOneWidget);
+        expect(visibleText('Admin'), findsOneWidget);
+        final menuButton = tester.getCenter(find.byIcon(Icons.menu_open));
+        final title = tester.getCenter(find.text('Mi Tienda'));
+        expect((menuButton.dy - title.dy).abs(), lessThan(16));
+        expect(title.dx, greaterThan(menuButton.dx));
+      });
+
+      testWidgets('rail cerrado: solo el logo, debajo del ☰', (tester) async {
+        await pumpScaffold(tester, tablet, brand: brand);
+        expect(visibleText('Mi Tienda'), findsNothing);
+        final logo = find.byKey(const Key('logo')).hitTestable();
+        expect(logo, findsOneWidget);
+        expect(
+          tester.getCenter(logo).dy,
+          greaterThan(tester.getCenter(find.byIcon(Icons.menu)).dy),
+        );
+      });
+
+      testWidgets('drawer: en el app bar y arriba del drawer', (tester) async {
+        await pumpScaffold(
+          tester,
+          phone,
+          brand: brand,
+          responsive: const FFValue(xs: FFNavStyle(type: FFNavigation.drawer)),
+        );
+        expect(inAppBar(find.text('Mi Tienda')), findsOneWidget);
+        expect(inAppBar(find.text('Admin')), findsNothing);
+
+        await tester.tap(find.byTooltip('Open navigation menu'));
+        await tester.pumpAndSettle();
+        final inDrawer = find.descendant(
+          of: find.byType(Drawer),
+          matching: find.text('Admin'),
+        );
+        expect(inDrawer, findsOneWidget);
+      });
+
+      testWidgets('drawer: showInDrawer false no la repite', (tester) async {
+        await pumpScaffold(
+          tester,
+          phone,
+          brand: const FFBrand(title: Text('Mi Tienda'), showInDrawer: false),
+          responsive: const FFValue(xs: FFNavStyle(type: FFNavigation.drawer)),
+        );
+        await tester.tap(find.byTooltip('Open navigation menu'));
+        await tester.pumpAndSettle();
+        expect(
+          find.descendant(
+            of: find.byType(Drawer),
+            matching: find.text('Mi Tienda'),
+          ),
+          findsNothing,
+        );
+      });
+
+      testWidgets('el título del AppBar manda sobre la marca', (tester) async {
+        await pumpScaffold(
+          tester,
+          phone,
+          brand: brand,
+          appBar: AppBar(title: const Text('Pedidos')),
+        );
+        expect(inAppBar(find.text('Pedidos')), findsOneWidget);
+        expect(find.text('Mi Tienda'), findsNothing);
+      });
+
+      testWidgets('appBar: la marca va antes de los enlaces', (tester) async {
+        await pumpScaffold(
+          tester,
+          tablet,
+          brand: brand,
+          responsive: const FFValue(xs: FFNavStyle(type: FFNavigation.appBar)),
+        );
+        expect(
+          tester.getCenter(inAppBar(find.text('Mi Tienda'))).dx,
+          lessThan(tester.getCenter(inAppBar(find.text('Inicio'))).dx),
+        );
+      });
+
+      testWidgets('onTap de la marca', (tester) async {
+        var taps = 0;
+        await pumpScaffold(
+          tester,
+          const Size(1300, 800),
+          brand: FFBrand(title: const Text('Mi Tienda'), onTap: () => taps++),
+        );
+        await tester.tap(find.text('Mi Tienda'));
+        expect(taps, 1);
+      });
     });
   });
 
