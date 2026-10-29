@@ -1,4 +1,4 @@
-## Sin publicar
+## 0.0.3 - 2026-10-29
 
 * `FFScaffold`: el rail y el sidebar ocupan toda la altura y el app bar queda solo sobre el contenido. El ☰ y el encabezado del menú se alinean con el app bar.
 
