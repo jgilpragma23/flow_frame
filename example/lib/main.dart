@@ -129,6 +129,17 @@ class _ExampleShellState extends State<ExampleShell> {
     ),
   ];
 
+  /// Nombre de la ruta actual, buscando también en las subrutas.
+  String get _title {
+    for (final d in _destinations) {
+      if (d.id == _selected) return d.label;
+      for (final c in d.children) {
+        if (c.id == _selected) return c.label;
+      }
+    }
+    return '';
+  }
+
   @override
   Widget build(BuildContext context) {
     final nav = Uri.base.queryParameters['nav'];
@@ -154,6 +165,7 @@ class _ExampleShellState extends State<ExampleShell> {
         onTap: () => setState(() => _selected = 'ejemplos'),
       ),
       appBar: AppBar(
+        title: Text(_title),
         actions: [
           FFActions(
             actions: [
