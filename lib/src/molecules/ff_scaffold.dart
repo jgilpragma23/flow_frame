@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../models/breakpoint.dart';
-import '../models/wr_color.dart';
-import '../models/wr_navigation.dart';
-import '../models/wr_value.dart';
+import '../models/ff_color.dart';
+import '../models/ff_navigation.dart';
+import '../models/ff_value.dart';
 import '../utils/context_extensions.dart';
 
 /// Un `Scaffold` cuya navegación cambia según el breakpoint: barra abajo,
@@ -12,8 +12,8 @@ import '../utils/context_extensions.dart';
 /// Recibe los mismos parámetros principales que `Scaffold` y los pasa tal
 /// cual. La ruta se identifica por `id`, así que no cambia al cambiar de
 /// navegación ni al ocultarse destinos.
-class WRScaffold extends StatefulWidget {
-  const WRScaffold({
+class FFScaffold extends StatefulWidget {
+  const FFScaffold({
     super.key,
     required this.destinations,
     required this.currentRoute,
@@ -29,18 +29,18 @@ class WRScaffold extends StatefulWidget {
   /// Lo que se usa en lo que [responsive] no define: barra abajo en
   /// `xs`/`sm`, rail con el menú encima en `md` y rail con el menú abierto
   /// como sidebar desde `lg`.
-  static const defaults = WRValue(
-    xs: WRNavStyle(
-      type: WRNavigation.bottom,
+  static const defaults = FFValue(
+    xs: FFNavStyle(
+      type: FFNavigation.bottom,
       expandMode: WRRailExpand.overlay,
       expanded: false,
       subRoutesAlwaysVisible: false,
     ),
-    md: WRNavStyle(type: WRNavigation.rail),
-    lg: WRNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
+    md: FFNavStyle(type: FFNavigation.rail),
+    lg: FFNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
   );
 
-  final List<WRDestination> destinations;
+  final List<FFDestination> destinations;
 
   /// `id` de la ruta actual (puede ser una subruta).
   final String currentRoute;
@@ -50,9 +50,9 @@ class WRScaffold extends StatefulWidget {
 
   /// Tipo, comportamiento y colores de la navegación por breakpoint, en
   /// cascada. Lo que no se define sale de [defaults].
-  final WRValue<WRNavStyle>? responsive;
+  final FFValue<FFNavStyle>? responsive;
 
-  /// Con [WRNavigation.drawer] muestra el botón ☰. Si es `null` y la
+  /// Con [FFNavigation.drawer] muestra el botón ☰. Si es `null` y la
   /// navegación es drawer, se usa un `AppBar` vacío para tener el botón.
   final PreferredSizeWidget? appBar;
   final Widget body;
@@ -60,24 +60,24 @@ class WRScaffold extends StatefulWidget {
   final FloatingActionButtonLocation? floatingActionButtonLocation;
   final Color? backgroundColor;
 
-  /// El estado del [WRScaffold] más cercano, para abrir o cerrar el menú.
+  /// El estado del [FFScaffold] más cercano, para abrir o cerrar el menú.
   static WRScaffoldState of(BuildContext context) =>
       context.findAncestorStateOfType<WRScaffoldState>()!;
 
   @override
-  State<WRScaffold> createState() => WRScaffoldState();
+  State<FFScaffold> createState() => WRScaffoldState();
 }
 
-class WRScaffoldState extends State<WRScaffold> {
+class WRScaffoldState extends State<FFScaffold> {
   static const _menuWidth = 280.0;
   static const _duration = Duration(milliseconds: 220);
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Breakpoint? _breakpoint;
-  WRNavStyle _style = const WRNavStyle();
+  FFNavStyle _style = const FFNavStyle();
 
-  WRNavigation get _navigation => _style.type ?? WRNavigation.bottom;
+  FFNavigation get _navigation => _style.type ?? FFNavigation.bottom;
   WRRailExpand get _expandMode => _style.expandMode ?? WRRailExpand.overlay;
   bool get _expandedByDefault => _style.expanded ?? false;
 
@@ -92,9 +92,9 @@ class WRScaffoldState extends State<WRScaffold> {
 
   /// Si el menú completo (con textos) está abierto.
   bool get isMenuOpen => switch (_navigation) {
-    WRNavigation.bottom || WRNavigation.appBar => false,
-    WRNavigation.drawer => _scaffoldKey.currentState?.isDrawerOpen ?? false,
-    WRNavigation.rail =>
+    FFNavigation.bottom || FFNavigation.appBar => false,
+    FFNavigation.drawer => _scaffoldKey.currentState?.isDrawerOpen ?? false,
+    FFNavigation.rail =>
       _expandMode == WRRailExpand.overlay
           ? _overlayOpen
           : _sidebarOpen ?? _expandedByDefault,
@@ -106,13 +106,13 @@ class WRScaffoldState extends State<WRScaffold> {
 
   void _setMenu(bool open) {
     switch (_navigation) {
-      case WRNavigation.bottom || WRNavigation.appBar:
+      case FFNavigation.bottom || FFNavigation.appBar:
         break;
-      case WRNavigation.drawer:
+      case FFNavigation.drawer:
         open
             ? _scaffoldKey.currentState?.openDrawer()
             : _scaffoldKey.currentState?.closeDrawer();
-      case WRNavigation.rail:
+      case FFNavigation.rail:
         setState(() {
           if (_expandMode == WRRailExpand.overlay) {
             _overlayOpen = open;
@@ -123,7 +123,7 @@ class WRScaffoldState extends State<WRScaffold> {
     }
   }
 
-  Color? _color(WRColor? color) => color?.resolve(context);
+  Color? _color(FFColor? color) => color?.resolve(context);
 
   @override
   Widget build(BuildContext context) {
@@ -133,7 +133,7 @@ class WRScaffoldState extends State<WRScaffold> {
       _sidebarOpen = null;
       _overlayOpen = false;
     }
-    _style = WRScaffold.defaults
+    _style = FFScaffold.defaults
         .resolveMerged(breakpoint)
         .merge(widget.responsive?.resolveMerged(breakpoint));
 
@@ -143,40 +143,40 @@ class WRScaffoldState extends State<WRScaffold> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: switch (_navigation) {
-        WRNavigation.drawer => widget.appBar ?? AppBar(),
-        WRNavigation.appBar => _appBarWithNav(items),
+        FFNavigation.drawer => widget.appBar ?? AppBar(),
+        FFNavigation.appBar => _appBarWithNav(items),
         _ => widget.appBar,
       },
       backgroundColor: widget.backgroundColor,
       floatingActionButton: widget.floatingActionButton,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
-      bottomNavigationBar: _navigation == WRNavigation.bottom
+      bottomNavigationBar: _navigation == FFNavigation.bottom
           ? _bottomBar(items)
           : null,
-      drawer: _navigation == WRNavigation.drawer
+      drawer: _navigation == FFNavigation.drawer
           ? Drawer(
               width: _menuWidth + 24,
               backgroundColor: _color(_style.backgroundColor),
               child: SafeArea(child: _menu(items, closeOnSelect: true)),
             )
           : null,
-      body: _navigation == WRNavigation.rail ? _railBody(items) : widget.body,
+      body: _navigation == FFNavigation.rail ? _railBody(items) : widget.body,
     );
   }
 
   /// Quita los ocultos y los grupos que se quedan sin subrutas visibles.
-  List<WRDestination> _visible(
-    List<WRDestination> destinations,
+  List<FFDestination> _visible(
+    List<FFDestination> destinations,
     Breakpoint breakpoint,
   ) {
-    bool shown(WRDestination d) => d.visible?.resolve(breakpoint) != false;
+    bool shown(FFDestination d) => d.visible?.resolve(breakpoint) != false;
     return [
       for (final d in destinations)
         if (shown(d))
           if (!d.isGroup)
             d
           else if (d.children.any(shown))
-            WRDestination(
+            FFDestination(
               id: d.id,
               icon: d.icon,
               selectedIcon: d.selectedIcon,
@@ -185,7 +185,7 @@ class WRScaffoldState extends State<WRScaffold> {
               children: [
                 for (final c in d.children)
                   if (shown(c))
-                    WRDestination(
+                    FFDestination(
                       id: c.id,
                       icon: c.icon,
                       selectedIcon: c.selectedIcon,
@@ -198,7 +198,7 @@ class WRScaffoldState extends State<WRScaffold> {
 
   /// Recuerda la última subruta de cada grupo y abre el grupo de la ruta
   /// actual cuando esta cambia.
-  void _trackRoute(List<WRDestination> items) {
+  void _trackRoute(List<FFDestination> items) {
     if (widget.currentRoute == _trackedRoute) return;
     _trackedRoute = widget.currentRoute;
     final group = _groupOf(items, widget.currentRoute);
@@ -209,22 +209,22 @@ class WRScaffoldState extends State<WRScaffold> {
   }
 
   /// El destino de primer nivel que es o contiene [id].
-  WRDestination? _groupOf(List<WRDestination> items, String id) {
+  FFDestination? _groupOf(List<FFDestination> items, String id) {
     for (final d in items) {
       if (d.id == id || d.children.any((c) => c.id == id)) return d;
     }
     return null;
   }
 
-  bool _isAlwaysOpen(WRDestination group) =>
+  bool _isAlwaysOpen(FFDestination group) =>
       group.alwaysOpen ?? _style.subRoutesAlwaysVisible ?? false;
 
-  bool _isOpen(WRDestination group) =>
+  bool _isOpen(FFDestination group) =>
       _isAlwaysOpen(group) || _openGroups.contains(group.id);
 
   /// Para la barra y el rail cerrado: un grupo va a su última subruta
   /// visitada (o a la primera).
-  String _targetOf(WRDestination d) {
+  String _targetOf(FFDestination d) {
     if (!d.isGroup) return d.id;
     final last = _lastChild[d.id];
     return d.children.any((c) => c.id == last) ? last! : d.children.first.id;
@@ -243,7 +243,7 @@ class WRScaffoldState extends State<WRScaffold> {
         );
   }
 
-  Widget _bottomBar(List<WRDestination> items) {
+  Widget _bottomBar(List<FFDestination> items) {
     final bar = _navigationBar(items);
     if (!(_style.shadow ?? false)) return bar;
     return DecoratedBox(
@@ -260,7 +260,7 @@ class WRScaffoldState extends State<WRScaffold> {
     );
   }
 
-  Widget _navigationBar(List<WRDestination> items) {
+  Widget _navigationBar(List<FFDestination> items) {
     final selected = _groupOf(items, widget.currentRoute);
     final icon = _color(_style.iconColor);
     final selectedIcon = _color(_style.selectedIconColor);
@@ -299,7 +299,7 @@ class WRScaffoldState extends State<WRScaffold> {
 
   /// El app bar del usuario con los enlaces después del título. Si no es un
   /// `AppBar`, los enlaces van en una franja debajo.
-  PreferredSizeWidget _appBarWithNav(List<WRDestination> items) {
+  PreferredSizeWidget _appBarWithNav(List<FFDestination> items) {
     final source = widget.appBar ?? AppBar();
     final nav = Align(
       alignment: Alignment.centerLeft,
@@ -388,7 +388,7 @@ class WRScaffoldState extends State<WRScaffold> {
     );
   }
 
-  Widget _appBarLink(WRDestination d) {
+  Widget _appBarLink(FFDestination d) {
     final selected = d.id == widget.currentRoute;
     return TextButton(
       style: _linkStyle(selected: selected),
@@ -398,7 +398,7 @@ class WRScaffoldState extends State<WRScaffold> {
   }
 
   /// Un grupo: botón con ▾ que abre un dropdown con sus subrutas.
-  Widget _appBarGroup(WRDestination d) {
+  Widget _appBarGroup(FFDestination d) {
     final scheme = Theme.of(context).colorScheme;
     final selected = d.children.any((c) => c.id == widget.currentRoute);
     return MenuAnchor(
@@ -442,7 +442,7 @@ class WRScaffoldState extends State<WRScaffold> {
     );
   }
 
-  Widget _railBody(List<WRDestination> items) {
+  Widget _railBody(List<FFDestination> items) {
     final background = _color(_style.backgroundColor);
     final sidebarOpen =
         _expandMode == WRRailExpand.sidebar &&
@@ -551,7 +551,7 @@ class WRScaffoldState extends State<WRScaffold> {
     ),
   );
 
-  Widget _collapsedRail(List<WRDestination> items) {
+  Widget _collapsedRail(List<FFDestination> items) {
     final selected = _groupOf(items, widget.currentRoute);
     final label = _color(_style.labelColor);
     final selectedLabel = _color(_style.selectedLabelColor);
@@ -595,7 +595,7 @@ class WRScaffoldState extends State<WRScaffold> {
 
   /// Menú completo con textos y acordeón (sidebar, overlay y drawer).
   Widget _menu(
-    List<WRDestination> items, {
+    List<FFDestination> items, {
     required bool closeOnSelect,
     Widget? header,
   }) {
@@ -656,7 +656,7 @@ class WRScaffoldState extends State<WRScaffold> {
   }
 
   Widget _tile({
-    required WRDestination destination,
+    required FFDestination destination,
     required bool selected,
     bool emphasized = false,
     bool child = false,

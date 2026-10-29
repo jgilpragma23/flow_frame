@@ -1,9 +1,9 @@
 import 'package:flutter/widgets.dart';
 
-import 'wr_value.dart';
+import 'ff_value.dart';
 
-/// Cómo se muestra un [WRAction] en un breakpoint.
-enum WRActionDisplay {
+/// Cómo se muestra un [FFAction] en un breakpoint.
+enum FFActionDisplay {
   /// Ícono y texto, como botón.
   full,
 
@@ -17,10 +17,10 @@ enum WRActionDisplay {
   hidden,
 }
 
-/// Una acción de un `WRActions`, como las del app bar.
+/// Una acción de un `FFActions`, como las del app bar.
 @immutable
-class WRAction {
-  const WRAction({
+class FFAction {
+  const FFAction({
     required this.icon,
     required this.label,
     this.onPressed,
@@ -34,6 +34,6 @@ class WRAction {
   final VoidCallback? onPressed;
 
   /// Cómo se muestra en cada breakpoint, en cascada. Por defecto
-  /// [WRActionDisplay.icon].
-  final WRValue<WRActionDisplay>? display;
+  /// [FFActionDisplay.icon].
+  final FFValue<FFActionDisplay>? display;
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import 'breakpoint.dart';
-import 'wr_value.dart';
+import 'ff_value.dart';
 
 /// Espaciado (padding o margin) que cambia según el breakpoint.
 ///
@@ -9,8 +9,8 @@ import 'wr_value.dart';
 /// breakpoint hay varios valores, gana el más específico: el lado (`top`)
 /// sobre el eje (`vertical`), y el eje sobre `all`.
 @immutable
-class WRSpacing {
-  const WRSpacing({
+class FFSpacing {
+  const FFSpacing({
     this.all,
     this.horizontal,
     this.vertical,
@@ -20,13 +20,13 @@ class WRSpacing {
     this.right,
   });
 
-  final WRValue<double>? all;
-  final WRValue<double>? horizontal;
-  final WRValue<double>? vertical;
-  final WRValue<double>? top;
-  final WRValue<double>? bottom;
-  final WRValue<double>? left;
-  final WRValue<double>? right;
+  final FFValue<double>? all;
+  final FFValue<double>? horizontal;
+  final FFValue<double>? vertical;
+  final FFValue<double>? top;
+  final FFValue<double>? bottom;
+  final FFValue<double>? left;
+  final FFValue<double>? right;
 
   /// Espaciado para [breakpoint]; los lados sin valor quedan en 0.
   EdgeInsets resolve(Breakpoint breakpoint) => EdgeInsets.fromLTRB(
@@ -38,8 +38,8 @@ class WRSpacing {
 
   double _side(
     Breakpoint breakpoint,
-    WRValue<double>? side,
-    WRValue<double>? axis,
+    FFValue<double>? side,
+    FFValue<double>? axis,
   ) {
     for (var i = breakpoint.index; i >= 0; i--) {
       final b = Breakpoint.values[i];
@@ -50,22 +50,22 @@ class WRSpacing {
   }
 
   /// Combina breakpoint por breakpoint; [other] gana donde define un valor.
-  WRSpacing merge(WRSpacing? other) {
+  FFSpacing merge(FFSpacing? other) {
     if (other == null) return this;
-    return WRSpacing(
-      all: WRValue.combine(all, other.all),
-      horizontal: WRValue.combine(horizontal, other.horizontal),
-      vertical: WRValue.combine(vertical, other.vertical),
-      top: WRValue.combine(top, other.top),
-      bottom: WRValue.combine(bottom, other.bottom),
-      left: WRValue.combine(left, other.left),
-      right: WRValue.combine(right, other.right),
+    return FFSpacing(
+      all: FFValue.combine(all, other.all),
+      horizontal: FFValue.combine(horizontal, other.horizontal),
+      vertical: FFValue.combine(vertical, other.vertical),
+      top: FFValue.combine(top, other.top),
+      bottom: FFValue.combine(bottom, other.bottom),
+      left: FFValue.combine(left, other.left),
+      right: FFValue.combine(right, other.right),
     );
   }
 
   @override
   bool operator ==(Object other) =>
-      other is WRSpacing &&
+      other is FFSpacing &&
       other.all == all &&
       other.horizontal == horizontal &&
       other.vertical == vertical &&

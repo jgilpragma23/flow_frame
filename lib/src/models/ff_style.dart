@@ -1,17 +1,17 @@
 import 'package:flutter/widgets.dart';
 
 import '../utils/context_extensions.dart';
-import 'wr_color.dart';
-import 'wr_spacing.dart';
-import 'wr_value.dart';
+import 'ff_color.dart';
+import 'ff_spacing.dart';
+import 'ff_value.dart';
 
 /// Estilo responsive reutilizable, parecido a una clase de CSS.
 ///
 /// Para el texto, [textStyle] es la base y [color], [fontWeight], [fontSize]
 /// y [lineHeight] se aplican encima.
 @immutable
-class WRStyle {
-  const WRStyle({
+class FFStyle {
+  const FFStyle({
     this.padding,
     this.margin,
     this.textStyle,
@@ -28,50 +28,50 @@ class WRStyle {
     this.visible,
   });
 
-  final WRSpacing? padding;
-  final WRSpacing? margin;
+  final FFSpacing? padding;
+  final FFSpacing? margin;
 
   /// Estilo de texto base. En cada breakpoint se combinan los estilos desde
   /// `xs`, así que lo que se define en `xs` no se pierde en `md`.
-  final WRValue<TextStyle>? textStyle;
+  final FFValue<TextStyle>? textStyle;
 
   /// Color del texto; sigue al modo claro/oscuro.
-  final WRColor? color;
-  final WRValue<FontWeight>? fontWeight;
-  final WRValue<double>? fontSize;
+  final FFColor? color;
+  final FFValue<FontWeight>? fontWeight;
+  final FFValue<double>? fontSize;
 
   /// Alto de línea, como múltiplo del tamaño de la fuente.
-  final WRValue<double>? lineHeight;
-  final WRValue<TextAlign>? textAlign;
+  final FFValue<double>? lineHeight;
+  final FFValue<TextAlign>? textAlign;
 
-  final WRColor? backgroundColor;
+  final FFColor? backgroundColor;
 
-  final WRValue<double>? width;
-  final WRValue<double>? minWidth;
-  final WRValue<double>? maxWidth;
-  final WRValue<double>? height;
+  final FFValue<double>? width;
+  final FFValue<double>? minWidth;
+  final FFValue<double>? maxWidth;
+  final FFValue<double>? height;
 
   /// `false` oculta el widget en ese breakpoint (equivale a `d-none`).
-  final WRValue<bool>? visible;
+  final FFValue<bool>? visible;
 
   /// Combina dos estilos; [other] gana donde define algo.
-  WRStyle merge(WRStyle? other) {
+  FFStyle merge(FFStyle? other) {
     if (other == null) return this;
-    return WRStyle(
+    return FFStyle(
       padding: padding?.merge(other.padding) ?? other.padding,
       margin: margin?.merge(other.margin) ?? other.margin,
       textStyle: textStyle?.mergeStyles(other.textStyle) ?? other.textStyle,
       color: other.color ?? color,
-      fontWeight: WRValue.combine(fontWeight, other.fontWeight),
-      fontSize: WRValue.combine(fontSize, other.fontSize),
-      lineHeight: WRValue.combine(lineHeight, other.lineHeight),
-      textAlign: WRValue.combine(textAlign, other.textAlign),
+      fontWeight: FFValue.combine(fontWeight, other.fontWeight),
+      fontSize: FFValue.combine(fontSize, other.fontSize),
+      lineHeight: FFValue.combine(lineHeight, other.lineHeight),
+      textAlign: FFValue.combine(textAlign, other.textAlign),
       backgroundColor: other.backgroundColor ?? backgroundColor,
-      width: WRValue.combine(width, other.width),
-      minWidth: WRValue.combine(minWidth, other.minWidth),
-      maxWidth: WRValue.combine(maxWidth, other.maxWidth),
-      height: WRValue.combine(height, other.height),
-      visible: WRValue.combine(visible, other.visible),
+      width: FFValue.combine(width, other.width),
+      minWidth: FFValue.combine(minWidth, other.minWidth),
+      maxWidth: FFValue.combine(maxWidth, other.maxWidth),
+      height: FFValue.combine(height, other.height),
+      visible: FFValue.combine(visible, other.visible),
     );
   }
 
@@ -107,7 +107,7 @@ class WRStyle {
   }
 }
 
-/// Un [WRStyle] con valores normales de Flutter, ya calculados.
+/// Un [FFStyle] con valores normales de Flutter, ya calculados.
 @immutable
 class WRResolvedStyle {
   const WRResolvedStyle({

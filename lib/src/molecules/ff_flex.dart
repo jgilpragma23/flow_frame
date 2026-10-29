@@ -3,27 +3,27 @@ import 'dart:math' as math;
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 
-import '../atoms/wr_item.dart';
+import '../atoms/ff_item.dart';
 import '../models/breakpoint.dart';
-import '../models/wr_style.dart';
-import '../models/wr_value.dart';
+import '../models/ff_style.dart';
+import '../models/ff_value.dart';
 import '../utils/context_extensions.dart';
-import '../utils/wr_style_builder.dart';
+import '../utils/ff_style_builder.dart';
 
 /// Una fila o columna cuya dirección, separación y alineación cambian según
 /// el breakpoint (equivale a `d-flex flex-column flex-md-row`).
 ///
-/// En horizontal funciona como un `row` de Bootstrap: cada [WRItem] ocupa
+/// En horizontal funciona como un `row` de Bootstrap: cada [FFItem] ocupa
 /// su `col` (de 12), lo que sobra en la fila (`fill`) o su tamaño natural,
 /// y lo que no cabe baja a la siguiente fila. En vertical los apila.
 ///
-/// Los [WRItem] también pueden cambiar de posición con `order` y ocultarse
+/// Los [FFItem] también pueden cambiar de posición con `order` y ocultarse
 /// con `visible`; los ocultos no dejan separación. Cualquier otro widget se
 /// muestra con su tamaño natural.
-class WRFlex extends StatelessWidget {
-  const WRFlex({
+class FFFlex extends StatelessWidget {
+  const FFFlex({
     super.key,
-    this.direction = const WRValue.all(Axis.vertical),
+    this.direction = const FFValue.all(Axis.vertical),
     this.gap,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
@@ -31,19 +31,19 @@ class WRFlex extends StatelessWidget {
     required this.children,
   });
 
-  final WRValue<Axis> direction;
+  final FFValue<Axis> direction;
 
   /// Separación entre elementos y, en horizontal, también entre filas.
-  final WRValue<double>? gap;
+  final FFValue<double>? gap;
 
   /// Por defecto `start`. En horizontal se aplica a cada fila.
-  final WRValue<MainAxisAlignment>? mainAxisAlignment;
+  final FFValue<MainAxisAlignment>? mainAxisAlignment;
 
   /// Por defecto `stretch` en vertical (los elementos ocupan todo el ancho)
   /// y `start` en horizontal. En horizontal se aplica dentro de cada fila.
   /// `baseline` se trata como `start`.
-  final WRValue<CrossAxisAlignment>? crossAxisAlignment;
-  final WRStyle? style;
+  final FFValue<CrossAxisAlignment>? crossAxisAlignment;
+  final FFStyle? style;
   final List<Widget> children;
 
   @override
@@ -51,7 +51,7 @@ class WRFlex extends StatelessWidget {
     final breakpoint = context.breakpoint;
     final axis = direction.resolve(breakpoint) ?? Axis.vertical;
 
-    return buildWRStyle(
+    return buildFFStyle(
       context,
       style,
       _WRFlexLayout(
@@ -78,7 +78,7 @@ class WRFlex extends StatelessWidget {
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
       var order = 0;
-      if (child is WRItem) {
+      if (child is FFItem) {
         if (child.style?.visible?.resolve(breakpoint) == false) continue;
         order = child.order?.resolve(breakpoint) ?? 0;
       }
@@ -94,8 +94,8 @@ class WRFlex extends StatelessWidget {
       for (final e in entries)
         _WRSlot(
           key: _SlotKey(e.index),
-          size: e.child is WRItem
-              ? _sizeOf(e.child as WRItem, breakpoint)
+          size: e.child is FFItem
+              ? _sizeOf(e.child as FFItem, breakpoint)
               : _SlotSize.natural,
           child: e.child,
         ),
@@ -104,7 +104,7 @@ class WRFlex extends StatelessWidget {
 
   /// Entre `col` y `fill` gana el breakpoint más cercano; en el mismo
   /// breakpoint gana `col`.
-  static _SlotSize _sizeOf(WRItem item, Breakpoint breakpoint) {
+  static _SlotSize _sizeOf(FFItem item, Breakpoint breakpoint) {
     for (var i = breakpoint.index; i >= 0; i--) {
       final b = Breakpoint.values[i];
       final col = item.col?.at(b);

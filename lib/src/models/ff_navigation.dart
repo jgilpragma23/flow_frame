@@ -1,11 +1,11 @@
 import 'package:flutter/widgets.dart';
 
 import 'breakpoint.dart';
-import 'wr_color.dart';
-import 'wr_value.dart';
+import 'ff_color.dart';
+import 'ff_value.dart';
 
-/// Tipo de navegación de un `WRScaffold`. Se elige uno por breakpoint.
-enum WRNavigation {
+/// Tipo de navegación de un `FFScaffold`. Se elige uno por breakpoint.
+enum FFNavigation {
   /// Barra abajo con íconos y textos (`NavigationBar`). Las subrutas no se
   /// muestran: tocar un grupo lleva a su última subruta visitada (o a la
   /// primera).
@@ -35,12 +35,12 @@ enum WRRailExpand {
   sidebar,
 }
 
-/// Cómo se ve y se comporta la navegación de un `WRScaffold` en un
-/// breakpoint. Se usa dentro de un `WRValue`, en cascada: cada breakpoint
+/// Cómo se ve y se comporta la navegación de un `FFScaffold` en un
+/// breakpoint. Se usa dentro de un `FFValue`, en cascada: cada breakpoint
 /// pone solo lo que cambia y hereda el resto de los menores.
 @immutable
-class WRNavStyle {
-  const WRNavStyle({
+class FFNavStyle {
+  const FFNavStyle({
     this.type,
     this.expandMode,
     this.expanded,
@@ -56,7 +56,7 @@ class WRNavStyle {
   });
 
   /// Barra abajo, rail, drawer o enlaces en el app bar.
-  final WRNavigation? type;
+  final FFNavigation? type;
 
   /// Con rail, si el menú completo se abre encima o como sidebar.
   final WRRailExpand? expandMode;
@@ -66,31 +66,31 @@ class WRNavStyle {
   final bool? expanded;
 
   /// Si los grupos están siempre abiertos, sin flecha.
-  /// `WRDestination.alwaysOpen` tiene prioridad.
+  /// `FFDestination.alwaysOpen` tiene prioridad.
   final bool? subRoutesAlwaysVisible;
 
-  /// Fondo de la barra, el rail y el menú. Con [WRNavigation.appBar], fondo
+  /// Fondo de la barra, el rail y el menú. Con [FFNavigation.appBar], fondo
   /// del app bar si este no define el suyo.
-  final WRColor? backgroundColor;
-  final WRColor? iconColor;
-  final WRColor? labelColor;
+  final FFColor? backgroundColor;
+  final FFColor? iconColor;
+  final FFColor? labelColor;
 
   /// Fondo del indicador del destino seleccionado.
-  final WRColor? selectedBackgroundColor;
-  final WRColor? selectedIconColor;
-  final WRColor? selectedLabelColor;
+  final FFColor? selectedBackgroundColor;
+  final FFColor? selectedIconColor;
+  final FFColor? selectedLabelColor;
 
   /// Sombra que separa la navegación del contenido: a la derecha del rail
   /// y del sidebar, y arriba de la barra. Por defecto sin sombra.
   final bool? shadow;
 
   /// Color de la sombra. Por defecto el `shadow` del `ColorScheme`, suave.
-  final WRColor? shadowColor;
+  final FFColor? shadowColor;
 
   /// Los valores de [other] reemplazan a los de este, salvo los `null`.
-  WRNavStyle merge(WRNavStyle? other) {
+  FFNavStyle merge(FFNavStyle? other) {
     if (other == null) return this;
-    return WRNavStyle(
+    return FFNavStyle(
       type: other.type ?? type,
       expandMode: other.expandMode ?? expandMode,
       expanded: other.expanded ?? expanded,
@@ -110,7 +110,7 @@ class WRNavStyle {
 
   @override
   bool operator ==(Object other) =>
-      other is WRNavStyle &&
+      other is FFNavStyle &&
       other.type == type &&
       other.expandMode == expandMode &&
       other.expanded == expanded &&
@@ -141,11 +141,11 @@ class WRNavStyle {
   );
 }
 
-/// Combina en cascada los [WRNavStyle] de un `WRValue`.
-extension WRNavStyleValue on WRValue<WRNavStyle> {
+/// Combina en cascada los [FFNavStyle] de un `FFValue`.
+extension WRNavStyleValue on FFValue<FFNavStyle> {
   /// Une los estilos desde `xs` hasta [breakpoint]; los mayores ganan.
-  WRNavStyle resolveMerged(Breakpoint breakpoint) {
-    var result = const WRNavStyle();
+  FFNavStyle resolveMerged(Breakpoint breakpoint) {
+    var result = const FFNavStyle();
     for (var i = 0; i <= breakpoint.index; i++) {
       result = result.merge(at(Breakpoint.values[i]));
     }
@@ -156,8 +156,8 @@ extension WRNavStyleValue on WRValue<WRNavStyle> {
 /// Un destino de la navegación. Si tiene [children], es un grupo: en el
 /// menú completo se muestra como acordeón y no es una página por sí mismo.
 @immutable
-class WRDestination {
-  const WRDestination({
+class FFDestination {
+  const FFDestination({
     required this.id,
     required this.icon,
     this.selectedIcon,
@@ -177,13 +177,13 @@ class WRDestination {
   final String label;
 
   /// Subrutas (un solo nivel). Las subrutas de las subrutas se ignoran.
-  final List<WRDestination> children;
+  final List<FFDestination> children;
 
   /// `false` lo oculta en ese breakpoint. Por defecto visible.
-  final WRValue<bool>? visible;
+  final FFValue<bool>? visible;
 
   /// Si el grupo está siempre abierto, sin flecha para cerrarlo. Si es
-  /// `null` se usa `WRNavStyle.subRoutesAlwaysVisible`.
+  /// `null` se usa `FFNavStyle.subRoutesAlwaysVisible`.
   final bool? alwaysOpen;
 
   bool get isGroup => children.isNotEmpty;

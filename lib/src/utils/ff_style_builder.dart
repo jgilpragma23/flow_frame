@@ -1,12 +1,12 @@
 import 'package:flutter/widgets.dart';
 
-import '../models/wr_style.dart';
+import '../models/ff_style.dart';
 
 /// Envuelve [child] con los widgets que aplican [style].
 ///
 /// De adentro hacia afuera: texto, padding, fondo, tamaño, límites de
 /// ancho y margin. Uso interno de los widgets de la librería.
-Widget buildWRStyle(BuildContext context, WRStyle? style, Widget child) {
+Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
   if (style == null) return child;
   final s = style.resolve(context);
   if (!s.visible) return const SizedBox.shrink();

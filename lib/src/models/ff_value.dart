@@ -5,13 +5,13 @@ import 'breakpoint.dart';
 /// Un valor que cambia según el breakpoint, con cascada mobile-first.
 ///
 /// Cada valor aplica desde su breakpoint hacia arriba hasta que otro lo
-/// reemplace: `WRValue(xs: 8, md: 16)` da 8 en `xs`/`sm` y 16 en `md`/`lg`/`xl`.
+/// reemplace: `FFValue(xs: 8, md: 16)` da 8 en `xs`/`sm` y 16 en `md`/`lg`/`xl`.
 @immutable
-class WRValue<T> {
-  const WRValue({this.xs, this.sm, this.md, this.lg, this.xl});
+class FFValue<T> {
+  const FFValue({this.xs, this.sm, this.md, this.lg, this.xl});
 
   /// El mismo valor en todos los breakpoints.
-  const WRValue.all(T value)
+  const FFValue.all(T value)
     : xs = value,
       sm = null,
       md = null,
@@ -44,9 +44,9 @@ class WRValue<T> {
   }
 
   /// Combina breakpoint por breakpoint; [other] gana donde define un valor.
-  WRValue<T> merge(WRValue<T>? other) {
+  FFValue<T> merge(FFValue<T>? other) {
     if (other == null) return this;
-    return WRValue(
+    return FFValue(
       xs: other.xs ?? xs,
       sm: other.sm ?? sm,
       md: other.md ?? md,
@@ -56,12 +56,12 @@ class WRValue<T> {
   }
 
   /// Como [merge], pero acepta que cualquiera de los dos sea `null`.
-  static WRValue<T>? combine<T>(WRValue<T>? a, WRValue<T>? b) =>
+  static FFValue<T>? combine<T>(FFValue<T>? a, FFValue<T>? b) =>
       a == null ? b : a.merge(b);
 
   @override
   bool operator ==(Object other) =>
-      other is WRValue<T> &&
+      other is FFValue<T> &&
       other.xs == xs &&
       other.sm == sm &&
       other.md == md &&
@@ -72,7 +72,7 @@ class WRValue<T> {
   int get hashCode => Object.hash(xs, sm, md, lg, xl);
 }
 
-extension WRTextStyleValue on WRValue<TextStyle> {
+extension WRTextStyleValue on FFValue<TextStyle> {
   /// Combina los estilos desde `xs` hasta [breakpoint]; en cada propiedad
   /// gana el breakpoint mayor.
   TextStyle? resolveMerged(Breakpoint breakpoint) {
@@ -86,10 +86,10 @@ extension WRTextStyleValue on WRValue<TextStyle> {
 
   /// Combina breakpoint por breakpoint; en el mismo breakpoint los estilos
   /// se mezclan y [other] gana en lo que define.
-  WRValue<TextStyle> mergeStyles(WRValue<TextStyle>? other) {
+  FFValue<TextStyle> mergeStyles(FFValue<TextStyle>? other) {
     if (other == null) return this;
     TextStyle? m(TextStyle? a, TextStyle? b) => a?.merge(b) ?? b;
-    return WRValue(
+    return FFValue(
       xs: m(xs, other.xs),
       sm: m(sm, other.sm),
       md: m(md, other.md),

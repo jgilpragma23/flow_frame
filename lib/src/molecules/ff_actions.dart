@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 
-import '../models/wr_action.dart';
+import '../models/ff_action.dart';
 import '../utils/context_extensions.dart';
 
 /// Acciones que cambian de forma según el breakpoint: ícono y texto, solo
 /// ícono, dentro del menú ⋮ u ocultas.
 ///
 /// Va en `AppBar.actions` (o en cualquier fila). El ⋮ aparece solo si
-/// alguna acción está en [WRActionDisplay.menu] en el breakpoint actual.
-class WRActions extends StatelessWidget {
-  const WRActions({
+/// alguna acción está en [FFActionDisplay.menu] en el breakpoint actual.
+class FFActions extends StatelessWidget {
+  const FFActions({
     super.key,
     required this.actions,
     this.menuIcon = const Icon(Icons.more_vert),
     this.menuTooltip = 'Más opciones',
   });
 
-  final List<WRAction> actions;
+  final List<FFAction> actions;
 
   /// Ícono del botón que abre el menú.
   final Widget menuIcon;
@@ -25,11 +25,11 @@ class WRActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final breakpoint = context.breakpoint;
-    WRActionDisplay displayOf(WRAction a) =>
-        a.display?.resolve(breakpoint) ?? WRActionDisplay.icon;
+    FFActionDisplay displayOf(FFAction a) =>
+        a.display?.resolve(breakpoint) ?? FFActionDisplay.icon;
     final inMenu = [
       for (final a in actions)
-        if (displayOf(a) == WRActionDisplay.menu) a,
+        if (displayOf(a) == FFActionDisplay.menu) a,
     ];
 
     return Row(
@@ -37,7 +37,7 @@ class WRActions extends StatelessWidget {
       children: [
         for (final a in actions)
           switch (displayOf(a)) {
-            WRActionDisplay.full => Padding(
+            FFActionDisplay.full => Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: TextButton.icon(
                 onPressed: a.onPressed,
@@ -45,13 +45,13 @@ class WRActions extends StatelessWidget {
                 label: Text(a.label),
               ),
             ),
-            WRActionDisplay.icon => IconButton(
+            FFActionDisplay.icon => IconButton(
               tooltip: a.label,
               onPressed: a.onPressed,
               icon: a.icon,
             ),
-            WRActionDisplay.menu ||
-            WRActionDisplay.hidden => const SizedBox.shrink(),
+            FFActionDisplay.menu ||
+            FFActionDisplay.hidden => const SizedBox.shrink(),
           },
         if (inMenu.isNotEmpty)
           MenuAnchor(

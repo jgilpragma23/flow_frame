@@ -21,36 +21,36 @@ class ExampleApp extends StatelessWidget {
 
 /// Colores de esta página, con su versión clara y oscura.
 class AppColors {
-  static const background = WRColor.adaptive(
+  static const background = FFColor.adaptive(
     light: Color(0xFFFFFFFF),
     dark: Color(0xFF0F0F0F),
   );
-  static const surface = WRColor.adaptive(
+  static const surface = FFColor.adaptive(
     light: Color(0xFFF5F5F5),
     dark: Color(0xFF1E1E1E),
   );
-  static const primary = WRColor.adaptive(
+  static const primary = FFColor.adaptive(
     light: Color(0xFF2563EB),
     dark: Color(0xFF60A5FA),
   );
-  static const muted = WRColor.adaptive(
+  static const muted = FFColor.adaptive(
     light: Color(0xFF666666),
     dark: Color(0xFF9E9E9E),
   );
-  static const primarySoft = WRColor.adaptive(
+  static const primarySoft = FFColor.adaptive(
     light: Color(0xFFDBEAFE),
     dark: Color(0xFF1E3A5F),
   );
 }
 
-const card = WRStyle(
-  padding: WRSpacing(all: WRValue(xs: 12, md: 20)),
+const card = FFStyle(
+  padding: FFSpacing(all: FFValue(xs: 12, md: 20)),
   backgroundColor: AppColors.surface,
-  height: WRValue.all(110),
+  height: FFValue.all(110),
 );
 
-const label = WRStyle(
-  textStyle: WRValue(
+const label = FFStyle(
+  textStyle: FFValue(
     xs: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
     md: TextStyle(fontSize: 22),
   ),
@@ -74,53 +74,53 @@ class _ExampleShellState extends State<ExampleShell> {
   String _selected = Uri.base.queryParameters['sel'] ?? 'ejemplos';
 
   static const _destinations = [
-    WRDestination(
+    FFDestination(
       id: 'ejemplos',
       icon: Icon(Icons.grid_view_outlined),
       selectedIcon: Icon(Icons.grid_view),
       label: 'Ejemplos',
     ),
-    WRDestination(
+    FFDestination(
       id: 'ventas',
       icon: Icon(Icons.storefront_outlined),
       selectedIcon: Icon(Icons.storefront),
       label: 'Ventas',
       children: [
-        WRDestination(
+        FFDestination(
           id: 'ventas/pedidos',
           icon: Icon(Icons.receipt_long_outlined),
           label: 'Pedidos',
         ),
-        WRDestination(
+        FFDestination(
           id: 'ventas/clientes',
           icon: Icon(Icons.people_outline),
           label: 'Clientes',
         ),
-        WRDestination(
+        FFDestination(
           id: 'ventas/facturas',
           icon: Icon(Icons.request_quote_outlined),
           label: 'Facturas',
         ),
       ],
     ),
-    WRDestination(
+    FFDestination(
       id: 'reportes',
       icon: Icon(Icons.bar_chart_outlined),
       label: 'Reportes',
-      visible: WRValue(xs: false, md: true),
+      visible: FFValue(xs: false, md: true),
     ),
-    WRDestination(
+    FFDestination(
       id: 'config',
       icon: Icon(Icons.settings_outlined),
       label: 'Configuración',
       alwaysOpen: true,
       children: [
-        WRDestination(
+        FFDestination(
           id: 'config/perfil',
           icon: Icon(Icons.person_outline),
           label: 'Perfil',
         ),
-        WRDestination(
+        FFDestination(
           id: 'config/seguridad',
           icon: Icon(Icons.lock_outline),
           label: 'Seguridad',
@@ -134,40 +134,40 @@ class _ExampleShellState extends State<ExampleShell> {
     final nav = Uri.base.queryParameters['nav'];
     final drawer = nav == 'drawer';
     final top = nav == 'top';
-    return WRScaffold(
+    return FFScaffold(
       appBar: AppBar(
         title: const Text('web_responsive'),
         actions: [
-          WRActions(
+          FFActions(
             actions: [
-              WRAction(
+              FFAction(
                 icon: const Icon(Icons.add),
                 label: 'Nuevo pedido',
                 onPressed: () {},
-                display: const WRValue(
-                  xs: WRActionDisplay.icon,
-                  md: WRActionDisplay.full,
+                display: const FFValue(
+                  xs: FFActionDisplay.icon,
+                  md: FFActionDisplay.full,
                 ),
               ),
-              WRAction(
+              FFAction(
                 icon: const Icon(Icons.download_outlined),
                 label: 'Exportar',
                 onPressed: () {},
-                display: const WRValue(
-                  xs: WRActionDisplay.menu,
-                  lg: WRActionDisplay.full,
+                display: const FFValue(
+                  xs: FFActionDisplay.menu,
+                  lg: FFActionDisplay.full,
                 ),
               ),
-              WRAction(
+              FFAction(
                 icon: const Icon(Icons.print_outlined),
                 label: 'Imprimir',
                 onPressed: () {},
-                display: const WRValue(
-                  xs: WRActionDisplay.hidden,
-                  md: WRActionDisplay.menu,
+                display: const FFValue(
+                  xs: FFActionDisplay.hidden,
+                  md: FFActionDisplay.menu,
                 ),
               ),
-              WRAction(
+              FFAction(
                 icon: const Icon(Icons.notifications_outlined),
                 label: 'Notificaciones',
                 onPressed: () {},
@@ -181,9 +181,9 @@ class _ExampleShellState extends State<ExampleShell> {
       currentRoute: _selected,
       onRouteSelected: (id) => setState(() => _selected = id),
       destinations: _destinations,
-      responsive: WRValue(
-        xs: WRNavStyle(
-          type: drawer ? WRNavigation.drawer : WRNavigation.bottom,
+      responsive: FFValue(
+        xs: FFNavStyle(
+          type: drawer ? FFNavigation.drawer : FFNavigation.bottom,
           backgroundColor: AppColors.surface,
           iconColor: AppColors.muted,
           labelColor: AppColors.muted,
@@ -191,12 +191,12 @@ class _ExampleShellState extends State<ExampleShell> {
           selectedIconColor: AppColors.primary,
           selectedLabelColor: AppColors.primary,
         ),
-        md: WRNavStyle(
-          type: top ? WRNavigation.appBar : WRNavigation.rail,
+        md: FFNavStyle(
+          type: top ? FFNavigation.appBar : FFNavigation.rail,
           expandMode: WRRailExpand.overlay,
           shadow: true,
         ),
-        lg: const WRNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
+        lg: const FFNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
       ),
       body: switch (_selected) {
         'ejemplos' => const ExamplePage(),
@@ -228,100 +228,100 @@ class ExamplePage extends StatelessWidget {
     if (!_openedMenu && Uri.base.queryParameters['open'] == '1') {
       _openedMenu = true;
       WidgetsBinding.instance.addPostFrameCallback(
-        (_) => WRScaffold.of(context).openMenu(),
+        (_) => FFScaffold.of(context).openMenu(),
       );
     }
     return SingleChildScrollView(
-      child: WRContainer(
+      child: FFContainer(
         maxSize: 1280,
-        style: const WRStyle(
-          padding: WRSpacing(
-            horizontal: WRValue(xs: 16, md: 32),
-            vertical: WRValue(xs: 16, md: 32),
+        style: const FFStyle(
+          padding: FFSpacing(
+            horizontal: FFValue(xs: 16, md: 32),
+            vertical: FFValue(xs: 16, md: 32),
           ),
         ),
-        child: WRFlex(
-          gap: const WRValue(xs: 16, md: 24),
+        child: FFFlex(
+          gap: const FFValue(xs: 16, md: 24),
           children: [
-            WRItem(
-              style: const WRStyle(
-                textStyle: WRValue(
+            FFItem(
+              style: const FFStyle(
+                textStyle: FFValue(
                   xs: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
                   md: TextStyle(fontSize: 34),
                 ),
-                textAlign: WRValue(xs: TextAlign.center, md: TextAlign.start),
+                textAlign: FFValue(xs: TextAlign.center, md: TextAlign.start),
               ),
               child: Text(
                 'Breakpoint actual: ${context.breakpoint.name} '
                 '(${MediaQuery.sizeOf(context).width.round()} px)',
               ),
             ),
-            const WRItem(
-              style: WRStyle(color: AppColors.muted),
+            const FFItem(
+              style: FFStyle(color: AppColors.muted),
               child: Text(
-                'Grilla con col: WRValue(xs: 12, md: 6, lg: 4). '
+                'Grilla con col: FFValue(xs: 12, md: 6, lg: 4). '
                 'Uno por fila en xs, dos en md y tres en lg; '
                 'lo que no cabe baja a la siguiente fila.',
               ),
             ),
-            WRFlex(
-              direction: const WRValue.all(Axis.horizontal),
-              gap: const WRValue(xs: 12, md: 16),
+            FFFlex(
+              direction: const FFValue.all(Axis.horizontal),
+              gap: const FFValue(xs: 12, md: 16),
               children: [
                 for (var i = 1; i <= 5; i++)
-                  WRItem(
-                    col: const WRValue(xs: 12, md: 6, lg: 4),
-                    style: card.merge(const WRStyle(height: WRValue.all(80))),
+                  FFItem(
+                    col: const FFValue(xs: 12, md: 6, lg: 4),
+                    style: card.merge(const FFStyle(height: FFValue.all(80))),
                     child: _CardBody('Producto $i', 'col: xs 12, md 6, lg 4'),
                   ),
               ],
             ),
-            const WRItem(
-              style: WRStyle(color: AppColors.muted),
+            const FFItem(
+              style: FFStyle(color: AppColors.muted),
               child: Text(
                 'Mezcla en una fila: col 3, fill y un ícono de tamaño natural. '
                 'En xs el col 12 ocupa toda la fila y los otros bajan.',
               ),
             ),
-            WRFlex(
-              direction: const WRValue.all(Axis.horizontal),
-              gap: const WRValue(xs: 12, md: 16),
-              crossAxisAlignment: const WRValue.all(CrossAxisAlignment.center),
+            FFFlex(
+              direction: const FFValue.all(Axis.horizontal),
+              gap: const FFValue(xs: 12, md: 16),
+              crossAxisAlignment: const FFValue.all(CrossAxisAlignment.center),
               children: [
-                WRItem(
-                  col: const WRValue(xs: 12, md: 3),
-                  style: card.merge(const WRStyle(height: WRValue.all(80))),
+                FFItem(
+                  col: const FFValue(xs: 12, md: 3),
+                  style: card.merge(const FFStyle(height: FFValue.all(80))),
                   child: const _CardBody('Filtros', 'col: xs 12, md 3'),
                 ),
-                WRItem(
-                  fill: const WRValue.all(true),
-                  style: card.merge(const WRStyle(height: WRValue.all(80))),
+                FFItem(
+                  fill: const FFValue.all(true),
+                  style: card.merge(const FFStyle(height: FFValue.all(80))),
                   child: const _CardBody('Buscador', 'fill: true'),
                 ),
-                WRItem(
-                  style: const WRStyle(color: AppColors.primary),
+                FFItem(
+                  style: const FFStyle(color: AppColors.primary),
                   child: const Icon(Icons.tune, size: 32),
                 ),
               ],
             ),
-            const WRItem(
-              style: WRStyle(color: AppColors.muted),
+            const FFItem(
+              style: FFStyle(color: AppColors.muted),
               child: Text(
-                'WRFlex vertical en xs/sm y horizontal desde md. '
-                'La tarjeta B tiene visible: WRValue(xs: false, md: true).',
+                'FFFlex vertical en xs/sm y horizontal desde md. '
+                'La tarjeta B tiene visible: FFValue(xs: false, md: true).',
               ),
             ),
-            WRFlex(
-              direction: const WRValue(xs: Axis.vertical, md: Axis.horizontal),
-              gap: const WRValue(xs: 12, md: 16),
+            FFFlex(
+              direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
+              gap: const FFValue(xs: 12, md: 16),
               children: [
                 _card('A', 'fill: md true'),
-                WRItem(
-                  fill: const WRValue(md: true),
+                FFItem(
+                  fill: const FFValue(md: true),
                   style: card.merge(
-                    const WRStyle(
-                      visible: WRValue(xs: false, md: true),
-                      backgroundColor: WRColor.adaptive(
+                    const FFStyle(
+                      visible: FFValue(xs: false, md: true),
+                      backgroundColor: FFColor.adaptive(
                         light: Color(0xFFFFF4D6),
                         dark: Color(0xFF3A2E14),
                       ),
@@ -332,22 +332,22 @@ class ExamplePage extends StatelessWidget {
                 _card('C', 'fill: md true'),
               ],
             ),
-            const WRItem(
-              style: WRStyle(color: AppColors.muted),
+            const FFItem(
+              style: FFStyle(color: AppColors.muted),
               child: Text(
                 'Sidebar de 260 px y el contenido llena el resto, desde md',
               ),
             ),
-            WRFlex(
-              direction: const WRValue(xs: Axis.vertical, md: Axis.horizontal),
-              gap: const WRValue(xs: 12, md: 16),
+            FFFlex(
+              direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
+              gap: const FFValue(xs: 12, md: 16),
               children: [
-                WRItem(
-                  style: card.merge(const WRStyle(width: WRValue(md: 260))),
+                FFItem(
+                  style: card.merge(const FFStyle(width: FFValue(md: 260))),
                   child: const _CardBody('Sidebar', 'width: md 260'),
                 ),
-                WRItem(
-                  fill: const WRValue(md: true),
+                FFItem(
+                  fill: const FFValue(md: true),
                   style: card,
                   child: const _CardBody('Contenido', 'fill: md true'),
                 ),
@@ -359,8 +359,8 @@ class ExamplePage extends StatelessWidget {
     );
   }
 
-  WRItem _card(String title, String note) => WRItem(
-    fill: const WRValue(md: true),
+  FFItem _card(String title, String note) => FFItem(
+    fill: const FFValue(md: true),
     style: card,
     child: _CardBody(title, note),
   );
@@ -381,7 +381,7 @@ class _CardBody extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           note,
-          style: const WRStyle(color: AppColors.muted).toTextStyle(context),
+          style: const FFStyle(color: AppColors.muted).toTextStyle(context),
         ),
       ],
     );
@@ -393,32 +393,32 @@ class _CardBody extends StatelessWidget {
 class PedidosPage extends StatelessWidget {
   const PedidosPage({super.key});
 
-  static const _card = WRStyle(
-    padding: WRSpacing(all: WRValue(xs: 12, md: 20)),
+  static const _card = FFStyle(
+    padding: FFSpacing(all: FFValue(xs: 12, md: 20)),
     backgroundColor: AppColors.surface,
   );
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: WRContainer(
+      child: FFContainer(
         maxSize: 1280,
-        style: const WRStyle(padding: WRSpacing(all: WRValue(xs: 16, md: 32))),
-        child: WRFlex(
-          gap: const WRValue(xs: 16, md: 24),
+        style: const FFStyle(padding: FFSpacing(all: FFValue(xs: 16, md: 32))),
+        child: FFFlex(
+          gap: const FFValue(xs: 16, md: 24),
           children: [
-            const WRItem(
-              style: WRStyle(
-                textStyle: WRValue(
+            const FFItem(
+              style: FFStyle(
+                textStyle: FFValue(
                   xs: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
                   md: TextStyle(fontSize: 30),
                 ),
               ),
               child: Text('Pedidos'),
             ),
-            WRFlex(
-              direction: const WRValue.all(Axis.horizontal),
-              gap: const WRValue(xs: 12, md: 16),
+            FFFlex(
+              direction: const FFValue.all(Axis.horizontal),
+              gap: const FFValue(xs: 12, md: 16),
               children: [
                 for (final (title, value) in [
                   ('Hoy', '24'),
@@ -426,29 +426,29 @@ class PedidosPage extends StatelessWidget {
                   ('Pendientes', '7'),
                   ('Ingresos', '\$4.2k'),
                 ])
-                  WRItem(
-                    col: const WRValue(xs: 12, sm: 6, lg: 3),
+                  FFItem(
+                    col: const FFValue(xs: 12, sm: 6, lg: 3),
                     style: _card,
                     child: _CardBody(value, title),
                   ),
               ],
             ),
-            WRFlex(
-              direction: const WRValue.all(Axis.horizontal),
-              gap: const WRValue.all(12),
-              crossAxisAlignment: const WRValue.all(CrossAxisAlignment.center),
+            FFFlex(
+              direction: const FFValue.all(Axis.horizontal),
+              gap: const FFValue.all(12),
+              crossAxisAlignment: const FFValue.all(CrossAxisAlignment.center),
               children: [
-                const WRItem(
-                  col: WRValue(xs: 12, md: 3),
+                const FFItem(
+                  col: FFValue(xs: 12, md: 3),
                   style: _card,
                   child: _CardBody('Filtros', 'col: xs 12, md 3'),
                 ),
-                const WRItem(
-                  fill: WRValue.all(true),
+                const FFItem(
+                  fill: FFValue.all(true),
                   style: _card,
                   child: _CardBody('Buscar pedido…', 'fill: true'),
                 ),
-                WRItem(
+                FFItem(
                   child: FilledButton(
                     onPressed: () {},
                     child: const Text('Nuevo'),
@@ -456,12 +456,12 @@ class PedidosPage extends StatelessWidget {
                 ),
               ],
             ),
-            WRFlex(
-              direction: const WRValue(xs: Axis.vertical, md: Axis.horizontal),
-              gap: const WRValue(xs: 12, md: 16),
+            FFFlex(
+              direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
+              gap: const FFValue(xs: 12, md: 16),
               children: [
-                WRItem(
-                  col: const WRValue(md: 7, xl: 8),
+                FFItem(
+                  col: const FFValue(md: 7, xl: 8),
                   style: _card,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -477,12 +477,12 @@ class PedidosPage extends StatelessWidget {
                     ],
                   ),
                 ),
-                const WRItem(
-                  fill: WRValue(md: true),
-                  style: WRStyle(
-                    padding: WRSpacing(all: WRValue(xs: 12, md: 20)),
+                const FFItem(
+                  fill: FFValue(md: true),
+                  style: FFStyle(
+                    padding: FFSpacing(all: FFValue(xs: 12, md: 20)),
                     backgroundColor: AppColors.primarySoft,
-                    visible: WRValue(xs: false, md: true),
+                    visible: FFValue(xs: false, md: true),
                   ),
                   child: _CardBody(
                     'Detalle del pedido',

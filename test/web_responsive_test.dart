@@ -1,7 +1,8 @@
+import 'package:flow_frame/flow_frame.dart';
+import 'package:flow_frame/src/atoms/atoms.dart';
+import 'package:flow_frame/src/models/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:web_responsive/web_responsive.dart';
 
 /// Monta [child] en una pantalla de tamaño [screen].
 Future<void> pump(WidgetTester tester, Size screen, Widget child) {
@@ -37,8 +38,8 @@ const tablet = Size(1000, 800);
 const purple = Color(0xFF7C3AED);
 const lightPurple = Color(0xFFA78BFA);
 const gray = Color(0xFF666666);
-const brand = WRColor.adaptive(light: purple, dark: lightPurple);
-const muted = WRColor.fixed(gray);
+const brand = FFColor.adaptive(light: purple, dark: lightPurple);
+const muted = FFColor.fixed(gray);
 
 void main() {
   group('WRBreakpoints', () {
@@ -68,9 +69,9 @@ void main() {
     });
   });
 
-  group('WRValue', () {
+  group('FFValue', () {
     test('hace cascada mobile-first', () {
-      const value = WRValue(xs: 8, md: 16);
+      const value = FFValue(xs: 8, md: 16);
       expect(value.resolve(Breakpoint.xs), 8);
       expect(value.resolve(Breakpoint.sm), 8);
       expect(value.resolve(Breakpoint.md), 16);
@@ -78,21 +79,21 @@ void main() {
     });
 
     test('devuelve null antes del primer valor', () {
-      const value = WRValue(md: 1);
+      const value = FFValue(md: 1);
       expect(value.resolve(Breakpoint.sm), isNull);
       expect(value.resolve(Breakpoint.lg), 1);
     });
 
     test('merge combina breakpoint por breakpoint', () {
-      const merged = WRValue(xs: 1, md: 2);
+      const merged = FFValue(xs: 1, md: 2);
       expect(
-        merged.merge(const WRValue(md: 3, xl: 4)),
-        const WRValue(xs: 1, md: 3, xl: 4),
+        merged.merge(const FFValue(md: 3, xl: 4)),
+        const FFValue(xs: 1, md: 3, xl: 4),
       );
     });
 
     test('los TextStyle se combinan en cascada', () {
-      const value = WRValue(
+      const value = FFValue(
         xs: TextStyle(fontSize: 14, fontFamily: 'Inter'),
         md: TextStyle(fontSize: 18),
       );
@@ -102,12 +103,12 @@ void main() {
     });
   });
 
-  group('WRSpacing', () {
-    const spacing = WRSpacing(
-      all: WRValue(xs: 8, md: 16, xl: 24),
-      horizontal: WRValue(lg: 32),
-      vertical: WRValue(sm: 12),
-      top: WRValue(md: 20),
+  group('FFSpacing', () {
+    const spacing = FFSpacing(
+      all: FFValue(xs: 8, md: 16, xl: 24),
+      horizontal: FFValue(lg: 32),
+      vertical: FFValue(sm: 12),
+      top: FFValue(md: 20),
     );
 
     test('gana el breakpoint más cercano y luego el más específico', () {
@@ -128,13 +129,13 @@ void main() {
 
     test('los lados sin valor quedan en 0', () {
       expect(
-        const WRSpacing(top: WRValue(xs: 4)).resolve(Breakpoint.md),
+        const FFSpacing(top: FFValue(xs: 4)).resolve(Breakpoint.md),
         const EdgeInsets.only(top: 4),
       );
     });
   });
 
-  group('WRColor', () {
+  group('FFColor', () {
     testWidgets('adaptive sigue al Theme de la app', (tester) async {
       var context = await pumpContext(
         tester,
@@ -161,13 +162,13 @@ void main() {
     });
   });
 
-  group('WRStyle', () {
-    const title = WRStyle(
-      textStyle: WRValue(
+  group('FFStyle', () {
+    const title = FFStyle(
+      textStyle: FFValue(
         xs: TextStyle(fontSize: 20, fontFamily: 'Inter'),
         md: TextStyle(fontSize: 28),
       ),
-      fontWeight: WRValue(md: FontWeight.bold),
+      fontWeight: FFValue(md: FontWeight.bold),
       color: brand,
     );
 
@@ -190,19 +191,19 @@ void main() {
     testWidgets('fontSize suelto gana sobre textStyle', (tester) async {
       final context = await pumpContext(tester, phone);
       final style = title
-          .merge(const WRStyle(fontSize: WRValue(xs: 12)))
+          .merge(const FFStyle(fontSize: FFValue(xs: 12)))
           .toTextStyle(context);
       expect(style.fontSize, 12);
     });
 
     testWidgets('resolve calcula todos los valores', (tester) async {
       final context = await pumpContext(tester, tablet);
-      final resolved = const WRStyle(
-        padding: WRSpacing(all: WRValue(xs: 8, md: 16)),
-        margin: WRSpacing(top: WRValue(xs: 4)),
+      final resolved = const FFStyle(
+        padding: FFSpacing(all: FFValue(xs: 8, md: 16)),
+        margin: FFSpacing(top: FFValue(xs: 4)),
         backgroundColor: muted,
-        maxWidth: WRValue(md: 640),
-        visible: WRValue(xs: false, md: true),
+        maxWidth: FFValue(md: 640),
+        visible: FFValue(xs: false, md: true),
       ).resolve(context);
       expect(resolved.padding, const EdgeInsets.all(16));
       expect(resolved.margin, const EdgeInsets.only(top: 4));
@@ -212,16 +213,16 @@ void main() {
     });
 
     test('merge: el segundo gana donde define algo', () {
-      const base = WRStyle(
-        padding: WRSpacing(all: WRValue(xs: 8)),
-        textStyle: WRValue(xs: TextStyle(fontSize: 14)),
+      const base = FFStyle(
+        padding: FFSpacing(all: FFValue(xs: 8)),
+        textStyle: FFValue(xs: TextStyle(fontSize: 14)),
         color: muted,
       );
       final merged = base.merge(
-        const WRStyle(
-          padding: WRSpacing(top: WRValue(xs: 20)),
-          textStyle: WRValue(xs: TextStyle(fontWeight: FontWeight.bold)),
-          visible: WRValue(xs: false),
+        const FFStyle(
+          padding: FFSpacing(top: FFValue(xs: 20)),
+          textStyle: FFValue(xs: TextStyle(fontWeight: FontWeight.bold)),
+          visible: FFValue(xs: false),
         ),
       );
       expect(
@@ -233,11 +234,11 @@ void main() {
         const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
       );
       expect(merged.color, muted);
-      expect(merged.visible, const WRValue(xs: false));
+      expect(merged.visible, const FFValue(xs: false));
     });
   });
 
-  group('WRContainer', () {
+  group('FFContainer', () {
     const box = SizedBox(key: Key('c'), height: 10);
     Rect rect(WidgetTester tester) =>
         tester.getRect(find.byKey(const Key('c')));
@@ -246,21 +247,21 @@ void main() {
       await pump(
         tester,
         const Size(2000, 800),
-        const WRContainer(maxSize: 1280, child: box),
+        const FFContainer(maxSize: 1280, child: box),
       );
       expect(rect(tester).width, 1280);
       expect(rect(tester).left, 360);
     });
 
     testWidgets('ocupa todo el ancho si la pantalla es menor', (tester) async {
-      await pump(tester, phone, const WRContainer(maxSize: 1280, child: box));
+      await pump(tester, phone, const FFContainer(maxSize: 1280, child: box));
       expect(rect(tester).width, 400);
     });
 
     testWidgets('aplica el padding del breakpoint actual', (tester) async {
-      const container = WRContainer(
+      const container = FFContainer(
         maxSize: 1280,
-        style: WRStyle(padding: WRSpacing(all: WRValue(xs: 8, md: 16))),
+        style: FFStyle(padding: FFSpacing(all: FFValue(xs: 8, md: 16))),
         child: box,
       );
 
@@ -278,9 +279,9 @@ void main() {
         DefaultTextStyle(
           style: const TextStyle(fontFamily: 'Inter'),
           child: Builder(
-            builder: (context) => WRContainer(
-              style: const WRStyle(
-                textStyle: WRValue(xs: TextStyle(fontSize: 14)),
+            builder: (context) => FFContainer(
+              style: const FFStyle(
+                textStyle: FFValue(xs: TextStyle(fontSize: 14)),
                 color: muted,
               ),
               child: Column(
@@ -288,8 +289,8 @@ void main() {
                   const Text('a'),
                   Text(
                     'b',
-                    style: const WRStyle(
-                      fontWeight: WRValue(xs: FontWeight.bold),
+                    style: const FFStyle(
+                      fontWeight: FFValue(xs: FontWeight.bold),
                     ).toTextStyle(context),
                   ),
                 ],
@@ -318,8 +319,8 @@ void main() {
     });
 
     testWidgets('visible: false oculta el contenido', (tester) async {
-      const container = WRContainer(
-        style: WRStyle(visible: WRValue(xs: false, md: true)),
+      const container = FFContainer(
+        style: FFStyle(visible: FFValue(xs: false, md: true)),
         child: box,
       );
       await pump(tester, phone, container);
@@ -330,17 +331,17 @@ void main() {
     });
   });
 
-  group('WRFlex', () {
+  group('FFFlex', () {
     Rect rectOf(WidgetTester tester, String key) =>
         tester.getRect(find.byKey(Key(key)));
 
-    Widget layout() => const WRFlex(
-      direction: WRValue(xs: Axis.vertical, md: Axis.horizontal),
-      gap: WRValue(xs: 8, md: 20),
+    Widget layout() => const FFFlex(
+      direction: FFValue(xs: Axis.vertical, md: Axis.horizontal),
+      gap: FFValue(xs: 8, md: 20),
       children: [
-        WRItem(child: SizedBox(key: Key('a'), width: 200, height: 10)),
-        WRItem(
-          fill: WRValue(md: true),
+        FFItem(child: SizedBox(key: Key('a'), width: 200, height: 10)),
+        FFItem(
+          fill: FFValue(md: true),
           child: SizedBox(key: Key('b'), height: 10),
         ),
       ],
@@ -370,15 +371,15 @@ void main() {
       await pump(
         tester,
         tablet,
-        const WRFlex(
-          direction: WRValue.all(Axis.horizontal),
+        const FFFlex(
+          direction: FFValue.all(Axis.horizontal),
           children: [
-            WRItem(
-              fill: WRValue.all(true),
+            FFItem(
+              fill: FFValue.all(true),
               child: SizedBox(key: Key('a'), height: 10),
             ),
-            WRItem(
-              fill: WRValue.all(true),
+            FFItem(
+              fill: FFValue.all(true),
               child: SizedBox(key: Key('b'), height: 10),
             ),
           ],
@@ -389,11 +390,11 @@ void main() {
     });
 
     testWidgets('fill cambia por breakpoint', (tester) async {
-      const flex = WRFlex(
-        direction: WRValue.all(Axis.horizontal),
+      const flex = FFFlex(
+        direction: FFValue.all(Axis.horizontal),
         children: [
-          WRItem(
-            fill: WRValue(xs: false, sm: true, lg: false),
+          FFItem(
+            fill: FFValue(xs: false, sm: true, lg: false),
             child: SizedBox(key: Key('a'), width: 100, height: 10),
           ),
         ],
@@ -412,12 +413,12 @@ void main() {
       await pump(
         tester,
         phone,
-        const WRFlex(
-          gap: WRValue.all(10),
+        const FFFlex(
+          gap: FFValue.all(10),
           children: [
             SizedBox(key: Key('a'), height: 10),
-            WRItem(
-              style: WRStyle(visible: WRValue(xs: false)),
+            FFItem(
+              style: FFStyle(visible: FFValue(xs: false)),
               child: SizedBox(height: 10),
             ),
             SizedBox(key: Key('c'), height: 10),
@@ -428,11 +429,11 @@ void main() {
     });
 
     testWidgets('order cambia la posición por breakpoint', (tester) async {
-      const flex = WRFlex(
+      const flex = FFFlex(
         children: [
-          WRItem(child: SizedBox(key: Key('a'), height: 10)),
-          WRItem(
-            order: WRValue(xs: -1, md: 0),
+          FFItem(child: SizedBox(key: Key('a'), height: 10)),
+          FFItem(
+            order: FFValue(xs: -1, md: 0),
             child: SizedBox(key: Key('b'), height: 10),
           ),
         ],
@@ -445,11 +446,11 @@ void main() {
     });
 
     testWidgets('el orden no hace perder el estado', (tester) async {
-      Widget flex(int order) => WRFlex(
+      Widget flex(int order) => FFFlex(
         children: [
-          const WRItem(child: _Counter(key: Key('a'))),
-          WRItem(
-            order: WRValue.all(order),
+          const FFItem(child: _Counter(key: Key('a'))),
+          FFItem(
+            order: FFValue.all(order),
             child: const _Counter(key: Key('b')),
           ),
         ],
@@ -461,13 +462,13 @@ void main() {
     });
 
     group('col', () {
-      Widget grid(int count) => WRFlex(
-        direction: const WRValue.all(Axis.horizontal),
-        gap: const WRValue.all(16),
+      Widget grid(int count) => FFFlex(
+        direction: const FFValue.all(Axis.horizontal),
+        gap: const FFValue.all(16),
         children: [
           for (var i = 0; i < count; i++)
-            WRItem(
-              col: const WRValue(xs: 12, md: 6, lg: 4),
+            FFItem(
+              col: const FFValue(xs: 12, md: 6, lg: 4),
               child: SizedBox(key: Key('$i'), height: 10),
             ),
         ],
@@ -503,16 +504,16 @@ void main() {
         await pump(
           tester,
           tablet,
-          const WRFlex(
-            direction: WRValue.all(Axis.horizontal),
-            gap: WRValue.all(16),
+          const FFFlex(
+            direction: FFValue.all(Axis.horizontal),
+            gap: FFValue.all(16),
             children: [
-              WRItem(
-                col: WRValue.all(3),
+              FFItem(
+                col: FFValue.all(3),
                 child: SizedBox(key: Key('a'), height: 10),
               ),
-              WRItem(
-                fill: WRValue.all(true),
+              FFItem(
+                fill: FFValue.all(true),
                 child: SizedBox(key: Key('b'), height: 10),
               ),
               SizedBox(key: Key('c'), width: 40, height: 10),
@@ -529,13 +530,13 @@ void main() {
       testWidgets('el breakpoint más cercano decide entre col y fill', (
         tester,
       ) async {
-        const flex = WRFlex(
-          direction: WRValue.all(Axis.horizontal),
+        const flex = FFFlex(
+          direction: FFValue.all(Axis.horizontal),
           children: [
             SizedBox(key: Key('a'), width: 100, height: 10),
-            WRItem(
-              col: WRValue(xs: 12),
-              fill: WRValue(md: true),
+            FFItem(
+              col: FFValue(xs: 12),
+              fill: FFValue(md: true),
               child: SizedBox(key: Key('b'), height: 10),
             ),
           ],
@@ -551,12 +552,12 @@ void main() {
         await pump(
           tester,
           tablet,
-          const WRFlex(
-            direction: WRValue.all(Axis.horizontal),
-            mainAxisAlignment: WRValue.all(MainAxisAlignment.center),
+          const FFFlex(
+            direction: FFValue.all(Axis.horizontal),
+            mainAxisAlignment: FFValue.all(MainAxisAlignment.center),
             children: [
-              WRItem(
-                col: WRValue.all(12),
+              FFItem(
+                col: FFValue.all(12),
                 child: SizedBox(key: Key('a'), height: 10),
               ),
               SizedBox(key: Key('b'), width: 200, height: 10),
@@ -570,16 +571,16 @@ void main() {
         await pump(
           tester,
           tablet,
-          const WRFlex(
-            direction: WRValue.all(Axis.horizontal),
-            crossAxisAlignment: WRValue.all(CrossAxisAlignment.stretch),
+          const FFFlex(
+            direction: FFValue.all(Axis.horizontal),
+            crossAxisAlignment: FFValue.all(CrossAxisAlignment.stretch),
             children: [
-              WRItem(
-                col: WRValue.all(6),
+              FFItem(
+                col: FFValue.all(6),
                 child: SizedBox(key: Key('a'), height: 10),
               ),
-              WRItem(
-                col: WRValue.all(6),
+              FFItem(
+                col: FFValue.all(6),
                 child: SizedBox(key: Key('b'), height: 50),
               ),
             ],
@@ -595,11 +596,11 @@ void main() {
         await tester.pumpWidget(
           const Directionality(
             textDirection: TextDirection.rtl,
-            child: WRFlex(
-              direction: WRValue.all(Axis.horizontal),
+            child: FFFlex(
+              direction: FFValue.all(Axis.horizontal),
               children: [
-                WRItem(
-                  col: WRValue.all(6),
+                FFItem(
+                  col: FFValue.all(6),
                   child: SizedBox(key: Key('a'), height: 10),
                 ),
               ],
@@ -613,10 +614,10 @@ void main() {
         await pump(
           tester,
           tablet,
-          const WRFlex(
+          const FFFlex(
             children: [
-              WRItem(
-                col: WRValue.all(6),
+              FFItem(
+                col: FFValue.all(6),
                 child: SizedBox(key: Key('a'), height: 10),
               ),
             ],
@@ -631,10 +632,10 @@ void main() {
         tester,
         phone,
         const SingleChildScrollView(
-          child: WRFlex(
+          child: FFFlex(
             children: [
-              WRItem(
-                fill: WRValue.all(true),
+              FFItem(
+                fill: FFValue.all(true),
                 child: SizedBox(key: Key('a'), height: 10),
               ),
             ],
@@ -645,7 +646,7 @@ void main() {
       expect(rectOf(tester, 'a').height, 10);
     });
 
-    testWidgets('WRItem fuera de WRFlex ignora fill y aplica el estilo', (
+    testWidgets('FFItem fuera de FFFlex ignora fill y aplica el estilo', (
       tester,
     ) async {
       await pump(
@@ -654,9 +655,9 @@ void main() {
         const Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            WRItem(
-              fill: WRValue.all(true),
-              style: WRStyle(padding: WRSpacing(all: WRValue(xs: 10))),
+            FFItem(
+              fill: FFValue.all(true),
+              style: FFStyle(padding: FFSpacing(all: FFValue(xs: 10))),
               child: SizedBox(key: Key('a'), height: 10),
             ),
           ],
@@ -666,31 +667,31 @@ void main() {
     });
   });
 
-  group('WRScaffold', () {
+  group('FFScaffold', () {
     const destinations = [
-      WRDestination(id: 'inicio', icon: Icon(Icons.home), label: 'Inicio'),
-      WRDestination(
+      FFDestination(id: 'inicio', icon: Icon(Icons.home), label: 'Inicio'),
+      FFDestination(
         id: 'ventas',
         icon: Icon(Icons.store),
         label: 'Ventas',
         children: [
-          WRDestination(
+          FFDestination(
             id: 'ventas/pedidos',
             icon: Icon(Icons.receipt),
             label: 'Pedidos',
           ),
-          WRDestination(
+          FFDestination(
             id: 'ventas/clientes',
             icon: Icon(Icons.people),
             label: 'Clientes',
           ),
         ],
       ),
-      WRDestination(
+      FFDestination(
         id: 'reportes',
         icon: Icon(Icons.bar_chart),
         label: 'Reportes',
-        visible: WRValue(xs: false, md: true),
+        visible: FFValue(xs: false, md: true),
       ),
     ];
 
@@ -698,16 +699,16 @@ void main() {
       WidgetTester tester,
       Size screen, {
       String currentRoute = 'inicio',
-      WRValue<WRNavStyle>? responsive,
+      FFValue<FFNavStyle>? responsive,
       ValueChanged<String>? onRouteSelected,
-      List<WRDestination> items = destinations,
+      List<FFDestination> items = destinations,
     }) {
       tester.view.physicalSize = screen;
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
       return tester.pumpWidget(
         MaterialApp(
-          home: WRScaffold(
+          home: FFScaffold(
             destinations: items,
             currentRoute: currentRoute,
             onRouteSelected: onRouteSelected ?? (_) {},
@@ -816,14 +817,14 @@ void main() {
         tester,
         const Size(1300, 800),
         items: const [
-          WRDestination(id: 'inicio', icon: Icon(Icons.home), label: 'Inicio'),
-          WRDestination(
+          FFDestination(id: 'inicio', icon: Icon(Icons.home), label: 'Inicio'),
+          FFDestination(
             id: 'config',
             icon: Icon(Icons.settings),
             label: 'Config',
             alwaysOpen: true,
             children: [
-              WRDestination(
+              FFDestination(
                 id: 'config/perfil',
                 icon: Icon(Icons.person),
                 label: 'Perfil',
@@ -857,7 +858,7 @@ void main() {
       await pumpScaffold(
         tester,
         phone,
-        responsive: const WRValue.all(WRNavStyle(type: WRNavigation.drawer)),
+        responsive: const FFValue.all(FFNavStyle(type: FFNavigation.drawer)),
         onRouteSelected: (id) => selected = id,
       );
       await tester.tap(find.byIcon(Icons.menu));
@@ -873,12 +874,12 @@ void main() {
     testWidgets('responsive: cascada sobre los valores por defecto', (
       tester,
     ) async {
-      const style = WRValue(
-        xs: WRNavStyle(
-          backgroundColor: WRColor.fixed(Color(0xFF112233)),
-          iconColor: WRColor.fixed(Color(0xFF445566)),
+      const style = FFValue(
+        xs: FFNavStyle(
+          backgroundColor: FFColor.fixed(Color(0xFF112233)),
+          iconColor: FFColor.fixed(Color(0xFF445566)),
         ),
-        md: WRNavStyle(type: WRNavigation.drawer),
+        md: FFNavStyle(type: FFNavigation.drawer),
       );
       // xs: sigue siendo barra (por defecto) con los colores de xs.
       await pumpScaffold(tester, phone, responsive: style);
@@ -897,25 +898,25 @@ void main() {
       await pumpScaffold(
         tester,
         const Size(1300, 800),
-        responsive: const WRValue(lg: WRNavStyle(subRoutesAlwaysVisible: true)),
+        responsive: const FFValue(lg: FFNavStyle(subRoutesAlwaysVisible: true)),
       );
       expect(visibleText('Pedidos'), findsOneWidget);
       expect(find.byIcon(Icons.expand_more), findsNothing);
     });
 
-    test('WRNavStyle.resolveMerged une desde xs', () {
-      const value = WRValue(
-        xs: WRNavStyle(type: WRNavigation.bottom, expanded: false),
-        md: WRNavStyle(type: WRNavigation.rail),
-        lg: WRNavStyle(expanded: true),
+    test('FFNavStyle.resolveMerged une desde xs', () {
+      const value = FFValue(
+        xs: FFNavStyle(type: FFNavigation.bottom, expanded: false),
+        md: FFNavStyle(type: FFNavigation.rail),
+        lg: FFNavStyle(expanded: true),
       );
       expect(
         value.resolveMerged(Breakpoint.sm),
-        const WRNavStyle(type: WRNavigation.bottom, expanded: false),
+        const FFNavStyle(type: FFNavigation.bottom, expanded: false),
       );
       expect(
         value.resolveMerged(Breakpoint.xl),
-        const WRNavStyle(type: WRNavigation.rail, expanded: true),
+        const FFNavStyle(type: FFNavigation.rail, expanded: true),
       );
     });
 
@@ -926,7 +927,7 @@ void main() {
       await pumpScaffold(
         tester,
         tablet,
-        responsive: const WRValue(md: WRNavStyle(type: WRNavigation.appBar)),
+        responsive: const FFValue(md: FFNavStyle(type: FFNavigation.appBar)),
         onRouteSelected: (id) => selected = id,
       );
       expect(find.byType(NavigationRail), findsNothing);
@@ -958,7 +959,7 @@ void main() {
       addTearDown(tester.view.reset);
       await tester.pumpWidget(
         MaterialApp(
-          home: WRScaffold(
+          home: FFScaffold(
             appBar: AppBar(
               title: const Text('Mi app'),
               actions: const [Icon(Icons.notifications)],
@@ -966,8 +967,8 @@ void main() {
             currentRoute: 'inicio',
             onRouteSelected: (_) {},
             destinations: destinations,
-            responsive: const WRValue(
-              md: WRNavStyle(type: WRNavigation.appBar),
+            responsive: const FFValue(
+              md: FFNavStyle(type: FFNavigation.appBar),
             ),
             body: const Text('cuerpo'),
           ),
@@ -979,7 +980,7 @@ void main() {
       expect(link.dy, lessThan(56));
       expect(find.byIcon(Icons.notifications), findsOneWidget);
       expect(
-        WRScaffold.of(tester.element(find.text('cuerpo'))).isMenuOpen,
+        FFScaffold.of(tester.element(find.text('cuerpo'))).isMenuOpen,
         isFalse,
       );
     });
@@ -997,7 +998,7 @@ void main() {
             w.decoration is BoxDecoration &&
             (w.decoration as BoxDecoration).boxShadow != null,
       );
-      const style = WRValue(md: WRNavStyle(shadow: true));
+      const style = FFValue(md: FFNavStyle(shadow: true));
 
       // xs: barra sin sombra (solo se activa desde md).
       await pumpScaffold(tester, phone, responsive: style);
@@ -1015,20 +1016,20 @@ void main() {
       await pumpScaffold(
         tester,
         phone,
-        responsive: const WRValue(xs: WRNavStyle(shadow: true)),
+        responsive: const FFValue(xs: FFNavStyle(shadow: true)),
       );
       expect(boxShadow, findsOneWidget);
     });
 
-    testWidgets('WRScaffold.of abre el menú', (tester) async {
+    testWidgets('FFScaffold.of abre el menú', (tester) async {
       await pumpScaffold(tester, tablet);
-      WRScaffold.of(tester.element(find.text('cuerpo'))).openMenu();
+      FFScaffold.of(tester.element(find.text('cuerpo'))).openMenu();
       await tester.pumpAndSettle();
       expect(visibleText('Reportes'), findsWidgets);
     });
   });
 
-  group('WRActions', () {
+  group('FFActions', () {
     Future<void> pumpActions(
       WidgetTester tester,
       Size screen, {
@@ -1043,33 +1044,33 @@ void main() {
           home: Scaffold(
             appBar: AppBar(
               actions: [
-                WRActions(
+                FFActions(
                   actions: [
-                    WRAction(
+                    FFAction(
                       icon: const Icon(Icons.add),
                       label: 'Nuevo',
                       onPressed: () => tap('nuevo'),
-                      display: const WRValue(
-                        xs: WRActionDisplay.icon,
-                        md: WRActionDisplay.full,
+                      display: const FFValue(
+                        xs: FFActionDisplay.icon,
+                        md: FFActionDisplay.full,
                       ),
                     ),
-                    WRAction(
+                    FFAction(
                       icon: const Icon(Icons.download),
                       label: 'Exportar',
                       onPressed: () => tap('exportar'),
-                      display: const WRValue(
-                        xs: WRActionDisplay.menu,
-                        md: WRActionDisplay.full,
+                      display: const FFValue(
+                        xs: FFActionDisplay.menu,
+                        md: FFActionDisplay.full,
                       ),
                     ),
-                    WRAction(
+                    FFAction(
                       icon: const Icon(Icons.print),
                       label: 'Imprimir',
                       onPressed: () => tap('imprimir'),
-                      display: const WRValue(
-                        xs: WRActionDisplay.hidden,
-                        md: WRActionDisplay.menu,
+                      display: const FFValue(
+                        xs: FFActionDisplay.hidden,
+                        md: FFActionDisplay.menu,
                       ),
                     ),
                   ],
@@ -1118,8 +1119,8 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: WRActions(
-              actions: [WRAction(icon: Icon(Icons.add), label: 'Nuevo')],
+            body: FFActions(
+              actions: [FFAction(icon: Icon(Icons.add), label: 'Nuevo')],
             ),
           ),
         ),

@@ -2,27 +2,27 @@
 
 Herramientas para hacer interfaces responsive en Flutter con una idea parecida a Bootstrap: breakpoints mobile-first, estilos reutilizables y colores que cambian con el modo claro u oscuro.
 
-> En desarrollo. Ya están los breakpoints, `WRValue`, `WRSpacing`, `WRStyle`, los colores con modo oscuro, `WRContainer`, `WRFlex`, `WRItem` y `WRScaffold`.
+> En desarrollo. Ya están los breakpoints, `FFValue`, `FFSpacing`, `FFStyle`, los colores con modo oscuro, `FFContainer`, `FFFlex`, `FFItem` y `FFScaffold`.
 
 ## Ejemplo completo
 
 ```dart
-WRContainer(
+FFContainer(
   maxSize: 1280,
-  style: const WRStyle(padding: WRSpacing(horizontal: WRValue(xs: 16, md: 24))),
-  child: WRFlex(
+  style: const FFStyle(padding: FFSpacing(horizontal: FFValue(xs: 16, md: 24))),
+  child: FFFlex(
     // Sidebar arriba en móvil, a la izquierda desde md
-    direction: const WRValue(xs: Axis.vertical, md: Axis.horizontal),
-    gap: const WRValue(xs: 16, md: 24),
+    direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
+    gap: const FFValue(xs: 16, md: 24),
     children: [
-      WRItem(
-        style: const WRStyle(
-          width: WRValue(md: 280),
-          visible: WRValue(xs: false, sm: true),
+      FFItem(
+        style: const FFStyle(
+          width: FFValue(md: 280),
+          visible: FFValue(xs: false, sm: true),
         ),
         child: Sidebar(),
       ),
-      WRItem(fill: const WRValue(md: true), child: Content()),
+      FFItem(fill: const FFValue(md: true), child: Content()),
     ],
   ),
 )
@@ -53,27 +53,27 @@ void main() {
 }
 ```
 
-## `WRValue`: un valor por breakpoint
+## `FFValue`: un valor por breakpoint
 
 Cada valor aplica desde su breakpoint hacia arriba hasta que otro lo reemplace (mobile-first).
 
 ```dart
-const gap = WRValue(xs: 8, md: 16); // 8 en xs/sm, 16 en md/lg/xl
-const fill = WRValue(md: true);     // null en xs/sm, true desde md
-const same = WRValue.all(12);       // 12 en todos
+const gap = FFValue(xs: 8, md: 16); // 8 en xs/sm, 16 en md/lg/xl
+const fill = FFValue(md: true);     // null en xs/sm, true desde md
+const same = FFValue.all(12);       // 12 en todos
 
 gap.resolve(context.breakpoint);
 context.responsive(xs: 1, md: 2, xl: 4); // atajo
 ```
 
-## `WRSpacing`: padding y margin
+## `FFSpacing`: padding y margin
 
 ```dart
-const WRSpacing(
-  all: WRValue(xs: 8, md: 16, xl: 24),
-  horizontal: WRValue(lg: 32),
-  vertical: WRValue(sm: 12),
-  top: WRValue(md: 20),
+const FFSpacing(
+  all: FFValue(xs: 8, md: 16, xl: 24),
+  horizontal: FFValue(lg: 32),
+  vertical: FFValue(sm: 12),
+  top: FFValue(md: 20),
 )
 ```
 
@@ -83,34 +83,34 @@ Para cada lado:
 
 Con el ejemplo de arriba, el `top` vale 8 en `xs`, 12 en `sm`, 20 en `md` y `lg`, y 24 en `xl`.
 
-## `WRStyle`: estilos reutilizables
+## `FFStyle`: estilos reutilizables
 
 Funciona como una clase de CSS. Todo es opcional.
 
 ```dart
-const card = WRStyle(
-  padding: WRSpacing(all: WRValue(xs: 12, md: 16)),
-  margin: WRSpacing(bottom: WRValue(xs: 8)),
+const card = FFStyle(
+  padding: FFSpacing(all: FFValue(xs: 12, md: 16)),
+  margin: FFSpacing(bottom: FFValue(xs: 8)),
 
   // Texto: textStyle es la base, lo demás va encima
-  textStyle: WRValue(
+  textStyle: FFValue(
     xs: TextStyle(fontSize: 14, fontFamily: 'Inter'),
     md: TextStyle(fontSize: 16),
   ),
   color: AppColors.text,
-  fontWeight: WRValue(md: FontWeight.w600),
-  fontSize: WRValue(xl: 18),
-  lineHeight: WRValue(xs: 1.4),
-  textAlign: WRValue(xs: TextAlign.center, md: TextAlign.start),
+  fontWeight: FFValue(md: FontWeight.w600),
+  fontSize: FFValue(xl: 18),
+  lineHeight: FFValue(xs: 1.4),
+  textAlign: FFValue(xs: TextAlign.center, md: TextAlign.start),
 
   backgroundColor: AppColors.surface,
 
-  width: WRValue(md: 480),
-  minWidth: WRValue(md: 320),
-  maxWidth: WRValue(lg: 640),
-  height: WRValue(md: 200),
+  width: FFValue(md: 480),
+  minWidth: FFValue(md: 320),
+  maxWidth: FFValue(lg: 640),
+  height: FFValue(md: 200),
 
-  visible: WRValue(xs: false, md: true), // como d-none d-md-block
+  visible: FFValue(xs: false, md: true), // como d-none d-md-block
 );
 ```
 
@@ -119,7 +119,7 @@ const card = WRStyle(
 - **`merge`** combina dos estilos; el segundo gana donde define algo:
 
 ```dart
-final hiddenCard = card.merge(const WRStyle(visible: WRValue(xs: false, lg: true)));
+final hiddenCard = card.merge(const FFStyle(visible: FFValue(xs: false, lg: true)));
 ```
 
 ### Texto
@@ -134,9 +134,9 @@ TextField(style: title.toTextStyle(context))
 Para varios textos, pon el estilo en un contenedor y los `Text` de adentro lo heredan:
 
 ```dart
-WRContainer(
-  style: const WRStyle(
-    textStyle: WRValue(xs: TextStyle(fontSize: 14)),
+FFContainer(
+  style: const FFStyle(
+    textStyle: FFValue(xs: TextStyle(fontSize: 14)),
     color: AppColors.muted,
   ),
   child: Column(
@@ -161,25 +161,25 @@ Padding(padding: s.padding, child: ...)
 
 ## Colores y modo oscuro
 
-La librería no tiene tema ni paleta propia: los colores se definen en tu código. Un `WRColor` puede tener versión clara y oscura:
+La librería no tiene tema ni paleta propia: los colores se definen en tu código. Un `FFColor` puede tener versión clara y oscura:
 
 ```dart
-WRColor.adaptive(light: Color(0xFFFFF7E6), dark: Color(0xFF3A2E14))
-WRColor.fixed(Color(0xFFFFFFFF)) // no cambia
+FFColor.adaptive(light: Color(0xFFFFF7E6), dark: Color(0xFF3A2E14))
+FFColor.fixed(Color(0xFFFFFFFF)) // no cambia
 ```
 
 Lo práctico es juntarlos en una clase y usarlos en los estilos:
 
 ```dart
 class AppColors {
-  static const surface = WRColor.adaptive(light: Color(0xFFF5F5F5), dark: Color(0xFF1E1E1E));
-  static const text = WRColor.adaptive(light: Color(0xFF111111), dark: Color(0xFFF5F5F5));
-  static const muted = WRColor.adaptive(light: Color(0xFF666666), dark: Color(0xFF9E9E9E));
-  static const primary = WRColor.adaptive(light: Color(0xFF2563EB), dark: Color(0xFF60A5FA));
-  static const primarySoft = WRColor.adaptive(light: Color(0xFFDBEAFE), dark: Color(0xFF1E3A5F));
+  static const surface = FFColor.adaptive(light: Color(0xFFF5F5F5), dark: Color(0xFF1E1E1E));
+  static const text = FFColor.adaptive(light: Color(0xFF111111), dark: Color(0xFFF5F5F5));
+  static const muted = FFColor.adaptive(light: Color(0xFF666666), dark: Color(0xFF9E9E9E));
+  static const primary = FFColor.adaptive(light: Color(0xFF2563EB), dark: Color(0xFF60A5FA));
+  static const primarySoft = FFColor.adaptive(light: Color(0xFFDBEAFE), dark: Color(0xFF1E3A5F));
 }
 
-const card = WRStyle(backgroundColor: AppColors.surface, color: AppColors.text);
+const card = FFStyle(backgroundColor: AppColors.surface, color: AppColors.text);
 ```
 
 Fuera de un estilo, `resolve` devuelve el `Color` del modo actual:
@@ -190,15 +190,15 @@ Scaffold(backgroundColor: AppColors.surface.resolve(context))
 
 El modo claro u oscuro se lee del `Theme` de la app, así que sigue al `themeMode` de tu `MaterialApp` sin configurar nada.
 
-## `WRContainer`
+## `FFContainer`
 
 Ocupa todo el ancho hasta `maxSize` y se centra en pantallas más anchas. El `style` se aplica por dentro de ese ancho.
 
 ```dart
-WRContainer(
+FFContainer(
   maxSize: 1280,
-  style: const WRStyle(
-    padding: WRSpacing(horizontal: WRValue(xs: 16, md: 24)),
+  style: const FFStyle(
+    padding: FFSpacing(horizontal: FFValue(xs: 16, md: 24)),
   ),
   child: ...,
 )
@@ -206,21 +206,21 @@ WRContainer(
 
 Sin `maxSize` ocupa todo el ancho.
 
-## `WRFlex` y `WRItem`
+## `FFFlex` y `FFItem`
 
-`WRFlex` es una fila o columna que cambia por breakpoint (como `d-flex flex-column flex-md-row`). `WRItem` es cada elemento.
+`FFFlex` es una fila o columna que cambia por breakpoint (como `d-flex flex-column flex-md-row`). `FFItem` es cada elemento.
 
 ### Grilla: filas que se acomodan solas
 
-En horizontal, `WRFlex` funciona como un `row` de Bootstrap: cada hijo dice cuánto ocupa y lo que no cabe baja a la siguiente fila.
+En horizontal, `FFFlex` funciona como un `row` de Bootstrap: cada hijo dice cuánto ocupa y lo que no cabe baja a la siguiente fila.
 
 ```dart
-WRFlex(
-  direction: const WRValue.all(Axis.horizontal),
-  gap: const WRValue.all(16), // entre elementos y entre filas
+FFFlex(
+  direction: const FFValue.all(Axis.horizontal),
+  gap: const FFValue.all(16), // entre elementos y entre filas
   children: [
     for (final p in products)
-      WRItem(col: const WRValue(xs: 12, md: 6, lg: 4), child: ProductCard(p)),
+      FFItem(col: const FFValue(xs: 12, md: 6, lg: 4), child: ProductCard(p)),
   ],
 )
 ```
@@ -233,21 +233,21 @@ WRFlex(
 
 Cada hijo puede medirse de tres formas:
 
-| `WRItem` | Ancho | En Bootstrap |
+| `FFItem` | Ancho | En Bootstrap |
 |---|---|---|
-| `col: WRValue(md: 6)` | 6 de 12 columnas | `col-md-6` |
-| `fill: WRValue(md: true)` | Lo que sobra en su fila | `col` |
+| `col: FFValue(md: 6)` | 6 de 12 columnas | `col-md-6` |
+| `fill: FFValue(md: true)` | Lo que sobra en su fila | `col` |
 | Ninguno | Su tamaño natural | `col-auto` |
 
 Se pueden mezclar en la misma fila:
 
 ```dart
-WRFlex(
-  direction: const WRValue.all(Axis.horizontal),
-  gap: const WRValue.all(16),
+FFFlex(
+  direction: const FFValue.all(Axis.horizontal),
+  gap: const FFValue.all(16),
   children: [
-    WRItem(col: const WRValue(xs: 12, md: 3), child: Filtros()),
-    WRItem(fill: const WRValue.all(true), child: Buscador()),
+    FFItem(col: const FFValue(xs: 12, md: 3), child: Filtros()),
+    FFItem(fill: const FFValue.all(true), child: Buscador()),
     IconButton(icon: const Icon(Icons.tune), onPressed: () {}),
   ],
 )
@@ -255,21 +255,21 @@ WRFlex(
 
 En `md` van los tres en una fila: filtros en 3/12, el ícono con su tamaño y el buscador con el resto. En `xs` los filtros ocupan la fila completa y el buscador y el ícono bajan a la siguiente.
 
-Si un `WRItem` tiene `col` y `fill`, gana el que esté definido en el breakpoint más cercano al actual. Con `col: WRValue(xs: 12)` y `fill: WRValue(md: true)`: fila completa en `xs`/`sm` y lo que sobra desde `md`. Si están en el mismo breakpoint, gana `col`.
+Si un `FFItem` tiene `col` y `fill`, gana el que esté definido en el breakpoint más cercano al actual. Con `col: FFValue(xs: 12)` y `fill: FFValue(md: true)`: fila completa en `xs`/`sm` y lo que sobra desde `md`. Si están en el mismo breakpoint, gana `col`.
 
 ### Vertical
 
-En vertical los elementos se apilan. Por defecto ocupan todo el ancho, `col` se ignora y `fill` reparte la altura que sobra (solo si el `WRFlex` tiene un alto limitado).
+En vertical los elementos se apilan. Por defecto ocupan todo el ancho, `col` se ignora y `fill` reparte la altura que sobra (solo si el `FFFlex` tiene un alto limitado).
 
 ```dart
-WRFlex(
-  direction: const WRValue(xs: Axis.vertical, md: Axis.horizontal),
-  gap: const WRValue(xs: 12, md: 16),
+FFFlex(
+  direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
+  gap: const FFValue(xs: 12, md: 16),
   children: [
-    WRItem(fill: const WRValue(md: true), style: card, child: Card1()),
-    WRItem(fill: const WRValue(md: true), style: card, child: Card2()),
-    WRItem(
-      order: const WRValue(xs: -1, md: 0), // primero en móvil, en su lugar desde md
+    FFItem(fill: const FFValue(md: true), style: card, child: Card1()),
+    FFItem(fill: const FFValue(md: true), style: card, child: Card2()),
+    FFItem(
+      order: const FFValue(xs: -1, md: 0), // primero en móvil, en su lugar desde md
       child: Image(...),
     ),
   ],
@@ -278,28 +278,28 @@ WRFlex(
 
 ### Referencia
 
-**`WRFlex`**
+**`FFFlex`**
 - `direction`: por defecto vertical.
 - `gap`: separación entre elementos y, en horizontal, también entre filas.
 - `mainAxisAlignment`: por defecto `start`. En horizontal se aplica a cada fila.
 - `crossAxisAlignment`: por defecto `stretch` en vertical (los elementos ocupan todo el ancho) y `start` en horizontal. En horizontal se aplica dentro de cada fila; `stretch` iguala la altura de la fila.
-- `style`: un `WRStyle` para el contenedor.
-- `children`: pueden ser `WRItem` o cualquier widget (este toma su tamaño natural).
+- `style`: un `FFStyle` para el contenedor.
+- `children`: pueden ser `FFItem` o cualquier widget (este toma su tamaño natural).
 
-**`WRItem`**
+**`FFItem`**
 - `col`: cuántas de las 12 columnas ocupa (de 1 a 12). Solo en horizontal.
-- `fill`: `true` hace que ocupe el espacio que sobra en su fila; si varios lo tienen, se lo reparten en partes iguales. `false` o sin valor: toma su tamaño natural. Puede cambiar por breakpoint, por ejemplo `WRValue(xs: false, sm: true, lg: false)`.
-- `order`: posición dentro del `WRFlex`; los menores van primero (por defecto 0).
-- `style`: un `WRStyle`. Con `visible: false` el elemento se quita y no deja separación.
+- `fill`: `true` hace que ocupe el espacio que sobra en su fila; si varios lo tienen, se lo reparten en partes iguales. `false` o sin valor: toma su tamaño natural. Puede cambiar por breakpoint, por ejemplo `FFValue(xs: false, sm: true, lg: false)`.
+- `order`: posición dentro del `FFFlex`; los menores van primero (por defecto 0).
+- `style`: un `FFStyle`. Con `visible: false` el elemento se quita y no deja separación.
 
 **Detalles:**
 - Cada hijo se mide una vez, como en un `Row` o un `Wrap`, así que no pesa más que ellos. Como ellos, construye todos sus hijos aunque no se vean; para listas de cientos de elementos conviene `GridView.builder`.
-- Si el `WRFlex` no tiene un límite en su eje (por ejemplo, vertical dentro de un `SingleChildScrollView`), `fill` y `col` se ignoran en vez de dar error.
+- Si el `FFFlex` no tiene un límite en su eje (por ejemplo, vertical dentro de un `SingleChildScrollView`), `fill` y `col` se ignoran en vez de dar error.
 - Cambiar `order` o ocultar un elemento no hace perder el estado de los demás.
 - Respeta `TextDirection.rtl`.
-- Fuera de un `WRFlex`, `WRItem` ignora `col`, `fill` y `order` y solo aplica su `style`. Sirve como un `div` con clases.
+- Fuera de un `FFFlex`, `FFItem` ignora `col`, `fill` y `order` y solo aplica su `style`. Sirve como un `div` con clases.
 
-## `WRScaffold`: navegación según el breakpoint
+## `FFScaffold`: navegación según el breakpoint
 
 Funciona como un `Scaffold` (recibe `appBar`, `body`, `floatingActionButton`, `floatingActionButtonLocation` y `backgroundColor`), pero además arma la navegación según el breakpoint.
 
@@ -318,44 +318,44 @@ class _HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return WRScaffold(
+    return FFScaffold(
       appBar: AppBar(title: const Text('Mi app')),
       currentRoute: _route,
       onRouteSelected: (id) => setState(() => _route = id),
       destinations: const [
-        WRDestination(id: 'inicio', icon: Icon(Icons.home_outlined), label: 'Inicio'),
-        WRDestination(
+        FFDestination(id: 'inicio', icon: Icon(Icons.home_outlined), label: 'Inicio'),
+        FFDestination(
           id: 'ventas',
           icon: Icon(Icons.storefront_outlined),
           label: 'Ventas',
           children: [
-            WRDestination(id: 'ventas/pedidos', icon: Icon(Icons.receipt_long_outlined), label: 'Pedidos'),
-            WRDestination(id: 'ventas/clientes', icon: Icon(Icons.people_outline), label: 'Clientes'),
+            FFDestination(id: 'ventas/pedidos', icon: Icon(Icons.receipt_long_outlined), label: 'Pedidos'),
+            FFDestination(id: 'ventas/clientes', icon: Icon(Icons.people_outline), label: 'Clientes'),
           ],
         ),
         // Solo desde md
-        WRDestination(
+        FFDestination(
           id: 'reportes',
           icon: Icon(Icons.bar_chart_outlined),
           label: 'Reportes',
-          visible: WRValue(xs: false, md: true),
+          visible: FFValue(xs: false, md: true),
         ),
         // Grupo siempre abierto, sin flecha
-        WRDestination(
+        FFDestination(
           id: 'config',
           icon: Icon(Icons.settings_outlined),
           label: 'Configuración',
           alwaysOpen: true,
           children: [
-            WRDestination(id: 'config/perfil', icon: Icon(Icons.person_outline), label: 'Perfil'),
+            FFDestination(id: 'config/perfil', icon: Icon(Icons.person_outline), label: 'Perfil'),
           ],
         ),
       ],
 
       // Cada breakpoint pone solo lo que cambia; el resto lo hereda
-      responsive: const WRValue(
-        xs: WRNavStyle(
-          type: WRNavigation.bottom,
+      responsive: const FFValue(
+        xs: FFNavStyle(
+          type: FFNavigation.bottom,
           backgroundColor: AppColors.surface,
           iconColor: AppColors.muted,
           labelColor: AppColors.muted,
@@ -363,8 +363,8 @@ class _HomeState extends State<Home> {
           selectedIconColor: AppColors.primary,
           selectedLabelColor: AppColors.primary,
         ),
-        md: WRNavStyle(type: WRNavigation.rail, expandMode: WRRailExpand.overlay),
-        lg: WRNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
+        md: FFNavStyle(type: FFNavigation.rail, expandMode: WRRailExpand.overlay),
+        lg: FFNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
       ),
 
       body: pages[_route]!,
@@ -379,11 +379,11 @@ class _HomeState extends State<Home> {
 | `md` | Rail de íconos; ☰ abre el menú completo encima del contenido |
 | `lg`, `xl` | Menú completo abierto como sidebar, que empuja el contenido |
 
-**`WRNavStyle`**
+**`FFNavStyle`**
 
 | Campo | Qué hace |
 |---|---|
-| `type` | `WRNavigation.bottom`, `rail`, `drawer` o `appBar` |
+| `type` | `FFNavigation.bottom`, `rail`, `drawer` o `appBar` |
 | `expandMode` | Con rail, cómo se abre el menú completo: `WRRailExpand.overlay` o `sidebar` |
 | `expanded` | Con `sidebar`, si el menú empieza abierto |
 | `subRoutesAlwaysVisible` | Todos los grupos siempre abiertos, sin flecha |
@@ -394,20 +394,20 @@ class _HomeState extends State<Home> {
 | `shadow` | Sombra que separa la navegación del contenido: a la derecha del rail y del sidebar, y arriba de la barra. Por defecto no hay |
 | `shadowColor` | Color de la sombra; por defecto uno suave según el modo claro u oscuro |
 
-- `responsive` funciona en cascada, como `WRStyle`: `lg` del ejemplo sigue siendo `rail` y usa los colores de `xs`.
-- Los colores son `WRColor`, así que cambian solos en modo oscuro. Los que no pongas usan los del `Theme`.
-- Lo que no definas sale de `WRScaffold.defaults`: barra abajo en `xs`/`sm`, rail con `overlay` en `md` y `sidebar` abierto desde `lg`.
+- `responsive` funciona en cascada, como `FFStyle`: `lg` del ejemplo sigue siendo `rail` y usa los colores de `xs`.
+- Los colores son `FFColor`, así que cambian solos en modo oscuro. Los que no pongas usan los del `Theme`.
+- Lo que no definas sale de `FFScaffold.defaults`: barra abajo en `xs`/`sm`, rail con `overlay` en `md` y `sidebar` abierto desde `lg`.
 
-**Tipos de navegación (`WRNavigation`)**
+**Tipos de navegación (`FFNavigation`)**
 - `bottom`: barra abajo con íconos y textos (`NavigationBar`).
 - `rail`: barra lateral de íconos con un botón ☰ arriba que abre el menú completo (íconos, textos y subrutas).
 - `drawer`: menú oculto que sale desde el lado al tocar ☰ en el app bar; se cierra al elegir una opción. Si no pasas `appBar`, se pone uno vacío para que exista el botón.
 - `appBar`: enlaces dentro del app bar, después del título, como en un sitio web. Un grupo es un botón con ▾ que abre un dropdown con sus subrutas. Pensado para `md` en adelante: en pantallas angostas los enlaces que no caben se desplazan de lado. Tu `AppBar` conserva su título, `leading` y `actions`; si pasas otro `PreferredSizeWidget`, los enlaces van en una franja debajo.
 
 ```dart
-responsive: const WRValue(
-  xs: WRNavStyle(type: WRNavigation.bottom),
-  md: WRNavStyle(type: WRNavigation.appBar),
+responsive: const FFValue(
+  xs: FFNavStyle(type: FFNavigation.bottom),
+  md: FFNavStyle(type: FFNavigation.appBar),
 ),
 ```
 
@@ -423,43 +423,43 @@ responsive: const WRValue(
 - En la barra abajo y en el rail cerrado solo se ven los grupos. En la barra, tocar un grupo lleva a su última subruta visitada (o a la primera). En el rail cerrado, abre el menú con ese grupo desplegado.
 
 **Destinos por breakpoint**
-- `visible: WRValue(...)` oculta un destino o una subruta en los breakpoints que digas. Un grupo sin subrutas visibles se oculta.
+- `visible: FFValue(...)` oculta un destino o una subruta en los breakpoints que digas. Un grupo sin subrutas visibles se oculta.
 
 **Abrir el menú desde código**
-- `WRScaffold.of(context)` da `openMenu()`, `closeMenu()`, `toggleMenu()` e `isMenuOpen`. Sirve para el rail y el drawer.
+- `FFScaffold.of(context)` da `openMenu()`, `closeMenu()`, `toggleMenu()` e `isMenuOpen`. Sirve para el rail y el drawer.
 
 **Detalles**
 - Se usa un solo tipo por breakpoint.
 - Si el usuario abre o cierra el menú con ☰, se respeta mientras siga en el mismo breakpoint. Al cambiar de breakpoint vuelve al valor de `expanded`.
 - La ruta actual (`currentRoute`) no cambia al cambiar de navegación.
 
-## `WRActions`: acciones del app bar
+## `FFActions`: acciones del app bar
 
-Cada acción decide por breakpoint si se ve con ícono y texto, solo con ícono, dentro del menú ⋮ o si no aparece. Va en `AppBar.actions` (con o sin `WRScaffold`) o en cualquier fila.
+Cada acción decide por breakpoint si se ve con ícono y texto, solo con ícono, dentro del menú ⋮ o si no aparece. Va en `AppBar.actions` (con o sin `FFScaffold`) o en cualquier fila.
 
 ```dart
 AppBar(
   title: const Text('Pedidos'),
   actions: [
-    WRActions(
+    FFActions(
       actions: [
-        WRAction(
+        FFAction(
           icon: const Icon(Icons.add),
           label: 'Nuevo pedido',
           onPressed: _nuevo,
-          display: const WRValue(xs: WRActionDisplay.icon, md: WRActionDisplay.full),
+          display: const FFValue(xs: FFActionDisplay.icon, md: FFActionDisplay.full),
         ),
-        WRAction(
+        FFAction(
           icon: const Icon(Icons.download_outlined),
           label: 'Exportar',
           onPressed: _exportar,
-          display: const WRValue(xs: WRActionDisplay.menu, lg: WRActionDisplay.full),
+          display: const FFValue(xs: FFActionDisplay.menu, lg: FFActionDisplay.full),
         ),
-        WRAction(
+        FFAction(
           icon: const Icon(Icons.print_outlined),
           label: 'Imprimir',
           onPressed: _imprimir,
-          display: const WRValue(xs: WRActionDisplay.hidden, md: WRActionDisplay.menu),
+          display: const FFValue(xs: FFActionDisplay.hidden, md: FFActionDisplay.menu),
         ),
       ],
     ),
@@ -473,7 +473,7 @@ AppBar(
 | `md` | Ícono y texto | En ⋮ | En ⋮ |
 | `lg`, `xl` | Ícono y texto | Ícono y texto | En ⋮ |
 
-**`WRActionDisplay`**
+**`FFActionDisplay`**
 - `full`: ícono y texto, como botón.
 - `icon`: solo el ícono; el texto queda como tooltip.
 - `menu`: dentro del menú ⋮, con ícono y texto.
