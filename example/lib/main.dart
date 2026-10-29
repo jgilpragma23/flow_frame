@@ -194,6 +194,7 @@ class _ExampleShellState extends State<ExampleShell> {
         md: WRNavStyle(
           type: top ? WRNavigation.appBar : WRNavigation.rail,
           expandMode: WRRailExpand.overlay,
+          shadow: true,
         ),
         lg: const WRNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
       ),

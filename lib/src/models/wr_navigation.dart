@@ -51,6 +51,8 @@ class WRNavStyle {
     this.selectedBackgroundColor,
     this.selectedIconColor,
     this.selectedLabelColor,
+    this.shadow,
+    this.shadowColor,
   });
 
   /// Barra abajo, rail, drawer o enlaces en el app bar.
@@ -78,6 +80,13 @@ class WRNavStyle {
   final WRColor? selectedIconColor;
   final WRColor? selectedLabelColor;
 
+  /// Sombra que separa la navegación del contenido: a la derecha del rail
+  /// y del sidebar, y arriba de la barra. Por defecto sin sombra.
+  final bool? shadow;
+
+  /// Color de la sombra. Por defecto el `shadow` del `ColorScheme`, suave.
+  final WRColor? shadowColor;
+
   /// Los valores de [other] reemplazan a los de este, salvo los `null`.
   WRNavStyle merge(WRNavStyle? other) {
     if (other == null) return this;
@@ -94,6 +103,8 @@ class WRNavStyle {
           other.selectedBackgroundColor ?? selectedBackgroundColor,
       selectedIconColor: other.selectedIconColor ?? selectedIconColor,
       selectedLabelColor: other.selectedLabelColor ?? selectedLabelColor,
+      shadow: other.shadow ?? shadow,
+      shadowColor: other.shadowColor ?? shadowColor,
     );
   }
 
@@ -109,7 +120,9 @@ class WRNavStyle {
       other.labelColor == labelColor &&
       other.selectedBackgroundColor == selectedBackgroundColor &&
       other.selectedIconColor == selectedIconColor &&
-      other.selectedLabelColor == selectedLabelColor;
+      other.selectedLabelColor == selectedLabelColor &&
+      other.shadow == shadow &&
+      other.shadowColor == shadowColor;
 
   @override
   int get hashCode => Object.hash(
@@ -123,6 +136,8 @@ class WRNavStyle {
     selectedBackgroundColor,
     selectedIconColor,
     selectedLabelColor,
+    shadow,
+    shadowColor,
   );
 }
 

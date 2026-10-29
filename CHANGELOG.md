@@ -1,3 +1,8 @@
+## Sin publicar
+
+* `WRScaffold`: se quitó la línea entre el rail o sidebar y el contenido.
+* `WRNavStyle`: `shadow` y `shadowColor` para una sombra opcional que separa la navegación del contenido.
+
 ## 0.0.1 - 2026-10-28
 
 * Breakpoints `xs`/`sm`/`md`/`lg`/`xl`, configurables con `WRBreakpoints.current`.

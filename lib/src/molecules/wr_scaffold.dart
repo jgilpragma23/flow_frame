@@ -235,7 +235,32 @@ class WRScaffoldState extends State<WRScaffold> {
     if (closeMenu) this.closeMenu();
   }
 
+  Color get _shadowColor {
+    final theme = Theme.of(context);
+    return _color(_style.shadowColor) ??
+        theme.colorScheme.shadow.withValues(
+          alpha: theme.brightness == Brightness.dark ? 0.5 : 0.12,
+        );
+  }
+
   Widget _bottomBar(List<WRDestination> items) {
+    final bar = _navigationBar(items);
+    if (!(_style.shadow ?? false)) return bar;
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: _shadowColor,
+            blurRadius: 8,
+            offset: const Offset(0, -1),
+          ),
+        ],
+      ),
+      child: bar,
+    );
+  }
+
+  Widget _navigationBar(List<WRDestination> items) {
     final selected = _groupOf(items, widget.currentRoute);
     final icon = _color(_style.iconColor);
     final selectedIcon = _color(_style.selectedIconColor);
@@ -441,8 +466,33 @@ class WRScaffoldState extends State<WRScaffold> {
                 )
               : _collapsedRail(items),
         ),
-        const VerticalDivider(width: 1, thickness: 1),
-        Expanded(child: widget.body),
+        Expanded(
+          child: Stack(
+            children: [
+              Positioned.fill(child: widget.body),
+              // Encima del contenido, para que un fondo propio no la tape.
+              if (_style.shadow ?? false)
+                Positioned(
+                  left: 0,
+                  top: 0,
+                  bottom: 0,
+                  width: 8,
+                  child: IgnorePointer(
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            _shadowColor,
+                            _shadowColor.withValues(alpha: 0),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
       ],
     );
     if (_expandMode == WRRailExpand.sidebar) return row;
