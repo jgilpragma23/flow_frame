@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../models/breakpoint.dart';
+import '../models/ff_brand.dart';
 import '../models/ff_color.dart';
 import '../models/ff_navigation.dart';
 import '../models/ff_value.dart';
@@ -19,6 +20,7 @@ class FFScaffold extends StatefulWidget {
     required this.currentRoute,
     required this.onRouteSelected,
     this.responsive,
+    this.brand,
     this.appBar,
     required this.body,
     this.floatingActionButton,
@@ -51,6 +53,10 @@ class FFScaffold extends StatefulWidget {
   /// Tipo, comportamiento y colores de la navegación por breakpoint, en
   /// cascada. Lo que no se define sale de [defaults].
   final FFValue<FFNavStyle>? responsive;
+
+  /// Logo y nombre de la app junto al ☰. Ver [FFBrand] para dónde aparece
+  /// en cada tipo de navegación.
+  final FFBrand? brand;
 
   /// Con [FFNavigation.drawer] muestra el botón ☰. Si es `null` y la
   /// navegación es drawer, se usa un `AppBar` vacío para tener el botón.
@@ -143,9 +149,10 @@ class WRScaffoldState extends State<FFScaffold> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: switch (_navigation) {
-        FFNavigation.drawer => widget.appBar ?? AppBar(),
+        FFNavigation.drawer => _appBarWithBrand(widget.appBar ?? AppBar()),
         FFNavigation.appBar => _appBarWithNav(items),
-        _ => widget.appBar,
+        FFNavigation.bottom => _appBarWithBrand(widget.appBar),
+        FFNavigation.rail => widget.appBar,
       },
       backgroundColor: widget.backgroundColor,
       floatingActionButton: widget.floatingActionButton,
@@ -157,7 +164,15 @@ class WRScaffoldState extends State<FFScaffold> {
           ? Drawer(
               width: _menuWidth + 24,
               backgroundColor: _color(_style.backgroundColor),
-              child: SafeArea(child: _menu(items, closeOnSelect: true)),
+              child: SafeArea(
+                child: _menu(
+                  items,
+                  closeOnSelect: true,
+                  header: widget.brand?.showInDrawer ?? false
+                      ? _drawerHeader()
+                      : null,
+                ),
+              ),
             )
           : null,
       body: _navigation == FFNavigation.rail ? _railBody(items) : widget.body,
@@ -334,17 +349,41 @@ class WRScaffoldState extends State<FFScaffold> {
       );
     }
 
-    final title = source.title;
-    return AppBar(
-      key: source.key,
-      leading: source.leading,
-      automaticallyImplyLeading: source.automaticallyImplyLeading,
+    final title = source.title ?? _brandInBar();
+    return _copyAppBar(
+      source,
       title: Row(
         children: [
           if (title != null) ...[title, const SizedBox(width: 24)],
           Expanded(child: nav),
         ],
       ),
+      centerTitle: false,
+      backgroundColor: source.backgroundColor ?? _color(_style.backgroundColor),
+    );
+  }
+
+  /// El app bar con la marca como título, si es un `AppBar` sin título.
+  PreferredSizeWidget? _appBarWithBrand(PreferredSizeWidget? source) {
+    final brand = _brandInBar();
+    if (source is! AppBar || source.title != null || brand == null) {
+      return source;
+    }
+    return _copyAppBar(source, title: brand);
+  }
+
+  /// Copia de [source] con otro título.
+  AppBar _copyAppBar(
+    AppBar source, {
+    required Widget title,
+    bool? centerTitle,
+    Color? backgroundColor,
+  }) {
+    return AppBar(
+      key: source.key,
+      leading: source.leading,
+      automaticallyImplyLeading: source.automaticallyImplyLeading,
+      title: title,
       actions: source.actions,
       actionsPadding: source.actionsPadding,
       flexibleSpace: source.flexibleSpace,
@@ -354,12 +393,12 @@ class WRScaffoldState extends State<FFScaffold> {
       shadowColor: source.shadowColor,
       surfaceTintColor: source.surfaceTintColor,
       shape: source.shape,
-      backgroundColor: source.backgroundColor ?? _color(_style.backgroundColor),
+      backgroundColor: backgroundColor ?? source.backgroundColor,
       foregroundColor: source.foregroundColor,
       iconTheme: source.iconTheme,
       actionsIconTheme: source.actionsIconTheme,
       primary: source.primary,
-      centerTitle: false,
+      centerTitle: centerTitle ?? source.centerTitle,
       titleSpacing: source.titleSpacing,
       toolbarHeight: source.toolbarHeight,
       leadingWidth: source.leadingWidth,
@@ -461,7 +500,7 @@ class WRScaffoldState extends State<FFScaffold> {
                   child: _menu(
                     items,
                     closeOnSelect: false,
-                    header: _menuButton(open: true),
+                    header: _menuHeader(),
                   ),
                 )
               : _collapsedRail(items),
@@ -529,7 +568,7 @@ class WRScaffoldState extends State<FFScaffold> {
               child: _menu(
                 items,
                 closeOnSelect: true,
-                header: _menuButton(open: true),
+                header: _menuHeader(),
               ),
             ),
           ),
@@ -538,18 +577,115 @@ class WRScaffoldState extends State<FFScaffold> {
     );
   }
 
-  Widget _menuButton({required bool open}) => Padding(
+  /// ☰ para cerrar el menú, con la marca al lado.
+  Widget _menuHeader() => Padding(
     padding: const EdgeInsets.fromLTRB(4, 0, 0, 8),
-    child: Align(
-      alignment: Alignment.centerLeft,
-      child: IconButton(
-        tooltip: open ? 'Cerrar menú' : 'Abrir menú',
-        color: _color(_style.iconColor),
-        icon: Icon(open ? Icons.menu_open : Icons.menu),
-        onPressed: open ? closeMenu : openMenu,
-      ),
+    child: Row(
+      children: [
+        IconButton(
+          tooltip: 'Cerrar menú',
+          color: _color(_style.iconColor),
+          icon: const Icon(Icons.menu_open),
+          onPressed: closeMenu,
+        ),
+        if (widget.brand case final brand?) ...[
+          const SizedBox(width: 4),
+          Expanded(child: _brandTile(brand, subtitle: true)),
+        ],
+      ],
     ),
   );
+
+  /// Arriba dentro del drawer: la marca con su subtítulo y una línea.
+  Widget _drawerHeader() => Padding(
+    padding: const EdgeInsets.only(bottom: 8),
+    child: Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 0, 12),
+          child: _brandTile(widget.brand!, subtitle: true, logoSize: 32),
+        ),
+        const Divider(height: 1),
+      ],
+    ),
+  );
+
+  /// Logo y título en una fila, para el app bar. `null` sin marca.
+  Widget? _brandInBar() {
+    final brand = widget.brand;
+    if (brand == null) return null;
+    return _tappable(
+      brand.onTap,
+      Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (brand.logo case final logo?) _logo(logo, 28),
+          if (brand.logo != null && brand.title != null)
+            const SizedBox(width: 10),
+          ?brand.title,
+        ],
+      ),
+    );
+  }
+
+  /// Logo, título y subtítulo para el menú, con los colores del estilo.
+  Widget _brandTile(
+    FFBrand brand, {
+    required bool subtitle,
+    double logoSize = 28,
+  }) {
+    final theme = Theme.of(context);
+    final label = _color(_style.labelColor);
+    return _tappable(
+      brand.onTap,
+      Row(
+        children: [
+          if (brand.logo case final logo?) _logo(logo, logoSize),
+          if (brand.logo != null) const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (brand.title case final title?)
+                  DefaultTextStyle.merge(
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: label ?? theme.colorScheme.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    child: title,
+                  ),
+                if (subtitle && brand.subtitle != null)
+                  DefaultTextStyle.merge(
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: label ?? theme.colorScheme.onSurfaceVariant,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    child: brand.subtitle!,
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _logo(Widget logo, double size) => SizedBox.square(
+    dimension: size,
+    child: FittedBox(child: logo),
+  );
+
+  Widget _tappable(VoidCallback? onTap, Widget child) => onTap == null
+      ? child
+      : InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(8),
+          child: child,
+        );
 
   Widget _collapsedRail(List<FFDestination> items) {
     final selected = _groupOf(items, widget.currentRoute);
@@ -573,11 +709,19 @@ class WRScaffoldState extends State<FFScaffold> {
         _openGroups.add(d.id);
         openMenu();
       },
-      leading: IconButton(
-        tooltip: 'Abrir menú',
-        color: _color(_style.iconColor),
-        icon: const Icon(Icons.menu),
-        onPressed: openMenu,
+      leading: Column(
+        children: [
+          IconButton(
+            tooltip: 'Abrir menú',
+            color: _color(_style.iconColor),
+            icon: const Icon(Icons.menu),
+            onPressed: openMenu,
+          ),
+          if (widget.brand?.logo case final logo?) ...[
+            const SizedBox(height: 8),
+            _tappable(widget.brand!.onTap, _logo(logo, 32)),
+          ],
+        ],
       ),
       destinations: [
         for (final d in items)

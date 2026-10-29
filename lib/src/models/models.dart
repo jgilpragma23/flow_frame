@@ -1,5 +1,6 @@
 export 'breakpoint.dart';
 export 'ff_action.dart';
+export 'ff_brand.dart';
 export 'ff_color.dart';
 export 'ff_navigation.dart';
 export 'ff_spacing.dart';
