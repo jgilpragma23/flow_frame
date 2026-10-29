@@ -1032,6 +1032,38 @@ void main() {
       expect(visibleText('Reportes'), findsWidgets);
     });
 
+    for (final (name, screen) in [
+      ('rail', tablet),
+      ('sidebar', const Size(1300, 800)),
+    ]) {
+      testWidgets('$name: ocupa toda la altura y el app bar va a su lado', (
+        tester,
+      ) async {
+        await pumpScaffold(
+          tester,
+          screen,
+          appBar: AppBar(title: const Text('Pedidos')),
+        );
+        final appBar = tester.getRect(find.byType(AppBar));
+        final nav = tester.getRect(
+          name == 'rail'
+              ? find.byType(NavigationRail)
+              : find.byIcon(Icons.menu_open),
+        );
+        expect(appBar.top, 0);
+        expect(appBar.left, greaterThanOrEqualTo(nav.right));
+        expect(nav.top, lessThan(appBar.bottom));
+        // El ☰ queda a la altura del título.
+        final menu = tester.getCenter(
+          find.byIcon(name == 'rail' ? Icons.menu : Icons.menu_open),
+        );
+        expect(
+          (menu.dy - tester.getCenter(find.text('Pedidos')).dy).abs(),
+          lessThan(2),
+        );
+      });
+    }
+
     group('marca', () {
       const brand = FFBrand(
         logo: Icon(Icons.storefront, key: Key('logo')),
