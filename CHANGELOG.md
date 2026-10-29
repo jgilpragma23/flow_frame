@@ -2,6 +2,7 @@
 
 * `FFScaffold`: se quitó la línea entre el rail o sidebar y el contenido.
 * `FFNavStyle`: `shadow` y `shadowColor` para una sombra opcional que separa la navegación del contenido.
+* `FFBrand` y `FFScaffold.brand`: logo y nombre de la app junto al ☰, acomodados según la navegación (encabezado del menú, rail, drawer o app bar).
 
 ## 0.0.1 - 2026-10-28
 

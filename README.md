@@ -425,6 +425,32 @@ responsive: const FFValue(
 **Destinos por breakpoint**
 - `visible: FFValue(...)` oculta un destino o una subruta en los breakpoints que digas. Un grupo sin subrutas visibles se oculta.
 
+**Marca: logo y nombre junto al ☰**
+
+```dart
+FFScaffold(
+  brand: FFBrand(
+    logo: Image.asset('assets/logo.png'),
+    title: const Text('Mi Tienda'),
+    subtitle: const Text('Admin'),       // opcional, solo en el menú
+    onTap: () => context.go('/'),        // opcional
+  ),
+  ...
+)
+```
+
+Se define una vez y cada navegación la acomoda:
+
+| Navegación | Dónde va |
+|---|---|
+| sidebar y overlay | `☰ [logo] Mi Tienda / Admin` en el encabezado del menú |
+| rail cerrado | solo el logo, debajo del ☰ |
+| drawer | `☰ [logo] Mi Tienda` en el app bar, y la marca completa arriba del drawer (`showInDrawer: false` la quita de ahí) |
+| appBar | `[logo] Mi Tienda` antes de los enlaces |
+| bottom | `[logo] Mi Tienda` en el app bar |
+
+En el app bar solo se usa si el `AppBar` no tiene `title`: el título propio siempre manda. El logo se ajusta a 28 px (32 en el rail y arriba del drawer).
+
 **Abrir el menú desde código**
 - `FFScaffold.of(context)` da `openMenu()`, `closeMenu()`, `toggleMenu()` e `isMenuOpen`. Sirve para el rail y el drawer.
 
