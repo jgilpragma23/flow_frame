@@ -1,32 +1,189 @@
-# web_responsive
+# flow_frame
 
-Herramientas para hacer interfaces responsive en Flutter con una idea parecida a Bootstrap: breakpoints mobile-first, estilos reutilizables y colores que cambian con el modo claro u oscuro.
+Herramientas para hacer interfaces responsive en Flutter con una idea parecida a Bootstrap: breakpoints mobile-first, estilos reutilizables, colores con modo claro u oscuro y una navegación que cambia sola según el ancho de la pantalla.
 
-> En desarrollo. Ya están los breakpoints, `FFValue`, `FFSpacing`, `FFStyle`, los colores con modo oscuro, `FFContainer`, `FFFlex`, `FFItem` y `FFScaffold`.
+![La misma pantalla de pedidos en teléfono, tablet y escritorio](doc/app.png)
+
+## Qué trae
+
+| | Para qué sirve | |
+|---|---|---|
+| [Breakpoints](#breakpoints) | `xs` `sm` `md` `lg` `xl`, mobile-first | |
+| [`FFValue`](#ffvalue-un-valor-por-breakpoint) | Un valor distinto por breakpoint, en cascada | |
+| [`FFSpacing`](#ffspacing-padding-y-margin) | Padding y margin por breakpoint | [imagen](#ffspacing-padding-y-margin) |
+| [`FFStyle`](#ffstyle-estilos-reutilizables) | Estilos reutilizables tipo clase de CSS: texto, color, tamaño, visible | [imagen](#ffstyle-estilos-reutilizables) |
+| [Colores](#colores-y-modo-oscuro) | `FFColor` con versión clara y oscura | [imagen](#colores-y-modo-oscuro) |
+| [`FFContainer`](#ffcontainer) | Contenedor centrado con ancho máximo | [imagen](#ffcontainer) |
+| [`FFFlex` y `FFItem`](#ffflex-y-ffitem) | Grilla de 12 columnas, filas o columnas que cambian por breakpoint | [imagen](#ffflex-y-ffitem) |
+| [`FFScaffold`](#ffscaffold-navegación-según-el-breakpoint) | Barra abajo, rail, sidebar, drawer o enlaces en el app bar, según el ancho | [GIF](#ffscaffold-navegación-según-el-breakpoint) |
+| [`FFBrand`](#ffscaffold-navegación-según-el-breakpoint) | Logo y nombre de la app junto al ☰ | |
+| [`FFActions`](#ffactions-acciones-del-app-bar) | Acciones del app bar: con texto, solo ícono, en el menú ⋮ u ocultas | [imagen](#ffactions-acciones-del-app-bar) |
+
+## Instalación
+
+```yaml
+dependencies:
+  flow_frame:
+    git:
+      url: https://github.com/jgilpragma23/flow_frame.git
+      ref: v0.0.3
+```
+
+```dart
+import 'package:flow_frame/flow_frame.dart';
+```
 
 ## Ejemplo completo
 
+Una app con navegación responsive, marca, acciones y una página en grilla. Es una versión resumida de la pantalla de la imagen de arriba; el código completo está en [`example/`](example/lib/main.dart).
+
 ```dart
-FFContainer(
-  maxSize: 1280,
-  style: const FFStyle(padding: FFSpacing(horizontal: FFValue(xs: 16, md: 24))),
-  child: FFFlex(
-    // Sidebar arriba en móvil, a la izquierda desde md
-    direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
-    gap: const FFValue(xs: 16, md: 24),
-    children: [
-      FFItem(
-        style: const FFStyle(
-          width: FFValue(md: 280),
-          visible: FFValue(xs: false, sm: true),
+class AppColors {
+  static const surface = FFColor.adaptive(light: Color(0xFFF5F5F5), dark: Color(0xFF1E1E1E));
+  static const primary = FFColor.adaptive(light: Color(0xFF2563EB), dark: Color(0xFF60A5FA));
+  static const primarySoft = FFColor.adaptive(light: Color(0xFFDBEAFE), dark: Color(0xFF1E3A5F));
+  static const muted = FFColor.adaptive(light: Color(0xFF666666), dark: Color(0xFF9E9E9E));
+}
+
+const card = FFStyle(
+  padding: FFSpacing(all: FFValue(xs: 12, md: 20)),
+  backgroundColor: AppColors.surface,
+);
+
+class Shell extends StatefulWidget {
+  const Shell({super.key});
+
+  @override
+  State<Shell> createState() => _ShellState();
+}
+
+class _ShellState extends State<Shell> {
+  String _route = 'ventas/pedidos';
+
+  @override
+  Widget build(BuildContext context) {
+    return FFScaffold(
+      currentRoute: _route,
+      onRouteSelected: (id) => setState(() => _route = id),
+      destinations: const [
+        FFDestination(id: 'inicio', icon: Icon(Icons.home_outlined), label: 'Inicio'),
+        FFDestination(
+          id: 'ventas',
+          icon: Icon(Icons.storefront_outlined),
+          label: 'Ventas',
+          children: [
+            FFDestination(id: 'ventas/pedidos', icon: Icon(Icons.receipt_long_outlined), label: 'Pedidos'),
+            FFDestination(id: 'ventas/clientes', icon: Icon(Icons.people_outline), label: 'Clientes'),
+          ],
         ),
-        child: Sidebar(),
+        FFDestination(
+          id: 'reportes',
+          icon: Icon(Icons.bar_chart_outlined),
+          label: 'Reportes',
+          visible: FFValue(xs: false, md: true), // no cabe en la barra de abajo
+        ),
+      ],
+      // Barra abajo en el teléfono, rail en tablet y sidebar en escritorio
+      responsive: const FFValue(
+        xs: FFNavStyle(
+          type: FFNavigation.bottom,
+          selectedIconColor: AppColors.primary,
+          selectedBackgroundColor: AppColors.primarySoft,
+        ),
+        md: FFNavStyle(type: FFNavigation.rail, shadow: true),
+        lg: FFNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
       ),
-      FFItem(fill: const FFValue(md: true), child: Content()),
-    ],
-  ),
-)
+      brand: const FFBrand(
+        logo: Icon(Icons.storefront),
+        title: Text('Mi Tienda'),
+        subtitle: Text('Admin'),
+      ),
+      appBar: AppBar(
+        title: const Text('Pedidos'),
+        actions: [
+          FFActions(
+            actions: [
+              FFAction(
+                icon: const Icon(Icons.add),
+                label: 'Nuevo pedido',
+                onPressed: () {},
+                display: const FFValue(xs: FFActionDisplay.icon, md: FFActionDisplay.full),
+              ),
+              FFAction(
+                icon: const Icon(Icons.download_outlined),
+                label: 'Exportar',
+                onPressed: () {},
+                display: const FFValue(xs: FFActionDisplay.menu, lg: FFActionDisplay.full),
+              ),
+            ],
+          ),
+        ],
+      ),
+      body: const PedidosPage(),
+    );
+  }
+}
+
+class PedidosPage extends StatelessWidget {
+  const PedidosPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      child: FFContainer(
+        maxSize: 1280,
+        style: const FFStyle(padding: FFSpacing(all: FFValue(xs: 16, md: 32))),
+        child: FFFlex(
+          gap: const FFValue(xs: 16, md: 24),
+          children: [
+            // Resumen: 1 por fila en xs, 2 en sm, 4 desde lg
+            FFFlex(
+              direction: const FFValue.all(Axis.horizontal),
+              gap: const FFValue(xs: 12, md: 16),
+              children: [
+                for (final (title, value) in [('Hoy', '24'), ('Semana', '183'), ('Pendientes', '7'), ('Ingresos', '\$4.2k')])
+                  FFItem(
+                    col: const FFValue(xs: 12, sm: 6, lg: 3),
+                    style: card,
+                    child: Text('$value  $title'),
+                  ),
+              ],
+            ),
+            // Lista y detalle: uno debajo del otro en xs/sm, lado a lado desde md
+            FFFlex(
+              direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
+              gap: const FFValue(xs: 12, md: 16),
+              children: [
+                const FFItem(col: FFValue(md: 7, xl: 8), style: card, child: ListaDePedidos()),
+                FFItem(
+                  fill: const FFValue(md: true),
+                  style: card.merge(const FFStyle(
+                    backgroundColor: AppColors.primarySoft,
+                    visible: FFValue(xs: false, md: true), // el detalle no se ve en el teléfono
+                  )),
+                  child: const DetalleDelPedido(),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 ```
+
+Lo mismo en modo oscuro, sin cambiar nada del código (los `FFColor` eligen su versión según el `Theme`):
+
+![La pantalla de pedidos en modo oscuro](doc/app-oscuro.png)
+
+### Ver el ejemplo
+
+```bash
+cd example && flutter run -d chrome
+```
+
+En el menú **Librería** hay una página por tema (estilos, espaciado, colores y contenedor); de ahí salen las imágenes de este README. Achica la ventana para ver cómo cambia cada cosa.
 
 ## Breakpoints
 
@@ -68,6 +225,8 @@ context.responsive(xs: 1, md: 2, xl: 4); // atajo
 
 ## `FFSpacing`: padding y margin
 
+![Padding y margin en xs, md y lg: naranja es el margin, verde el padding y azul el contenido](doc/espaciado.png)
+
 ```dart
 const FFSpacing(
   all: FFValue(xs: 8, md: 16, xl: 24),
@@ -84,6 +243,8 @@ Para cada lado:
 Con el ejemplo de arriba, el `top` vale 8 en `xs`, 12 en `sm`, 20 en `md` y `lg`, y 24 en `xl`.
 
 ## `FFStyle`: estilos reutilizables
+
+![Texto, variantes con merge y tamaños en xs y lg](doc/estilos.png)
 
 Funciona como una clase de CSS. Todo es opcional.
 
@@ -161,6 +322,8 @@ Padding(padding: s.padding, child: ...)
 
 ## Colores y modo oscuro
 
+![La misma paleta en modo claro y oscuro](doc/colores.png)
+
 La librería no tiene tema ni paleta propia: los colores se definen en tu código. Un `FFColor` puede tener versión clara y oscura:
 
 ```dart
@@ -192,6 +355,8 @@ El modo claro u oscuro se lee del `Theme` de la app, así que sigue al `themeMod
 
 ## `FFContainer`
 
+![Contenedores con maxSize 480, 800 y 1100 en xs y lg: en pantalla ancha se centran](doc/contenedor.png)
+
 Ocupa todo el ancho hasta `maxSize` y se centra en pantallas más anchas. El `style` se aplica por dentro de ese ancho.
 
 ```dart
@@ -211,6 +376,8 @@ Sin `maxSize` ocupa todo el ancho.
 `FFFlex` es una fila o columna que cambia por breakpoint (como `d-flex flex-column flex-md-row`). `FFItem` es cada elemento.
 
 ### Grilla: filas que se acomodan solas
+
+![La grilla en xs, md y lg: 1, 2 y 3 productos por fila](doc/flex.png)
 
 En horizontal, `FFFlex` funciona como un `row` de Bootstrap: cada hijo dice cuánto ocupa y lo que no cabe baja a la siguiente fila.
 
@@ -461,6 +628,8 @@ En el app bar solo se usa si el `AppBar` no tiene `title`: el título propio sie
 - La ruta actual (`currentRoute`) no cambia al cambiar de navegación.
 
 ## `FFActions`: acciones del app bar
+
+![El app bar en xs, md y lg: las acciones pasan de ícono a texto y al menú ⋮](doc/acciones.png)
 
 Cada acción decide por breakpoint si se ve con ícono y texto, solo con ícono, dentro del menú ⋮ o si no aparece. Va en `AppBar.actions` (con o sin `FFScaffold`) o en cualquier fila.
 

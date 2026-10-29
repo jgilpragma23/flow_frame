@@ -1,3 +1,8 @@
+## Sin publicar
+
+* README: índice de lo que trae la librería, instalación, ejemplo completo e imágenes en xs, md y lg de cada tema.
+* Ejemplo: sección "Librería" con una página para estilos, espaciado, colores y contenedor.
+
 ## 0.0.3 - 2026-10-29
 
 * `FFScaffold`: el rail y el sidebar ocupan toda la altura y el app bar queda solo sobre el contenido. El ☰ y el encabezado del menú se alinean con el app bar.
