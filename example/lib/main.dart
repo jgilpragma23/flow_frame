@@ -135,8 +135,25 @@ class _ExampleShellState extends State<ExampleShell> {
     final drawer = nav == 'drawer';
     final top = nav == 'top';
     return FFScaffold(
+      brand: FFBrand(
+        logo: Container(
+          width: 28,
+          height: 28,
+          decoration: BoxDecoration(
+            color: AppColors.primary.resolve(context),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: const Icon(
+            Icons.storefront_outlined,
+            color: Colors.white,
+            size: 18,
+          ),
+        ),
+        title: const Text('Mi Tienda'),
+        subtitle: const Text('Admin'),
+        onTap: () => setState(() => _selected = 'ejemplos'),
+      ),
       appBar: AppBar(
-        title: const Text('web_responsive'),
         actions: [
           FFActions(
             actions: [
@@ -192,7 +209,11 @@ class _ExampleShellState extends State<ExampleShell> {
           selectedLabelColor: AppColors.primary,
         ),
         md: FFNavStyle(
-          type: top ? FFNavigation.appBar : FFNavigation.rail,
+          type: drawer
+              ? FFNavigation.drawer
+              : top
+              ? FFNavigation.appBar
+              : FFNavigation.rail,
           expandMode: WRRailExpand.overlay,
           shadow: true,
         ),
