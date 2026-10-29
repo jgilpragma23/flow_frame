@@ -1,5 +1,6 @@
-## Sin publicar
+## 0.0.2 - 2026-10-29
 
+* **Cambio de nombre**: el paquete ahora es `flow_frame` (`import 'package:flow_frame/flow_frame.dart'`) y las clases usan el prefijo `FF` en vez de `WR` (`FFScaffold`, `FFValue`, `FFNavStyle`...).
 * `FFScaffold`: se quitó la línea entre el rail o sidebar y el contenido.
 * `FFNavStyle`: `shadow` y `shadowColor` para una sombra opcional que separa la navegación del contenido.
 * `FFBrand` y `FFScaffold.brand`: logo y nombre de la app junto al ☰, acomodados según la navegación (encabezado del menú, rail, drawer o app bar).
