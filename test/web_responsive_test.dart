@@ -203,12 +203,14 @@ void main() {
         margin: FFSpacing(top: FFValue(xs: 4)),
         backgroundColor: muted,
         maxWidth: FFValue(md: 640),
+        maxHeight: FFValue(xs: 120, lg: 400),
         visible: FFValue(xs: false, md: true),
       ).resolve(context);
       expect(resolved.padding, const EdgeInsets.all(16));
       expect(resolved.margin, const EdgeInsets.only(top: 4));
       expect(resolved.backgroundColor, gray);
       expect(resolved.maxWidth, 640);
+      expect(resolved.maxHeight, 120);
       expect(resolved.visible, isTrue);
     });
 
@@ -270,6 +272,30 @@ void main() {
 
       await pump(tester, tablet, container);
       expect(rect(tester).width, 1000 - 32);
+    });
+
+    testWidgets('maxHeight limita el alto por breakpoint', (tester) async {
+      const container = FFContainer(
+        style: FFStyle(maxHeight: FFValue(xs: 200, md: 300)),
+        child: SizedBox(key: Key('c'), height: 500),
+      );
+      await pump(tester, phone, container);
+      expect(rect(tester).height, 200);
+
+      await pump(tester, tablet, container);
+      expect(rect(tester).height, 300);
+    });
+
+    testWidgets('sin maxHeight el contenido toma su alto', (tester) async {
+      await pump(
+        tester,
+        phone,
+        const FFContainer(
+          style: FFStyle(maxHeight: FFValue(md: 300)),
+          child: SizedBox(key: Key('c'), height: 500),
+        ),
+      );
+      expect(rect(tester).height, 500);
     });
 
     testWidgets('los Text de adentro heredan el estilo', (tester) async {
@@ -339,7 +365,10 @@ void main() {
       direction: FFValue(xs: Axis.vertical, md: Axis.horizontal),
       gap: FFValue(xs: 8, md: 20),
       children: [
-        FFItem(child: SizedBox(key: Key('a'), width: 200, height: 10)),
+        FFItem(
+          fill: FFValue.all(false),
+          child: SizedBox(key: Key('a'), width: 200, height: 10),
+        ),
         FFItem(
           fill: FFValue(md: true),
           child: SizedBox(key: Key('b'), height: 10),
@@ -516,7 +545,10 @@ void main() {
                 fill: FFValue.all(true),
                 child: SizedBox(key: Key('b'), height: 10),
               ),
-              SizedBox(key: Key('c'), width: 40, height: 10),
+              FFItem(
+                fill: FFValue.all(false),
+                child: SizedBox(key: Key('c'), width: 40, height: 10),
+              ),
             ],
           ),
         );
@@ -533,7 +565,10 @@ void main() {
         const flex = FFFlex(
           direction: FFValue.all(Axis.horizontal),
           children: [
-            SizedBox(key: Key('a'), width: 100, height: 10),
+            FFItem(
+              fill: FFValue.all(false),
+              child: SizedBox(key: Key('a'), width: 100, height: 10),
+            ),
             FFItem(
               col: FFValue(xs: 12),
               fill: FFValue(md: true),
@@ -560,7 +595,10 @@ void main() {
                 col: FFValue.all(12),
                 child: SizedBox(key: Key('a'), height: 10),
               ),
-              SizedBox(key: Key('b'), width: 200, height: 10),
+              FFItem(
+                fill: FFValue.all(false),
+                child: SizedBox(key: Key('b'), width: 200, height: 10),
+              ),
             ],
           ),
         );
@@ -615,6 +653,7 @@ void main() {
           tester,
           tablet,
           const FFFlex(
+            direction: FFValue.all(Axis.vertical),
             children: [
               FFItem(
                 col: FFValue.all(6),
@@ -624,6 +663,54 @@ void main() {
           ),
         );
         expect(rectOf(tester, 'a').width, 1000);
+      });
+
+      testWidgets('por defecto es horizontal: col sin direction', (
+        tester,
+      ) async {
+        const flex = FFFlex(
+          children: [
+            FFItem(
+              col: FFValue(xs: 4, md: 12),
+              child: SizedBox(key: Key('a'), height: 10),
+            ),
+            FFItem(
+              col: FFValue(xs: 8, md: 12),
+              child: SizedBox(key: Key('b'), height: 10),
+            ),
+          ],
+        );
+        await pump(tester, phone, flex);
+        expect(rectOf(tester, 'a').width, closeTo(400 / 3, 0.001));
+        expect(rectOf(tester, 'b').top, 0);
+        expect(rectOf(tester, 'b').left, closeTo(400 / 3, 0.001));
+
+        await pump(tester, tablet, flex);
+        expect(rectOf(tester, 'a').width, 1000);
+        expect(rectOf(tester, 'b').top, 10);
+      });
+
+      testWidgets('sin col ocupa la fila completa, como en Bootstrap', (
+        tester,
+      ) async {
+        await pump(
+          tester,
+          tablet,
+          const FFFlex(
+            gap: FFValue.all(8),
+            children: [
+              FFItem(child: SizedBox(key: Key('a'), width: 100, height: 10)),
+              SizedBox(key: Key('b'), width: 100, height: 10),
+              FFItem(
+                fill: FFValue.all(false),
+                child: SizedBox(key: Key('c'), width: 100, height: 10),
+              ),
+            ],
+          ),
+        );
+        expect(rectOf(tester, 'a'), const Rect.fromLTWH(0, 0, 1000, 10));
+        expect(rectOf(tester, 'b'), const Rect.fromLTWH(0, 18, 1000, 10));
+        expect(rectOf(tester, 'c'), const Rect.fromLTWH(0, 36, 100, 10));
       });
     });
 

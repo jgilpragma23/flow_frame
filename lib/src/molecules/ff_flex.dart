@@ -13,17 +13,21 @@ import '../utils/ff_style_builder.dart';
 /// Una fila o columna cuya dirección, separación y alineación cambian según
 /// el breakpoint (equivale a `d-flex flex-column flex-md-row`).
 ///
-/// En horizontal funciona como un `row` de Bootstrap: cada [FFItem] ocupa
-/// su `col` (de 12), lo que sobra en la fila (`fill`) o su tamaño natural,
-/// y lo que no cabe baja a la siguiente fila. En vertical los apila.
+/// Por defecto es horizontal y funciona como un `row` de Bootstrap: cada
+/// [FFItem] ocupa su `col` (de 12), lo que sobra en la fila (`fill: true`)
+/// o su tamaño natural (`fill: false`), y lo que no cabe baja a la
+/// siguiente fila. Un hijo sin `col` ni `fill`, o que no es un [FFItem],
+/// ocupa la fila completa, así que sin `col` los hijos quedan apilados.
+///
+/// En vertical los apila siempre; sirve cuando importa el alto: `fill`
+/// reparte la altura que sobra y `mainAxisAlignment` alinea en vertical.
 ///
 /// Los [FFItem] también pueden cambiar de posición con `order` y ocultarse
-/// con `visible`; los ocultos no dejan separación. Cualquier otro widget se
-/// muestra con su tamaño natural.
+/// con `visible`; los ocultos no dejan separación.
 class FFFlex extends StatelessWidget {
   const FFFlex({
     super.key,
-    this.direction = const FFValue.all(Axis.vertical),
+    this.direction = const FFValue.all(Axis.horizontal),
     this.gap,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
@@ -31,6 +35,7 @@ class FFFlex extends StatelessWidget {
     required this.children,
   });
 
+  /// Por defecto horizontal en todos los breakpoints.
   final FFValue<Axis> direction;
 
   /// Separación entre elementos y, en horizontal, también entre filas.
@@ -49,7 +54,7 @@ class FFFlex extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final breakpoint = context.breakpoint;
-    final axis = direction.resolve(breakpoint) ?? Axis.vertical;
+    final axis = direction.resolve(breakpoint) ?? Axis.horizontal;
 
     return buildFFStyle(
       context,
@@ -96,14 +101,14 @@ class FFFlex extends StatelessWidget {
           key: _SlotKey(e.index),
           size: e.child is FFItem
               ? _sizeOf(e.child as FFItem, breakpoint)
-              : _SlotSize.natural,
+              : _SlotSize.row,
           child: e.child,
         ),
     ];
   }
 
   /// Entre `col` y `fill` gana el breakpoint más cercano; en el mismo
-  /// breakpoint gana `col`.
+  /// breakpoint gana `col`. Sin ninguno, la fila completa.
   static _SlotSize _sizeOf(FFItem item, Breakpoint breakpoint) {
     for (var i = breakpoint.index; i >= 0; i--) {
       final b = Breakpoint.values[i];
@@ -112,7 +117,7 @@ class FFFlex extends StatelessWidget {
       final fill = item.fill?.at(b);
       if (fill != null) return fill ? _SlotSize.fill : _SlotSize.natural;
     }
-    return _SlotSize.natural;
+    return _SlotSize.row;
   }
 }
 
@@ -128,6 +133,9 @@ class _SlotSize {
 
   static const natural = _SlotSize._(_SlotKind.natural, 0);
   static const fill = _SlotSize._(_SlotKind.fill, 0);
+
+  /// La fila completa, como `col: 12`.
+  static const row = _SlotSize._(_SlotKind.col, 12);
 
   final _SlotKind kind;
   final int col;

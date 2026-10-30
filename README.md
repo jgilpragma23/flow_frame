@@ -135,7 +135,6 @@ class PedidosPage extends StatelessWidget {
           children: [
             // Resumen: 1 por fila en xs, 2 en sm, 4 desde lg
             FFFlex(
-              direction: const FFValue.all(Axis.horizontal),
               gap: const FFValue(xs: 12, md: 16),
               children: [
                 for (final (title, value) in [('Hoy', '24'), ('Semana', '183'), ('Pendientes', '7'), ('Ingresos', '\$4.2k')])
@@ -267,6 +266,7 @@ const card = FFStyle(
   minWidth: FFValue(md: 320),
   maxWidth: FFValue(lg: 640),
   height: FFValue(md: 200),
+  maxHeight: FFValue(xs: 240, lg: 400),
 
   visible: FFValue(xs: false, md: true), // como d-none d-md-block
 );
@@ -274,6 +274,15 @@ const card = FFStyle(
 
 - **`textStyle` se combina en cascada:** en `md` se juntan los `TextStyle` de `xs`, `sm` y `md`, y en cada propiedad gana el mayor. En el ejemplo, la fuente `Inter` definida en `xs` se mantiene en `md`.
 - **`color`, `fontWeight`, `fontSize` y `lineHeight` ganan sobre `textStyle`.** `color` va aparte porque un `TextStyle` no sabe del modo oscuro.
+- **`maxHeight` limita el alto pero no agrega scroll:** si el contenido es más alto, se desborda. Para una lista o un texto largo, pon adentro un `ListView` o un `SingleChildScrollView`:
+
+```dart
+FFContainer(
+  style: const FFStyle(maxHeight: FFValue(xs: 240, lg: 400)),
+  child: ListView(shrinkWrap: true, children: [...]),
+)
+```
+
 - **`merge`** combina dos estilos; el segundo gana donde define algo:
 
 ```dart
@@ -370,17 +379,16 @@ Sin `maxSize` ocupa todo el ancho.
 
 ## `FFFlex` y `FFItem`
 
-`FFFlex` es una fila o columna que cambia por breakpoint (como `d-flex flex-column flex-md-row`). `FFItem` es cada elemento.
+`FFFlex` es un `row` de Bootstrap: una fila que reparte 12 columnas y baja a la siguiente fila lo que no cabe. `FFItem` es cada elemento. También puede ser vertical, en todos o en algunos breakpoints.
 
 ### Grilla: filas que se acomodan solas
 
 ![La grilla en xs, md y lg: 1, 2 y 3 productos por fila](doc/flex.png)
 
-En horizontal, `FFFlex` funciona como un `row` de Bootstrap: cada hijo dice cuánto ocupa y lo que no cabe baja a la siguiente fila.
+Por defecto es horizontal: cada hijo dice cuánto ocupa y lo que no cabe baja a la siguiente fila.
 
 ```dart
 FFFlex(
-  direction: const FFValue.all(Axis.horizontal),
   gap: const FFValue.all(16), // entre elementos y entre filas
   children: [
     for (final p in products)
@@ -401,18 +409,34 @@ Cada hijo puede medirse de tres formas:
 |---|---|---|
 | `col: FFValue(md: 6)` | 6 de 12 columnas | `col-md-6` |
 | `fill: FFValue(md: true)` | Lo que sobra en su fila | `col` |
-| Ninguno | Su tamaño natural | `col-auto` |
+| `fill: FFValue(md: false)` | Su tamaño natural | `col-auto` |
+| Ninguno | La fila completa | Hijo de `.row` sin `col` |
+
+Como un hijo sin `col` ocupa la fila completa, un `FFFlex` con hijos sin `col` los apila uno debajo del otro. Así funciona para una página, un formulario o una lista de secciones sin escribir nada más.
 
 Se pueden mezclar en la misma fila:
 
 ```dart
 FFFlex(
-  direction: const FFValue.all(Axis.horizontal),
   gap: const FFValue.all(16),
   children: [
     FFItem(col: const FFValue(xs: 12, md: 3), child: Filtros()),
     FFItem(fill: const FFValue.all(true), child: Buscador()),
-    IconButton(icon: const Icon(Icons.tune), onPressed: () {}),
+    FFItem(
+      fill: const FFValue.all(false), // tamaño natural
+      child: IconButton(icon: const Icon(Icons.tune), onPressed: () {}),
+    ),
+  ],
+)
+```
+
+Un ejemplo común: imagen al lado del texto en el teléfono y una debajo de la otra desde `md`:
+
+```dart
+FFFlex(
+  children: [
+    FFItem(col: const FFValue(xs: 4, md: 12), child: Imagen()),
+    FFItem(col: const FFValue(xs: 8, md: 12), child: Texto()),
   ],
 )
 ```
@@ -423,36 +447,38 @@ Si un `FFItem` tiene `col` y `fill`, gana el que esté definido en el breakpoint
 
 ### Vertical
 
-En vertical los elementos se apilan. Por defecto ocupan todo el ancho, `col` se ignora y `fill` reparte la altura que sobra (solo si el `FFFlex` tiene un alto limitado).
+Con `direction: Axis.vertical` los elementos se apilan, ocupan todo el ancho y `col` se ignora. Úsalo cuando importa el alto:
+
+- `fill` reparte la altura que sobra, como un `Expanded` en un `Column` (solo si el `FFFlex` tiene un alto limitado).
+- `mainAxisAlignment` alinea en vertical, por ejemplo un login centrado en la pantalla o un pie empujado hasta abajo.
+- Con `crossAxisAlignment: center` apila elementos de tamaño natural centrados.
 
 ```dart
 FFFlex(
-  direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
-  gap: const FFValue(xs: 12, md: 16),
+  direction: const FFValue.all(Axis.vertical),
   children: [
-    FFItem(fill: const FFValue(md: true), style: card, child: Card1()),
-    FFItem(fill: const FFValue(md: true), style: card, child: Card2()),
-    FFItem(
-      order: const FFValue(xs: -1, md: 0), // primero en móvil, en su lugar desde md
-      child: Image(...),
-    ),
+    const Encabezado(),
+    FFItem(fill: const FFValue.all(true), child: ListView(...)), // toma el alto libre
+    const BotonGuardar(),
   ],
 )
 ```
 
+La dirección también cambia por breakpoint, por ejemplo `FFValue(xs: Axis.vertical, md: Axis.horizontal)`.
+
 ### Referencia
 
 **`FFFlex`**
-- `direction`: por defecto vertical.
+- `direction`: por defecto horizontal.
 - `gap`: separación entre elementos y, en horizontal, también entre filas.
 - `mainAxisAlignment`: por defecto `start`. En horizontal se aplica a cada fila.
 - `crossAxisAlignment`: por defecto `stretch` en vertical (los elementos ocupan todo el ancho) y `start` en horizontal. En horizontal se aplica dentro de cada fila; `stretch` iguala la altura de la fila.
 - `style`: un `FFStyle` para el contenedor.
-- `children`: pueden ser `FFItem` o cualquier widget (este toma su tamaño natural).
+- `children`: pueden ser `FFItem` o cualquier widget. En horizontal, un widget que no es `FFItem` ocupa la fila completa.
 
 **`FFItem`**
-- `col`: cuántas de las 12 columnas ocupa (de 1 a 12). Solo en horizontal.
-- `fill`: `true` hace que ocupe el espacio que sobra en su fila; si varios lo tienen, se lo reparten en partes iguales. `false` o sin valor: toma su tamaño natural. Puede cambiar por breakpoint, por ejemplo `FFValue(xs: false, sm: true, lg: false)`.
+- `col`: cuántas de las 12 columnas ocupa (de 1 a 12). Solo en horizontal. Sin `col` ni `fill`, ocupa la fila completa.
+- `fill`: `true` hace que ocupe el espacio que sobra en su fila; si varios lo tienen, se lo reparten en partes iguales. `false`: toma su tamaño natural (`col-auto`). Puede cambiar por breakpoint, por ejemplo `FFValue(xs: false, sm: true, lg: false)`.
 - `order`: posición dentro del `FFFlex`; los menores van primero (por defecto 0).
 - `style`: un `FFStyle`. Con `visible: false` el elemento se quita y no deja separación.
 

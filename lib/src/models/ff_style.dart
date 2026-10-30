@@ -25,6 +25,7 @@ class FFStyle {
     this.minWidth,
     this.maxWidth,
     this.height,
+    this.maxHeight,
     this.visible,
   });
 
@@ -51,6 +52,10 @@ class FFStyle {
   final FFValue<double>? maxWidth;
   final FFValue<double>? height;
 
+  /// Alto máximo. Lo que no quepa se desborda, así que para contenido largo
+  /// conviene que el hijo tenga scroll (por ejemplo un `ListView`).
+  final FFValue<double>? maxHeight;
+
   /// `false` oculta el widget en ese breakpoint (equivale a `d-none`).
   final FFValue<bool>? visible;
 
@@ -71,6 +76,7 @@ class FFStyle {
       minWidth: FFValue.combine(minWidth, other.minWidth),
       maxWidth: FFValue.combine(maxWidth, other.maxWidth),
       height: FFValue.combine(height, other.height),
+      maxHeight: FFValue.combine(maxHeight, other.maxHeight),
       visible: FFValue.combine(visible, other.visible),
     );
   }
@@ -102,6 +108,7 @@ class FFStyle {
       minWidth: minWidth?.resolve(breakpoint),
       maxWidth: maxWidth?.resolve(breakpoint),
       height: height?.resolve(breakpoint),
+      maxHeight: maxHeight?.resolve(breakpoint),
       visible: visible?.resolve(breakpoint) ?? true,
     );
   }
@@ -120,6 +127,7 @@ class WRResolvedStyle {
     this.minWidth,
     this.maxWidth,
     this.height,
+    this.maxHeight,
     this.visible = true,
   });
 
@@ -132,5 +140,6 @@ class WRResolvedStyle {
   final double? minWidth;
   final double? maxWidth;
   final double? height;
+  final double? maxHeight;
   final bool visible;
 }
