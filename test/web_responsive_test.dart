@@ -1170,6 +1170,180 @@ void main() {
     });
   });
 
+  group('FFAppBar', () {
+    const brand = FFBrand(logo: Icon(Icons.store), title: Text('Mi Tienda'));
+    const links = [
+      FFDestination(id: 'inicio', icon: Icon(Icons.home), label: 'Inicio'),
+      FFDestination(id: 'ventas', icon: Icon(Icons.store), label: 'Ventas'),
+      FFDestination(
+        id: 'reportes',
+        icon: Icon(Icons.bar_chart),
+        label: 'Reportes',
+        visible: FFValue(xs: false, md: true),
+      ),
+    ];
+
+    Future<void> pumpBar(WidgetTester tester, Size screen, FFAppBar bar) {
+      tester.view.physicalSize = screen;
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      return tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(appBar: bar, body: const Text('cuerpo')),
+        ),
+      );
+    }
+
+    testWidgets('se usa en un Scaffold normal con marca, título y acciones', (
+      tester,
+    ) async {
+      await pumpBar(
+        tester,
+        tablet,
+        FFAppBar(
+          brand: brand,
+          title: const Text('Pedidos'),
+          actions: [
+            FFAction(
+              icon: const Icon(Icons.add),
+              label: 'Nuevo',
+              onPressed: () {},
+              display: const FFValue(md: FFActionDisplay.full),
+            ),
+          ],
+        ),
+      );
+      expect(find.byType(AppBar), findsOneWidget);
+      expect(find.text('Mi Tienda'), findsOneWidget);
+      expect(find.text('Pedidos'), findsOneWidget);
+      expect(find.text('Nuevo'), findsOneWidget);
+    });
+
+    testWidgets('visible: oculto en xs, el contenido sube', (tester) async {
+      const bar = FFAppBar(
+        title: Text('Pedidos'),
+        responsive: FFValue(
+          xs: FFAppBarStyle(visible: false),
+          md: FFAppBarStyle(visible: true),
+        ),
+      );
+      await pumpBar(tester, phone, bar);
+      expect(find.byType(AppBar), findsNothing);
+      expect(tester.getTopLeft(find.text('cuerpo')).dy, 0);
+
+      await pumpBar(tester, tablet, bar);
+      expect(find.byType(AppBar), findsOneWidget);
+      expect(tester.getTopLeft(find.text('cuerpo')).dy, kToolbarHeight);
+    });
+
+    testWidgets('showBrand y showTitle por breakpoint', (tester) async {
+      const bar = FFAppBar(
+        brand: brand,
+        title: Text('Pedidos'),
+        responsive: FFValue(
+          xs: FFAppBarStyle(showBrand: false),
+          md: FFAppBarStyle(showBrand: true, showTitle: false),
+        ),
+      );
+      await pumpBar(tester, phone, bar);
+      expect(find.text('Mi Tienda'), findsNothing);
+      expect(find.text('Pedidos'), findsOneWidget);
+
+      await pumpBar(tester, tablet, bar);
+      expect(find.text('Mi Tienda'), findsOneWidget);
+      expect(find.text('Pedidos'), findsNothing);
+    });
+
+    testWidgets('enlaces con visible por breakpoint', (tester) async {
+      String? selected;
+      FFAppBar bar() => FFAppBar(
+        destinations: links,
+        currentRoute: 'inicio',
+        onRouteSelected: (id) => selected = id,
+      );
+      await pumpBar(tester, phone, bar());
+      expect(find.text('Inicio'), findsOneWidget);
+      expect(find.text('Reportes'), findsNothing);
+
+      await pumpBar(tester, tablet, bar());
+      await tester.tap(find.text('Reportes'));
+      expect(selected, 'reportes');
+    });
+
+    testWidgets('sin onRouteSelected no muestra enlaces', (tester) async {
+      await pumpBar(tester, tablet, const FFAppBar(destinations: links));
+      expect(find.text('Inicio'), findsNothing);
+    });
+
+    group('dentro de FFScaffold', () {
+      Future<void> pumpIn(
+        WidgetTester tester,
+        Size screen,
+        FFAppBar bar, {
+        FFValue<FFNavStyle>? responsive,
+      }) {
+        tester.view.physicalSize = screen;
+        tester.view.devicePixelRatio = 1;
+        addTearDown(tester.view.reset);
+        return tester.pumpWidget(
+          MaterialApp(
+            home: FFScaffold(
+              destinations: links,
+              currentRoute: 'inicio',
+              onRouteSelected: (_) {},
+              brand: brand,
+              responsive: responsive,
+              appBar: bar,
+              body: const Text('cuerpo'),
+            ),
+          ),
+        );
+      }
+
+      Finder inBar(String text) =>
+          find.descendant(of: find.byType(AppBar), matching: find.text(text));
+
+      testWidgets('con navegación appBar recibe marca y enlaces', (
+        tester,
+      ) async {
+        await pumpIn(
+          tester,
+          tablet,
+          const FFAppBar(),
+          responsive: const FFValue(xs: FFNavStyle(type: FFNavigation.appBar)),
+        );
+        expect(inBar('Mi Tienda'), findsOneWidget);
+        expect(inBar('Reportes'), findsOneWidget);
+      });
+
+      testWidgets('con rail la marca va en el menú, no en el app bar', (
+        tester,
+      ) async {
+        await pumpIn(tester, const Size(1300, 800), const FFAppBar());
+        expect(inBar('Mi Tienda'), findsNothing);
+        expect(find.text('Mi Tienda'), findsOneWidget);
+      });
+
+      testWidgets('con título propio no recibe la marca', (tester) async {
+        await pumpIn(tester, phone, const FFAppBar(title: Text('Pedidos')));
+        expect(inBar('Pedidos'), findsOneWidget);
+        expect(inBar('Mi Tienda'), findsNothing);
+      });
+
+      testWidgets('oculto deja el contenido arriba', (tester) async {
+        await pumpIn(
+          tester,
+          phone,
+          const FFAppBar(
+            responsive: FFValue(xs: FFAppBarStyle(visible: false)),
+          ),
+        );
+        expect(find.byType(AppBar), findsNothing);
+        expect(tester.getTopLeft(find.text('cuerpo')).dy, 0);
+      });
+    });
+  });
+
   group('FFActions', () {
     Future<void> pumpActions(
       WidgetTester tester,
