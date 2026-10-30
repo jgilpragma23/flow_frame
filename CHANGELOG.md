@@ -1,4 +1,4 @@
-## Unreleased
+## 0.0.9 - 2026-10-30
 
 * Arreglo: `maxWidth` y `width` del `FFStyle` no tenían efecto en un `FFContainer` ni en un `FFItem` dentro de una columna de `FFFlex`. Ahora limitan la caja: en `FFContainer` queda centrada y en `FFItem` al inicio de su columna, que sigue ocupando su espacio.
 
