@@ -1,4 +1,4 @@
-## Unreleased
+## 0.0.8 - 2026-10-30
 
 * **Cambio**: `FFStyle.backgroundColor` ahora es un `FFValue<FFColor>`, así el fondo cambia por breakpoint. Para migrar, envuelve el color: `backgroundColor: AppColors.surface` pasa a `backgroundColor: FFValue(xs: AppColors.surface)`.
 
