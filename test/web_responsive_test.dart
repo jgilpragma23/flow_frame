@@ -290,6 +290,76 @@ void main() {
       expect(rect(tester).width, 1000 - 32);
     });
 
+    testWidgets('maxWidth, minWidth y width del style limitan el ancho', (
+      tester,
+    ) async {
+      const container = FFContainer(
+        style: FFStyle(maxWidth: FFValue(xs: 300, md: 600)),
+        child: SizedBox(key: Key('c'), height: 10),
+      );
+      await pump(tester, phone, container);
+      expect(rect(tester).width, 300);
+      expect(rect(tester).left, (400 - 300) / 2);
+
+      await pump(tester, tablet, container);
+      expect(rect(tester).width, 600);
+      expect(rect(tester).left, (1000 - 600) / 2);
+
+      await pump(
+        tester,
+        tablet,
+        const FFContainer(
+          style: FFStyle(width: FFValue(xs: 250)),
+          child: SizedBox(key: Key('c'), height: 10),
+        ),
+      );
+      expect(rect(tester).width, 250);
+    });
+
+    testWidgets('maxWidth del style de un FFItem limita su columna', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        tablet,
+        const FFFlex(
+          children: [
+            FFItem(
+              col: FFValue(xs: 6),
+              style: FFStyle(maxWidth: FFValue(xs: 120)),
+              child: SizedBox(key: Key('c'), height: 10),
+            ),
+            FFItem(
+              col: FFValue(xs: 6),
+              child: SizedBox(key: Key('d'), height: 10),
+            ),
+          ],
+        ),
+      );
+      expect(rect(tester).width, 120);
+      expect(rect(tester).left, 0);
+      // La columna sigue ocupando su espacio.
+      expect(tester.getRect(find.byKey(const Key('d'))).left, 500);
+    });
+
+    testWidgets('maxWidth del style respeta el padding y el maxSize', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        tablet,
+        const FFContainer(
+          maxSize: 500,
+          style: FFStyle(
+            padding: FFSpacing(all: FFValue(xs: 10)),
+            maxWidth: FFValue(xs: 800),
+          ),
+          child: SizedBox(key: Key('c'), height: 10),
+        ),
+      );
+      expect(rect(tester).width, 500 - 20);
+    });
+
     testWidgets('maxHeight limita el alto por breakpoint', (tester) async {
       const container = FFContainer(
         style: FFStyle(maxHeight: FFValue(xs: 200, md: 300)),
