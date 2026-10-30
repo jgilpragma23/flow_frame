@@ -362,7 +362,7 @@ void main() {
         tester.getRect(find.byKey(Key(key)));
 
     Widget layout() => const FFFlex(
-      direction: FFValue(xs: Axis.vertical, md: Axis.horizontal),
+      direction: FFValue(xs: FFDirection.vertical, md: FFDirection.horizontal),
       gap: FFValue(xs: 8, md: 20),
       children: [
         FFItem(
@@ -401,7 +401,7 @@ void main() {
         tester,
         tablet,
         const FFFlex(
-          direction: FFValue.all(Axis.horizontal),
+          direction: FFValue.all(FFDirection.horizontal),
           children: [
             FFItem(
               fill: FFValue.all(true),
@@ -420,7 +420,7 @@ void main() {
 
     testWidgets('fill cambia por breakpoint', (tester) async {
       const flex = FFFlex(
-        direction: FFValue.all(Axis.horizontal),
+        direction: FFValue.all(FFDirection.horizontal),
         children: [
           FFItem(
             fill: FFValue(xs: false, sm: true, lg: false),
@@ -492,7 +492,7 @@ void main() {
 
     group('col', () {
       Widget grid(int count) => FFFlex(
-        direction: const FFValue.all(Axis.horizontal),
+        direction: const FFValue.all(FFDirection.horizontal),
         gap: const FFValue.all(16),
         children: [
           for (var i = 0; i < count; i++)
@@ -534,7 +534,7 @@ void main() {
           tester,
           tablet,
           const FFFlex(
-            direction: FFValue.all(Axis.horizontal),
+            direction: FFValue.all(FFDirection.horizontal),
             gap: FFValue.all(16),
             children: [
               FFItem(
@@ -563,7 +563,7 @@ void main() {
         tester,
       ) async {
         const flex = FFFlex(
-          direction: FFValue.all(Axis.horizontal),
+          direction: FFValue.all(FFDirection.horizontal),
           children: [
             FFItem(
               fill: FFValue.all(false),
@@ -588,7 +588,7 @@ void main() {
           tester,
           tablet,
           const FFFlex(
-            direction: FFValue.all(Axis.horizontal),
+            direction: FFValue.all(FFDirection.horizontal),
             mainAxisAlignment: FFValue.all(MainAxisAlignment.center),
             children: [
               FFItem(
@@ -610,7 +610,7 @@ void main() {
           tester,
           tablet,
           const FFFlex(
-            direction: FFValue.all(Axis.horizontal),
+            direction: FFValue.all(FFDirection.horizontal),
             crossAxisAlignment: FFValue.all(CrossAxisAlignment.stretch),
             children: [
               FFItem(
@@ -635,7 +635,7 @@ void main() {
           const Directionality(
             textDirection: TextDirection.rtl,
             child: FFFlex(
-              direction: FFValue.all(Axis.horizontal),
+              direction: FFValue.all(FFDirection.horizontal),
               children: [
                 FFItem(
                   col: FFValue.all(6),
@@ -653,7 +653,7 @@ void main() {
           tester,
           tablet,
           const FFFlex(
-            direction: FFValue.all(Axis.vertical),
+            direction: FFValue.all(FFDirection.vertical),
             children: [
               FFItem(
                 col: FFValue.all(6),
@@ -688,6 +688,93 @@ void main() {
         await pump(tester, tablet, flex);
         expect(rectOf(tester, 'a').width, 1000);
         expect(rectOf(tester, 'b').top, 10);
+      });
+
+      testWidgets('horizontalReverse invierte la fila por breakpoint', (
+        tester,
+      ) async {
+        const flex = FFFlex(
+          direction: FFValue(
+            xs: FFDirection.horizontal,
+            md: FFDirection.horizontalReverse,
+          ),
+          children: [
+            FFItem(
+              col: FFValue.all(4),
+              child: SizedBox(key: Key('a'), height: 10),
+            ),
+            FFItem(
+              col: FFValue.all(8),
+              child: SizedBox(key: Key('b'), height: 10),
+            ),
+          ],
+        );
+        await pump(tester, phone, flex);
+        expect(rectOf(tester, 'a').left, 0);
+
+        await pump(tester, tablet, flex);
+        expect(rectOf(tester, 'b').left, 0);
+        expect(rectOf(tester, 'a').left, closeTo(1000 * 8 / 12, 0.001));
+      });
+
+      testWidgets('horizontalReverse apilados: el último queda arriba', (
+        tester,
+      ) async {
+        await pump(
+          tester,
+          phone,
+          const FFFlex(
+            direction: FFValue.all(FFDirection.horizontalReverse),
+            children: [
+              SizedBox(key: Key('a'), height: 10),
+              SizedBox(key: Key('b'), height: 10),
+            ],
+          ),
+        );
+        expect(rectOf(tester, 'b').top, 0);
+        expect(rectOf(tester, 'a').top, 10);
+      });
+
+      testWidgets('verticalReverse apila de abajo hacia arriba', (
+        tester,
+      ) async {
+        await pump(
+          tester,
+          phone,
+          const FFFlex(
+            direction: FFValue.all(FFDirection.verticalReverse),
+            gap: FFValue.all(4),
+            children: [
+              SizedBox(key: Key('a'), height: 10),
+              FFItem(
+                order: FFValue.all(-1),
+                child: SizedBox(key: Key('b'), height: 10),
+              ),
+              SizedBox(key: Key('c'), height: 10),
+            ],
+          ),
+        );
+        // order primero (b, a, c) y después se invierte: c, a, b.
+        expect(rectOf(tester, 'c').top, 0);
+        expect(rectOf(tester, 'a').top, 14);
+        expect(rectOf(tester, 'b').top, 28);
+      });
+
+      testWidgets('invertir no hace perder el estado', (tester) async {
+        Widget flex(FFDirection d) => FFFlex(
+          direction: FFValue.all(d),
+          children: const [
+            _Counter(key: Key('a')),
+            _Counter(key: Key('b')),
+          ],
+        );
+        await pump(tester, phone, flex(FFDirection.vertical));
+        tester.state<_CounterState>(find.byKey(const Key('b'))).value = 7;
+        await pump(tester, phone, flex(FFDirection.verticalReverse));
+        expect(
+          tester.state<_CounterState>(find.byKey(const Key('b'))).value,
+          7,
+        );
       });
 
       testWidgets('sin col ocupa la fila completa, como en Bootstrap', (
