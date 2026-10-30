@@ -266,6 +266,7 @@ const card = FFStyle(
   minWidth: FFValue(md: 320),
   maxWidth: FFValue(lg: 640),
   height: FFValue(md: 200),
+  maxHeight: FFValue(xs: 240, lg: 400),
 
   visible: FFValue(xs: false, md: true), // como d-none d-md-block
 );
@@ -273,6 +274,15 @@ const card = FFStyle(
 
 - **`textStyle` se combina en cascada:** en `md` se juntan los `TextStyle` de `xs`, `sm` y `md`, y en cada propiedad gana el mayor. En el ejemplo, la fuente `Inter` definida en `xs` se mantiene en `md`.
 - **`color`, `fontWeight`, `fontSize` y `lineHeight` ganan sobre `textStyle`.** `color` va aparte porque un `TextStyle` no sabe del modo oscuro.
+- **`maxHeight` limita el alto pero no agrega scroll:** si el contenido es más alto, se desborda. Para una lista o un texto largo, pon adentro un `ListView` o un `SingleChildScrollView`:
+
+```dart
+FFContainer(
+  style: const FFStyle(maxHeight: FFValue(xs: 240, lg: 400)),
+  child: ListView(shrinkWrap: true, children: [...]),
+)
+```
+
 - **`merge`** combina dos estilos; el segundo gana donde define algo:
 
 ```dart
