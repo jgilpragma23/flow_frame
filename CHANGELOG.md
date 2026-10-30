@@ -1,4 +1,4 @@
-## Unreleased
+## 0.0.7 - 2026-10-30
 
 * `FFStyle.shadow`: sombra por breakpoint (`List<BoxShadow>`), también en `WRResolvedStyle`. `FFShadow` trae `sm`, `md`, `lg` y `none`, como `shadow-sm`, `shadow` y `shadow-lg` de Bootstrap.
 * `FFStyle.backgroundImage`: imagen de fondo por breakpoint (`DecorationImage`), encima de `backgroundColor`.

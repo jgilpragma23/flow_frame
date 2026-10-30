@@ -27,7 +27,7 @@ dependencies:
   flow_frame:
     git:
       url: https://github.com/jgilpragma23/flow_frame.git
-      ref: v0.0.6
+      ref: v0.0.7
 ```
 
 ```dart
