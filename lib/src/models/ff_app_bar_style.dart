@@ -32,8 +32,8 @@ class FFAppBarStyle {
   /// `false` oculta el título. Por defecto visible.
   final bool? showTitle;
 
-  /// Si la marca y el título van al centro. Con enlaces siempre van a la
-  /// izquierda.
+  /// Si la marca y el título van al centro. Por defecto a la izquierda, en
+  /// todas las plataformas; con enlaces siempre van a la izquierda.
   final bool? centerTitle;
   final FFColor? backgroundColor;
 

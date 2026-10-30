@@ -119,6 +119,14 @@ class FFAppBar extends StatelessWidget implements PreferredSizeWidget {
         children: [
           FFBrandBar(brand: brand),
           const SizedBox(width: 16),
+          SizedBox(
+            width: 1,
+            height: 24,
+            child: ColoredBox(
+              color: Theme.of(context).colorScheme.outlineVariant,
+            ),
+          ),
+          const SizedBox(width: 16),
           Flexible(child: title),
         ],
       );
@@ -153,7 +161,7 @@ class FFAppBar extends StatelessWidget implements PreferredSizeWidget {
                 ),
               ],
             ),
-      centerTitle: links.isEmpty ? style.centerTitle : false,
+      centerTitle: links.isEmpty ? style.centerTitle ?? false : false,
       backgroundColor: style.backgroundColor?.resolve(context),
       foregroundColor: style.foregroundColor?.resolve(context),
       elevation: style.elevation,
