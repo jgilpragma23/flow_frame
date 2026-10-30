@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flow_frame/flow_frame.dart';
 import 'package:flow_frame/src/atoms/atoms.dart';
 import 'package:flow_frame/src/models/models.dart';
@@ -284,6 +286,160 @@ void main() {
 
       await pump(tester, tablet, container);
       expect(rect(tester).height, 300);
+    });
+
+    testWidgets('shadow cambia por breakpoint y se quita con none', (
+      tester,
+    ) async {
+      List<BoxShadow>? shadow() {
+        final boxes = tester.widgetList<DecoratedBox>(
+          find.ancestor(
+            of: find.byKey(const Key('c')),
+            matching: find.byType(DecoratedBox),
+          ),
+        );
+        return boxes.isEmpty
+            ? null
+            : (boxes.first.decoration as BoxDecoration).boxShadow;
+      }
+
+      const container = FFContainer(
+        style: FFStyle(
+          backgroundColor: FFColor.fixed(Color(0xFFFFFFFF)),
+          shadow: FFValue(xs: FFShadow.sm, md: FFShadow.lg, xl: FFShadow.none),
+        ),
+        child: SizedBox(key: Key('c'), height: 10),
+      );
+      await pump(tester, phone, container);
+      expect(shadow(), FFShadow.sm);
+
+      await pump(tester, tablet, container);
+      expect(shadow(), FFShadow.lg);
+
+      await pump(tester, const Size(1700, 900), container);
+      expect(shadow(), isNull);
+    });
+
+    testWidgets('borderRadius y borderWidth cambian por breakpoint', (
+      tester,
+    ) async {
+      BoxDecoration decoration() =>
+          tester
+                  .widget<DecoratedBox>(
+                    find
+                        .ancestor(
+                          of: find.byKey(const Key('c')),
+                          matching: find.byType(DecoratedBox),
+                        )
+                        .first,
+                  )
+                  .decoration
+              as BoxDecoration;
+
+      const container = FFContainer(
+        style: FFStyle(
+          padding: FFSpacing(all: FFValue(xs: 8)),
+          borderRadius: FFValue(xs: 8, md: 16),
+          borderWidth: FFValue(xs: 1, md: 2),
+          borderColor: FFColor.fixed(Color(0xFFFF0000)),
+        ),
+        child: SizedBox(key: Key('c'), width: 50, height: 50),
+      );
+      await pump(tester, phone, container);
+      expect(decoration().borderRadius, BorderRadius.circular(8));
+      expect(
+        decoration().border,
+        Border.all(color: const Color(0xFFFF0000), width: 1),
+      );
+      expect(find.byType(ClipRRect), findsOneWidget);
+      // El borde se suma al padding.
+      expect(
+        tester.getTopLeft(find.byKey(const Key('c'))) -
+            tester.getTopLeft(find.byType(DecoratedBox).first),
+        const Offset(9, 9),
+      );
+
+      await pump(tester, tablet, container);
+      expect(decoration().borderRadius, BorderRadius.circular(16));
+      expect(
+        decoration().border,
+        Border.all(color: const Color(0xFFFF0000), width: 2),
+      );
+    });
+
+    testWidgets('sin borderColor el borde usa outlineVariant', (tester) async {
+      await pump(
+        tester,
+        phone,
+        const FFContainer(
+          style: FFStyle(borderWidth: FFValue(xs: 1)),
+          child: SizedBox(key: Key('c')),
+        ),
+      );
+      final context = tester.element(find.byKey(const Key('c')));
+      final box = tester.widget<DecoratedBox>(
+        find
+            .ancestor(
+              of: find.byKey(const Key('c')),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      expect(
+        (box.decoration as BoxDecoration).border,
+        Border.all(color: Theme.of(context).colorScheme.outlineVariant),
+      );
+      expect(find.byType(ClipRRect), findsNothing);
+    });
+
+    testWidgets('backgroundImage cambia por breakpoint', (tester) async {
+      // PNG transparente de 1x1.
+      final png = Uint8List.fromList(const [
+        0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, 0x00, 0x00, 0x00, //
+        0x0D, 0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00,
+        0x00, 0x01, 0x08, 0x06, 0x00, 0x00, 0x00, 0x1F, 0x15, 0xC4, 0x89,
+        0x00, 0x00, 0x00, 0x0D, 0x49, 0x44, 0x41, 0x54, 0x78, 0x9C, 0x63,
+        0x00, 0x01, 0x00, 0x00, 0x05, 0x00, 0x01, 0x0D, 0x0A, 0x2D, 0xB4,
+        0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4E, 0x44, 0xAE, 0x42, 0x60,
+        0x82,
+      ]);
+      final phoneImage = DecorationImage(image: MemoryImage(png));
+      final tabletImage = DecorationImage(
+        image: MemoryImage(png),
+        fit: BoxFit.cover,
+      );
+      DecorationImage? image() =>
+          (tester
+                      .widget<DecoratedBox>(
+                        find
+                            .ancestor(
+                              of: find.byKey(const Key('c')),
+                              matching: find.byType(DecoratedBox),
+                            )
+                            .first,
+                      )
+                      .decoration
+                  as BoxDecoration)
+              .image;
+
+      final container = FFContainer(
+        style: FFStyle(
+          backgroundImage: FFValue(xs: phoneImage, md: tabletImage),
+        ),
+        child: const SizedBox(key: Key('c'), width: 10, height: 10),
+      );
+      await pump(tester, phone, container);
+      expect(image(), phoneImage);
+
+      await pump(tester, tablet, container);
+      expect(image(), tabletImage);
+    });
+
+    test('merge de shadow: el segundo gana', () {
+      final style = const FFStyle(shadow: FFValue(xs: FFShadow.sm))
+          .merge(const FFStyle(shadow: FFValue(md: FFShadow.md)));
+      expect(style.shadow?.resolve(Breakpoint.xs), FFShadow.sm);
+      expect(style.shadow?.resolve(Breakpoint.md), FFShadow.md);
     });
 
     testWidgets('sin maxHeight el contenido toma su alto', (tester) async {
