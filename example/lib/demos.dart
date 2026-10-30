@@ -442,3 +442,151 @@ class ContenedorDemo extends StatelessWidget {
     );
   }
 }
+
+// ─── App bar ────────────────────────────────────────────────────────────
+
+class AppBarDemo extends StatelessWidget {
+  const AppBarDemo({super.key});
+
+  static const _brand = FFBrand(
+    logo: Icon(Icons.storefront, color: Color(0xFF2563EB)),
+    title: Text('Mi Tienda'),
+  );
+
+  /// Los enlaces aparecen desde md.
+  static const _links = [
+    FFDestination(
+      id: 'inicio',
+      icon: Icon(Icons.home_outlined),
+      label: 'Inicio',
+      visible: FFValue(xs: false, md: true),
+    ),
+    FFDestination(
+      id: 'productos',
+      icon: Icon(Icons.category_outlined),
+      label: 'Productos',
+      visible: FFValue(xs: false, md: true),
+      children: [
+        FFDestination(
+          id: 'productos/nuevos',
+          icon: Icon(Icons.fiber_new_outlined),
+          label: 'Nuevos',
+        ),
+        FFDestination(
+          id: 'productos/ofertas',
+          icon: Icon(Icons.local_offer_outlined),
+          label: 'Ofertas',
+        ),
+      ],
+    ),
+    FFDestination(
+      id: 'contacto',
+      icon: Icon(Icons.mail_outline),
+      label: 'Contacto',
+      visible: FFValue(xs: false, lg: true),
+    ),
+  ];
+
+  static final _actions = [
+    FFAction(icon: const Icon(Icons.search), label: 'Buscar', onPressed: () {}),
+    FFAction(
+      icon: const Icon(Icons.shopping_cart),
+      label: 'Carrito',
+      onPressed: () {},
+      display: const FFValue(
+        xs: FFActionDisplay.icon,
+        lg: FFActionDisplay.full,
+      ),
+    ),
+    FFAction(
+      icon: const Icon(Icons.help_outline),
+      label: 'Ayuda',
+      onPressed: () {},
+      display: const FFValue(
+        xs: FFActionDisplay.menu,
+        md: FFActionDisplay.icon,
+      ),
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return _DemoPage(
+      title: 'App bar',
+      intro:
+          'FFAppBar va en el appBar de cualquier Scaffold, sin FFScaffold. '
+          'Cada caja de abajo es un Scaffold normal.',
+      children: [
+        _frame(
+          context,
+          'Marca, enlaces y acciones: en xs solo la marca al centro; los '
+          'enlaces aparecen desde md y "Contacto" desde lg.',
+          FFAppBar(
+            brand: _brand,
+            destinations: _links,
+            currentRoute: 'inicio',
+            onRouteSelected: (_) {},
+            actions: _actions,
+            responsive: const FFValue(
+              xs: FFAppBarStyle(
+                centerTitle: true,
+                backgroundColor: AppColors.surface,
+              ),
+            ),
+          ),
+        ),
+        _frame(
+          context,
+          'Título de la página: en xs reemplaza a la marca; desde md van '
+          'los dos.',
+          FFAppBar(
+            brand: _brand,
+            title: const Text('Pedidos'),
+            actions: _actions,
+            responsive: const FFValue(
+              xs: FFAppBarStyle(showBrand: false),
+              md: FFAppBarStyle(showBrand: true),
+            ),
+          ),
+        ),
+        _frame(
+          context,
+          'visible: oculto en xs (el contenido sube) y de color desde md.',
+          const FFAppBar(
+            title: Text('Solo en tablet y escritorio'),
+            responsive: FFValue(
+              xs: FFAppBarStyle(visible: false),
+              md: FFAppBarStyle(
+                visible: true,
+                backgroundColor: AppColors.primary,
+                foregroundColor: FFColor.fixed(Colors.white),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _frame(BuildContext context, String note, FFAppBar bar) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _Note(note),
+      const SizedBox(height: 8),
+      ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: SizedBox(
+          height: 150,
+          child: Scaffold(
+            appBar: bar,
+            backgroundColor: AppColors.primarySoft.resolve(context),
+            body: const Padding(
+              padding: EdgeInsets.all(16),
+              child: Text('Contenido de la página'),
+            ),
+          ),
+        ),
+      ),
+    ],
+  );
+}
