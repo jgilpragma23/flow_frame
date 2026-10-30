@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
 import '../utils/context_extensions.dart';
 import 'ff_color.dart';
@@ -21,6 +21,11 @@ class FFStyle {
     this.lineHeight,
     this.textAlign,
     this.backgroundColor,
+    this.backgroundImage,
+    this.shadow,
+    this.borderRadius,
+    this.borderWidth,
+    this.borderColor,
     this.width,
     this.minWidth,
     this.maxWidth,
@@ -47,6 +52,24 @@ class FFStyle {
 
   final FFColor? backgroundColor;
 
+  /// Imagen de fondo por breakpoint, encima de [backgroundColor]. Con
+  /// `DecorationImage` se elige `fit`, `alignment`, opacidad, etc.
+  final FFValue<DecorationImage>? backgroundImage;
+
+  /// Sombra por breakpoint. Hay listas en `FFShadow`; `FFShadow.none` la
+  /// quita en un breakpoint mayor.
+  final FFValue<List<BoxShadow>>? shadow;
+
+  /// Radio de las esquinas. Redondea el fondo, la sombra y el borde, y
+  /// recorta el contenido (por ejemplo una imagen) a esa forma.
+  final FFValue<double>? borderRadius;
+
+  /// Grosor del borde. Se suma al padding, así el contenido no lo tapa.
+  final FFValue<double>? borderWidth;
+
+  /// Color del borde. Por defecto `outlineVariant` del tema.
+  final FFColor? borderColor;
+
   final FFValue<double>? width;
   final FFValue<double>? minWidth;
   final FFValue<double>? maxWidth;
@@ -72,6 +95,11 @@ class FFStyle {
       lineHeight: FFValue.combine(lineHeight, other.lineHeight),
       textAlign: FFValue.combine(textAlign, other.textAlign),
       backgroundColor: other.backgroundColor ?? backgroundColor,
+      backgroundImage: FFValue.combine(backgroundImage, other.backgroundImage),
+      shadow: FFValue.combine(shadow, other.shadow),
+      borderRadius: FFValue.combine(borderRadius, other.borderRadius),
+      borderWidth: FFValue.combine(borderWidth, other.borderWidth),
+      borderColor: other.borderColor ?? borderColor,
       width: FFValue.combine(width, other.width),
       minWidth: FFValue.combine(minWidth, other.minWidth),
       maxWidth: FFValue.combine(maxWidth, other.maxWidth),
@@ -104,6 +132,13 @@ class FFStyle {
       textStyle: toTextStyle(context),
       textAlign: textAlign?.resolve(breakpoint),
       backgroundColor: backgroundColor?.resolve(context),
+      backgroundImage: backgroundImage?.resolve(breakpoint),
+      shadow: shadow?.resolve(breakpoint) ?? const [],
+      borderRadius: borderRadius?.resolve(breakpoint) ?? 0,
+      borderWidth: borderWidth?.resolve(breakpoint) ?? 0,
+      borderColor:
+          borderColor?.resolve(context) ??
+          Theme.of(context).colorScheme.outlineVariant,
       width: width?.resolve(breakpoint),
       minWidth: minWidth?.resolve(breakpoint),
       maxWidth: maxWidth?.resolve(breakpoint),
@@ -123,6 +158,11 @@ class WRResolvedStyle {
     this.textStyle = const TextStyle(),
     this.textAlign,
     this.backgroundColor,
+    this.backgroundImage,
+    this.shadow = const [],
+    this.borderRadius = 0,
+    this.borderWidth = 0,
+    this.borderColor = const Color(0x00000000),
     this.width,
     this.minWidth,
     this.maxWidth,
@@ -136,6 +176,11 @@ class WRResolvedStyle {
   final TextStyle textStyle;
   final TextAlign? textAlign;
   final Color? backgroundColor;
+  final DecorationImage? backgroundImage;
+  final List<BoxShadow> shadow;
+  final double borderRadius;
+  final double borderWidth;
+  final Color borderColor;
   final double? width;
   final double? minWidth;
   final double? maxWidth;

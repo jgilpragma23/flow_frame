@@ -5,6 +5,7 @@ export 'ff_brand.dart';
 export 'ff_color.dart';
 export 'ff_direction.dart';
 export 'ff_navigation.dart';
+export 'ff_shadow.dart';
 export 'ff_spacing.dart';
 export 'ff_style.dart';
 export 'ff_value.dart';

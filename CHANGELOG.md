@@ -1,3 +1,9 @@
+## Unreleased
+
+* `FFStyle.shadow`: sombra por breakpoint (`List<BoxShadow>`), también en `WRResolvedStyle`. `FFShadow` trae `sm`, `md`, `lg` y `none`, como `shadow-sm`, `shadow` y `shadow-lg` de Bootstrap.
+* `FFStyle.backgroundImage`: imagen de fondo por breakpoint (`DecorationImage`), encima de `backgroundColor`.
+* `FFStyle.borderRadius`, `borderWidth` y `borderColor`: esquinas y borde por breakpoint. El radio recorta el contenido y el borde se suma al padding; sin `borderColor` usa `outlineVariant` del tema.
+
 ## 0.0.6 - 2026-10-30
 
 * **Cambio**: `FFFlex.direction` ahora recibe un `FFDirection` en vez de un `Axis`: `horizontal`, `horizontalReverse`, `vertical` y `verticalReverse` (como `flex-row`, `flex-row-reverse`, `flex-column` y `flex-column-reverse`). Para migrar, cambia `Axis.horizontal` por `FFDirection.horizontal` y `Axis.vertical` por `FFDirection.vertical`.
