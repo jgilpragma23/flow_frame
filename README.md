@@ -261,6 +261,14 @@ const card = FFStyle(
   textAlign: FFValue(xs: TextAlign.center, md: TextAlign.start),
 
   backgroundColor: AppColors.surface,
+  backgroundImage: FFValue(
+    xs: DecorationImage(image: AssetImage('assets/fondo_movil.jpg'), fit: BoxFit.cover),
+    md: DecorationImage(image: AssetImage('assets/fondo.jpg'), fit: BoxFit.cover),
+  ),
+  shadow: FFValue(xs: FFShadow.sm, md: FFShadow.lg), // como shadow-sm / shadow-lg
+  borderRadius: FFValue(xs: 8, md: 16),
+  borderWidth: FFValue(xs: 1),
+  borderColor: AppColors.border, // por defecto outlineVariant del tema
 
   width: FFValue(md: 480),
   minWidth: FFValue(md: 320),
@@ -274,6 +282,10 @@ const card = FFStyle(
 
 - **`textStyle` se combina en cascada:** en `md` se juntan los `TextStyle` de `xs`, `sm` y `md`, y en cada propiedad gana el mayor. En el ejemplo, la fuente `Inter` definida en `xs` se mantiene en `md`.
 - **`color`, `fontWeight`, `fontSize` y `lineHeight` ganan sobre `textStyle`.** `color` va aparte porque un `TextStyle` no sabe del modo oscuro.
+- **`shadow`** recibe una `List<BoxShadow>` por breakpoint. `FFShadow` trae `sm`, `md` y `lg` (los de Bootstrap) y `none` para quitarla en un breakpoint mayor. La sombra va alrededor del fondo y del padding.
+- **`backgroundImage`** recibe un `DecorationImage` por breakpoint (imagen, `fit`, `alignment`, opacidad…) y va encima de `backgroundColor`. Sirve para usar una imagen más liviana en el móvil.
+- **`borderRadius`** redondea el fondo, la sombra y el borde, y recorta el contenido a esa forma, así una imagen sin padding queda con las esquinas redondeadas.
+- **`borderWidth`** se dibuja por dentro de la caja y se suma al padding, así el contenido no queda debajo del borde.
 - **`maxHeight` limita el alto pero no agrega scroll:** si el contenido es más alto, se desborda. Para una lista o un texto largo, pon adentro un `ListView` o un `SingleChildScrollView`:
 
 ```dart
