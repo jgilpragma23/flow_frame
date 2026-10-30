@@ -24,12 +24,13 @@ class FFItem extends StatelessWidget {
 
   /// Cuántas de las 12 columnas ocupa en un `FFFlex` horizontal (como
   /// `col-md-6`). Lo que no cabe en la fila baja a la siguiente. Valores de
-  /// 1 a 12. En un `FFFlex` vertical se ignora.
+  /// 1 a 12. Sin `col` ni [fill] ocupa la fila completa (12). En un
+  /// `FFFlex` vertical se ignora.
   final FFValue<int>? col;
 
   /// `true`: ocupa el espacio libre en su fila (o en la columna, si el
   /// `FFFlex` es vertical); si varios lo tienen, se lo reparten en partes
-  /// iguales. `false` o sin valor: toma su tamaño natural.
+  /// iguales. `false`: toma su tamaño natural, como `col-auto`.
   final FFValue<bool>? fill;
 
   /// Posición dentro del `FFFlex`; los menores van primero. Por defecto 0.
