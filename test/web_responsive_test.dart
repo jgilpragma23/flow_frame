@@ -203,7 +203,7 @@ void main() {
       final resolved = const FFStyle(
         padding: FFSpacing(all: FFValue(xs: 8, md: 16)),
         margin: FFSpacing(top: FFValue(xs: 4)),
-        backgroundColor: muted,
+        backgroundColor: FFValue(xs: muted),
         maxWidth: FFValue(md: 640),
         maxHeight: FFValue(xs: 120, lg: 400),
         visible: FFValue(xs: false, md: true),
@@ -214,6 +214,20 @@ void main() {
       expect(resolved.maxWidth, 640);
       expect(resolved.maxHeight, 120);
       expect(resolved.visible, isTrue);
+    });
+
+    testWidgets('backgroundColor cambia por breakpoint', (tester) async {
+      const style = FFStyle(
+        backgroundColor: FFValue(
+          xs: FFColor.fixed(Color(0xFF111111)),
+          md: FFColor.fixed(Color(0xFF222222)),
+        ),
+      );
+      var context = await pumpContext(tester, phone);
+      expect(style.resolve(context).backgroundColor, const Color(0xFF111111));
+
+      context = await pumpContext(tester, tablet);
+      expect(style.resolve(context).backgroundColor, const Color(0xFF222222));
     });
 
     test('merge: el segundo gana donde define algo', () {
@@ -305,7 +319,7 @@ void main() {
 
       const container = FFContainer(
         style: FFStyle(
-          backgroundColor: FFColor.fixed(Color(0xFFFFFFFF)),
+          backgroundColor: FFValue(xs: FFColor.fixed(Color(0xFFFFFFFF))),
           shadow: FFValue(xs: FFShadow.sm, md: FFShadow.lg, xl: FFShadow.none),
         ),
         child: SizedBox(key: Key('c'), height: 10),

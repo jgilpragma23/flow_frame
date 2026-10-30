@@ -48,7 +48,7 @@ class AppColors {
 
 const card = FFStyle(
   padding: FFSpacing(all: FFValue(xs: 12, md: 20)),
-  backgroundColor: AppColors.surface,
+  backgroundColor: FFValue(xs: AppColors.surface),
 );
 
 class Shell extends StatefulWidget {
@@ -154,7 +154,7 @@ class PedidosPage extends StatelessWidget {
                 FFItem(
                   fill: const FFValue(md: true),
                   style: card.merge(const FFStyle(
-                    backgroundColor: AppColors.primarySoft,
+                    backgroundColor: FFValue(xs: AppColors.primarySoft),
                     visible: FFValue(xs: false, md: true), // el detalle no se ve en el teléfono
                   )),
                   child: const DetalleDelPedido(),
@@ -260,7 +260,7 @@ const card = FFStyle(
   lineHeight: FFValue(xs: 1.4),
   textAlign: FFValue(xs: TextAlign.center, md: TextAlign.start),
 
-  backgroundColor: AppColors.surface,
+  backgroundColor: FFValue(xs: AppColors.surface, lg: AppColors.primarySoft),
   backgroundImage: FFValue(
     xs: DecorationImage(image: AssetImage('assets/fondo_movil.jpg'), fit: BoxFit.cover),
     md: DecorationImage(image: AssetImage('assets/fondo.jpg'), fit: BoxFit.cover),
@@ -283,6 +283,7 @@ const card = FFStyle(
 - **`textStyle` se combina en cascada:** en `md` se juntan los `TextStyle` de `xs`, `sm` y `md`, y en cada propiedad gana el mayor. En el ejemplo, la fuente `Inter` definida en `xs` se mantiene en `md`.
 - **`color`, `fontWeight`, `fontSize` y `lineHeight` ganan sobre `textStyle`.** `color` va aparte porque un `TextStyle` no sabe del modo oscuro.
 - **`shadow`** recibe una `List<BoxShadow>` por breakpoint. `FFShadow` trae `sm`, `md` y `lg` (los de Bootstrap) y `none` para quitarla en un breakpoint mayor. La sombra va alrededor del fondo y del padding.
+- **`backgroundColor`** es un `FFValue<FFColor>`: cambia por breakpoint y cada color sigue al modo claro/oscuro.
 - **`backgroundImage`** recibe un `DecorationImage` por breakpoint (imagen, `fit`, `alignment`, opacidad…) y va encima de `backgroundColor`. Sirve para usar una imagen más liviana en el móvil.
 - **`borderRadius`** redondea el fondo, la sombra y el borde, y recorta el contenido a esa forma, así una imagen sin padding queda con las esquinas redondeadas.
 - **`borderWidth`** se dibuja por dentro de la caja y se suma al padding, así el contenido no queda debajo del borde.
@@ -360,7 +361,7 @@ class AppColors {
   static const primarySoft = FFColor.adaptive(light: Color(0xFFDBEAFE), dark: Color(0xFF1E3A5F));
 }
 
-const card = FFStyle(backgroundColor: AppColors.surface, color: AppColors.text);
+const card = FFStyle(backgroundColor: FFValue(xs: AppColors.surface), color: AppColors.text);
 ```
 
 Fuera de un estilo, `resolve` devuelve el `Color` del modo actual:

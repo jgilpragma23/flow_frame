@@ -50,7 +50,9 @@ class FFStyle {
   final FFValue<double>? lineHeight;
   final FFValue<TextAlign>? textAlign;
 
-  final FFColor? backgroundColor;
+  /// Color de fondo por breakpoint; cada `FFColor` sigue al modo
+  /// claro/oscuro.
+  final FFValue<FFColor>? backgroundColor;
 
   /// Imagen de fondo por breakpoint, encima de [backgroundColor]. Con
   /// `DecorationImage` se elige `fit`, `alignment`, opacidad, etc.
@@ -94,7 +96,7 @@ class FFStyle {
       fontSize: FFValue.combine(fontSize, other.fontSize),
       lineHeight: FFValue.combine(lineHeight, other.lineHeight),
       textAlign: FFValue.combine(textAlign, other.textAlign),
-      backgroundColor: other.backgroundColor ?? backgroundColor,
+      backgroundColor: FFValue.combine(backgroundColor, other.backgroundColor),
       backgroundImage: FFValue.combine(backgroundImage, other.backgroundImage),
       shadow: FFValue.combine(shadow, other.shadow),
       borderRadius: FFValue.combine(borderRadius, other.borderRadius),
@@ -131,7 +133,7 @@ class FFStyle {
       margin: margin?.resolve(breakpoint) ?? EdgeInsets.zero,
       textStyle: toTextStyle(context),
       textAlign: textAlign?.resolve(breakpoint),
-      backgroundColor: backgroundColor?.resolve(context),
+      backgroundColor: backgroundColor?.resolve(breakpoint)?.resolve(context),
       backgroundImage: backgroundImage?.resolve(breakpoint),
       shadow: shadow?.resolve(breakpoint) ?? const [],
       borderRadius: borderRadius?.resolve(breakpoint) ?? 0,

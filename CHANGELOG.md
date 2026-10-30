@@ -1,3 +1,7 @@
+## Unreleased
+
+* **Cambio**: `FFStyle.backgroundColor` ahora es un `FFValue<FFColor>`, así el fondo cambia por breakpoint. Para migrar, envuelve el color: `backgroundColor: AppColors.surface` pasa a `backgroundColor: FFValue(xs: AppColors.surface)`.
+
 ## 0.0.7 - 2026-10-30
 
 * `FFStyle.shadow`: sombra por breakpoint (`List<BoxShadow>`), también en `WRResolvedStyle`. `FFShadow` trae `sm`, `md`, `lg` y `none`, como `shadow-sm`, `shadow` y `shadow-lg` de Bootstrap.

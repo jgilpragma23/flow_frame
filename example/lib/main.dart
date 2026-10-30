@@ -47,7 +47,7 @@ class AppColors {
 
 const card = FFStyle(
   padding: FFSpacing(all: FFValue(xs: 12, md: 20)),
-  backgroundColor: AppColors.surface,
+  backgroundColor: FFValue(xs: AppColors.surface),
   height: FFValue.all(110),
 );
 
@@ -394,9 +394,11 @@ class ExamplePage extends StatelessWidget {
                   style: card.merge(
                     const FFStyle(
                       visible: FFValue(xs: false, md: true),
-                      backgroundColor: FFColor.adaptive(
-                        light: Color(0xFFFFF4D6),
-                        dark: Color(0xFF3A2E14),
+                      backgroundColor: FFValue(
+                        xs: FFColor.adaptive(
+                          light: Color(0xFFFFF4D6),
+                          dark: Color(0xFF3A2E14),
+                        ),
                       ),
                     ),
                   ),
@@ -472,7 +474,7 @@ class PedidosPage extends StatelessWidget {
 
   static const _card = FFStyle(
     padding: FFSpacing(all: FFValue(xs: 12, md: 20)),
-    backgroundColor: AppColors.surface,
+    backgroundColor: FFValue(xs: AppColors.surface),
   );
 
   @override
@@ -562,7 +564,7 @@ class PedidosPage extends StatelessWidget {
                   fill: FFValue(md: true),
                   style: FFStyle(
                     padding: FFSpacing(all: FFValue(xs: 12, md: 20)),
-                    backgroundColor: AppColors.primarySoft,
+                    backgroundColor: FFValue(xs: AppColors.primarySoft),
                     visible: FFValue(xs: false, md: true),
                   ),
                   child: _CardBody(
