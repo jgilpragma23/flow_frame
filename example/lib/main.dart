@@ -368,6 +368,7 @@ class ExamplePage extends StatelessWidget {
                   child: const _CardBody('Buscador', 'fill: true'),
                 ),
                 FFItem(
+                  fill: const FFValue.all(false),
                   style: const FFStyle(color: AppColors.primary),
                   child: const Icon(Icons.tune, size: 32),
                 ),
@@ -412,6 +413,7 @@ class ExamplePage extends StatelessWidget {
               gap: const FFValue(xs: 12, md: 16),
               children: [
                 FFItem(
+                  fill: const FFValue.all(false),
                   style: card.merge(const FFStyle(width: FFValue(md: 260))),
                   child: const _CardBody('Sidebar', 'width: md 260'),
                 ),
@@ -518,6 +520,7 @@ class PedidosPage extends StatelessWidget {
                   child: _CardBody('Buscar pedido…', 'fill: true'),
                 ),
                 FFItem(
+                  fill: const FFValue.all(false),
                   child: FilledButton(
                     onPressed: () {},
                     child: const Text('Nuevo'),
