@@ -39,5 +39,22 @@ class FFItem extends StatelessWidget {
   final Widget child;
 
   @override
-  Widget build(BuildContext context) => buildFFStyle(context, style, child);
+  Widget build(BuildContext context) {
+    final s = style?.resolve(context);
+    if (s == null || (s.width == null && s.maxWidth == null)) {
+      return buildFFStyle(context, style, child);
+    }
+    // En un `FFFlex` la columna llega con un ancho fijo. Se suelta para que
+    // el ancho del style limite la caja, al inicio de su columna, y el
+    // contenido llena ese ancho como un bloque.
+    return Align(
+      alignment: AlignmentDirectional.topStart,
+      heightFactor: 1,
+      child: buildFFStyle(
+        context,
+        style,
+        SizedBox(width: double.infinity, child: child),
+      ),
+    );
+  }
 }

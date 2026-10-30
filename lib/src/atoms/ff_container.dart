@@ -23,9 +23,12 @@ class FFContainer extends StatelessWidget {
       heightFactor: 1,
       child: ConstrainedBox(
         constraints: BoxConstraints(maxWidth: maxSize ?? double.infinity),
-        child: SizedBox(
-          width: double.infinity,
-          child: buildFFStyle(context, style, child),
+        // El style va por fuera del ancho completo: así su maxWidth, minWidth
+        // y width limitan la caja, que queda centrada.
+        child: buildFFStyle(
+          context,
+          style,
+          SizedBox(width: double.infinity, child: child),
         ),
       ),
     );

@@ -1,3 +1,7 @@
+## Unreleased
+
+* Arreglo: `maxWidth` y `width` del `FFStyle` no tenían efecto en un `FFContainer` ni en un `FFItem` dentro de una columna de `FFFlex`. Ahora limitan la caja: en `FFContainer` queda centrada y en `FFItem` al inicio de su columna, que sigue ocupando su espacio.
+
 ## 0.0.8 - 2026-10-30
 
 * **Cambio**: `FFStyle.backgroundColor` ahora es un `FFValue<FFColor>`, así el fondo cambia por breakpoint. Para migrar, envuelve el color: `backgroundColor: AppColors.surface` pasa a `backgroundColor: FFValue(xs: AppColors.surface)`.
