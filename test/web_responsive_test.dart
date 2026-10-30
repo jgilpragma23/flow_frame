@@ -203,12 +203,14 @@ void main() {
         margin: FFSpacing(top: FFValue(xs: 4)),
         backgroundColor: muted,
         maxWidth: FFValue(md: 640),
+        maxHeight: FFValue(xs: 120, lg: 400),
         visible: FFValue(xs: false, md: true),
       ).resolve(context);
       expect(resolved.padding, const EdgeInsets.all(16));
       expect(resolved.margin, const EdgeInsets.only(top: 4));
       expect(resolved.backgroundColor, gray);
       expect(resolved.maxWidth, 640);
+      expect(resolved.maxHeight, 120);
       expect(resolved.visible, isTrue);
     });
 
@@ -270,6 +272,30 @@ void main() {
 
       await pump(tester, tablet, container);
       expect(rect(tester).width, 1000 - 32);
+    });
+
+    testWidgets('maxHeight limita el alto por breakpoint', (tester) async {
+      const container = FFContainer(
+        style: FFStyle(maxHeight: FFValue(xs: 200, md: 300)),
+        child: SizedBox(key: Key('c'), height: 500),
+      );
+      await pump(tester, phone, container);
+      expect(rect(tester).height, 200);
+
+      await pump(tester, tablet, container);
+      expect(rect(tester).height, 300);
+    });
+
+    testWidgets('sin maxHeight el contenido toma su alto', (tester) async {
+      await pump(
+        tester,
+        phone,
+        const FFContainer(
+          style: FFStyle(maxHeight: FFValue(md: 300)),
+          child: SizedBox(key: Key('c'), height: 500),
+        ),
+      );
+      expect(rect(tester).height, 500);
     });
 
     testWidgets('los Text de adentro heredan el estilo', (tester) async {

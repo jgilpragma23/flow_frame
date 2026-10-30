@@ -5,7 +5,7 @@ import '../models/ff_style.dart';
 /// Envuelve [child] con los widgets que aplican [style].
 ///
 /// De adentro hacia afuera: texto, padding, fondo, tamaño, límites de
-/// ancho y margin. Uso interno de los widgets de la librería.
+/// ancho y alto, y margin. Uso interno de los widgets de la librería.
 Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
   if (style == null) return child;
   final s = style.resolve(context);
@@ -28,11 +28,12 @@ Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
   if (s.width != null || s.height != null) {
     current = SizedBox(width: s.width, height: s.height, child: current);
   }
-  if (s.minWidth != null || s.maxWidth != null) {
+  if (s.minWidth != null || s.maxWidth != null || s.maxHeight != null) {
     current = ConstrainedBox(
       constraints: BoxConstraints(
         minWidth: s.minWidth ?? 0,
         maxWidth: s.maxWidth ?? double.infinity,
+        maxHeight: s.maxHeight ?? double.infinity,
       ),
       child: current,
     );
