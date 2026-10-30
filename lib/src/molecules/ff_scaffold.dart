@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 import '../models/breakpoint.dart';
+import '../models/ff_app_bar_style.dart';
 import '../models/ff_brand.dart';
 import '../models/ff_color.dart';
 import '../models/ff_navigation.dart';
 import '../models/ff_value.dart';
 import '../utils/context_extensions.dart';
+import 'ff_app_bar.dart';
 
 /// Un `Scaffold` cuya navegación cambia según el breakpoint: barra abajo,
 /// rail lateral o drawer, con subrutas en acordeón en el menú completo.
@@ -143,12 +145,13 @@ class WRScaffoldState extends State<FFScaffold> {
         .resolveMerged(breakpoint)
         .merge(widget.responsive?.resolveMerged(breakpoint));
 
-    final items = _visible(widget.destinations, breakpoint);
+    final items = visibleDestinations(widget.destinations, breakpoint);
     _trackRoute(items);
 
     final scaffold = Scaffold(
       key: _scaffoldKey,
       appBar: switch (_navigation) {
+        _ when widget.appBar is FFAppBar => _adapt(widget.appBar! as FFAppBar),
         FFNavigation.drawer => _appBarWithBrand(widget.appBar ?? AppBar()),
         FFNavigation.appBar => _appBarWithNav(items),
         FFNavigation.bottom => _appBarWithBrand(widget.appBar),
@@ -186,43 +189,13 @@ class WRScaffoldState extends State<FFScaffold> {
 
   /// Alto del app bar, para alinear el ☰ del rail y del menú con él.
   double get _toolbarHeight {
-    final appBar = widget.appBar;
-    if (appBar is AppBar && appBar.toolbarHeight != null) {
-      return appBar.toolbarHeight!;
-    }
+    final height = switch (widget.appBar) {
+      final AppBar bar => bar.toolbarHeight,
+      final FFAppBar bar => bar.toolbarHeight,
+      _ => null,
+    };
+    if (height != null) return height;
     return Theme.of(context).appBarTheme.toolbarHeight ?? kToolbarHeight;
-  }
-
-  /// Quita los ocultos y los grupos que se quedan sin subrutas visibles.
-  List<FFDestination> _visible(
-    List<FFDestination> destinations,
-    Breakpoint breakpoint,
-  ) {
-    bool shown(FFDestination d) => d.visible?.resolve(breakpoint) != false;
-    return [
-      for (final d in destinations)
-        if (shown(d))
-          if (!d.isGroup)
-            d
-          else if (d.children.any(shown))
-            FFDestination(
-              id: d.id,
-              icon: d.icon,
-              selectedIcon: d.selectedIcon,
-              label: d.label,
-              alwaysOpen: d.alwaysOpen,
-              children: [
-                for (final c in d.children)
-                  if (shown(c))
-                    FFDestination(
-                      id: c.id,
-                      icon: c.icon,
-                      selectedIcon: c.selectedIcon,
-                      label: c.label,
-                    ),
-              ],
-            ),
-    ];
   }
 
   /// Recuerda la última subruta de cada grupo y abre el grupo de la ruta
@@ -330,20 +303,15 @@ class WRScaffoldState extends State<FFScaffold> {
   /// `AppBar`, los enlaces van en una franja debajo.
   PreferredSizeWidget _appBarWithNav(List<FFDestination> items) {
     final source = widget.appBar ?? AppBar();
-    final nav = Align(
-      alignment: Alignment.centerLeft,
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          children: [
-            for (final d in items)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 2),
-                child: d.isGroup ? _appBarGroup(d) : _appBarLink(d),
-              ),
-          ],
-        ),
-      ),
+    final nav = FFNavLinks(
+      items: items,
+      currentRoute: widget.currentRoute,
+      onSelected: widget.onRouteSelected,
+      labelColor: _color(_style.labelColor),
+      iconColor: _color(_style.iconColor),
+      selectedLabelColor: _color(_style.selectedLabelColor),
+      selectedIconColor: _color(_style.selectedIconColor),
+      selectedBackgroundColor: _color(_style.selectedBackgroundColor),
     );
 
     if (source is! AppBar) {
@@ -363,7 +331,7 @@ class WRScaffoldState extends State<FFScaffold> {
       );
     }
 
-    final title = source.title ?? _brandInBar();
+    final title = source.title ?? _brandBar;
     return _copyAppBar(
       source,
       title: Row(
@@ -379,11 +347,52 @@ class WRScaffoldState extends State<FFScaffold> {
 
   /// El app bar con la marca como título, si es un `AppBar` sin título.
   PreferredSizeWidget? _appBarWithBrand(PreferredSizeWidget? source) {
-    final brand = _brandInBar();
+    final brand = _brandBar;
     if (source is! AppBar || source.title != null || brand == null) {
       return source;
     }
     return _copyAppBar(source, title: brand);
+  }
+
+  /// La marca para el app bar; `null` sin marca.
+  Widget? get _brandBar =>
+      widget.brand == null ? null : FFBrandBar(brand: widget.brand!);
+
+  /// Un [FFAppBar] con lo que no define tomado de este scaffold: la marca
+  /// (si no tiene título y la navegación no es rail), los destinos con
+  /// [FFNavigation.appBar] y los colores de la navegación como base.
+  FFAppBar _adapt(FFAppBar bar) {
+    final linksInBar = _navigation == FFNavigation.appBar;
+    final base = FFAppBarStyle(
+      backgroundColor: linksInBar ? _style.backgroundColor : null,
+      linkColor: _style.labelColor,
+      selectedLinkColor: _style.selectedLabelColor,
+      selectedLinkBackgroundColor: _style.selectedBackgroundColor,
+    );
+    final own = bar.responsive;
+    return bar.copyWith(
+      brand:
+          bar.brand == null &&
+              bar.title == null &&
+              _navigation != FFNavigation.rail
+          ? widget.brand
+          : null,
+      destinations: linksInBar && bar.destinations.isEmpty
+          ? widget.destinations
+          : null,
+      currentRoute: bar.currentRoute == null ? widget.currentRoute : null,
+      onRouteSelected: linksInBar && bar.onRouteSelected == null
+          ? widget.onRouteSelected
+          : null,
+      // La base va en xs para que cualquier breakpoint del app bar la pise.
+      responsive: FFValue(
+        xs: base.merge(own?.xs),
+        sm: own?.sm,
+        md: own?.md,
+        lg: own?.lg,
+        xl: own?.xl,
+      ),
+    );
   }
 
   /// Copia de [source] con otro título.
@@ -421,77 +430,6 @@ class WRScaffoldState extends State<FFScaffold> {
       systemOverlayStyle: source.systemOverlayStyle,
       forceMaterialTransparency: source.forceMaterialTransparency,
       clipBehavior: source.clipBehavior,
-    );
-  }
-
-  ButtonStyle _linkStyle({required bool selected}) {
-    final scheme = Theme.of(context).colorScheme;
-    return TextButton.styleFrom(
-      foregroundColor: selected
-          ? _color(_style.selectedLabelColor) ?? scheme.onSecondaryContainer
-          : _color(_style.labelColor) ?? scheme.onSurfaceVariant,
-      iconColor: selected
-          ? _color(_style.selectedIconColor) ?? scheme.onSecondaryContainer
-          : _color(_style.iconColor) ?? scheme.onSurfaceVariant,
-      backgroundColor: selected
-          ? _color(_style.selectedBackgroundColor) ?? scheme.secondaryContainer
-          : null,
-      shape: const StadiumBorder(),
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-    );
-  }
-
-  Widget _appBarLink(FFDestination d) {
-    final selected = d.id == widget.currentRoute;
-    return TextButton(
-      style: _linkStyle(selected: selected),
-      onPressed: () => widget.onRouteSelected(d.id),
-      child: Text(d.label),
-    );
-  }
-
-  /// Un grupo: botón con ▾ que abre un dropdown con sus subrutas.
-  Widget _appBarGroup(FFDestination d) {
-    final scheme = Theme.of(context).colorScheme;
-    final selected = d.children.any((c) => c.id == widget.currentRoute);
-    return MenuAnchor(
-      alignmentOffset: const Offset(0, 4),
-      builder: (context, controller, _) => TextButton(
-        style: _linkStyle(selected: selected),
-        onPressed: () =>
-            controller.isOpen ? controller.close() : controller.open(),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(d.label),
-            const SizedBox(width: 4),
-            AnimatedRotation(
-              turns: controller.isOpen ? 0.5 : 0,
-              duration: _duration,
-              child: const Icon(Icons.expand_more, size: 18),
-            ),
-          ],
-        ),
-      ),
-      menuChildren: [
-        for (final c in d.children)
-          MenuItemButton(
-            leadingIcon: c.id == widget.currentRoute
-                ? c.selectedIcon ?? c.icon
-                : c.icon,
-            style: c.id == widget.currentRoute
-                ? MenuItemButton.styleFrom(
-                    foregroundColor:
-                        _color(_style.selectedLabelColor) ?? scheme.primary,
-                    iconColor:
-                        _color(_style.selectedIconColor) ?? scheme.primary,
-                    backgroundColor: _color(_style.selectedBackgroundColor),
-                  )
-                : null,
-            onPressed: () => widget.onRouteSelected(c.id),
-            child: Text(c.label),
-          ),
-      ],
     );
   }
 
@@ -642,24 +580,6 @@ class WRScaffoldState extends State<FFScaffold> {
     ),
   );
 
-  /// Logo y título en una fila, para el app bar. `null` sin marca.
-  Widget? _brandInBar() {
-    final brand = widget.brand;
-    if (brand == null) return null;
-    return _tappable(
-      brand.onTap,
-      Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (brand.logo case final logo?) _logo(logo, 28),
-          if (brand.logo != null && brand.title != null)
-            const SizedBox(width: 10),
-          ?brand.title,
-        ],
-      ),
-    );
-  }
-
   /// Logo, título y subtítulo para el menú, con los colores del estilo.
   Widget _brandTile(
     FFBrand brand, {
@@ -668,11 +588,11 @@ class WRScaffoldState extends State<FFScaffold> {
   }) {
     final theme = Theme.of(context);
     final label = _color(_style.labelColor);
-    return _tappable(
+    return brandTappable(
       brand.onTap,
       Row(
         children: [
-          if (brand.logo case final logo?) _logo(logo, logoSize),
+          if (brand.logo case final logo?) brandLogo(logo, logoSize),
           if (brand.logo != null) const SizedBox(width: 10),
           Expanded(
             child: Column(
@@ -705,19 +625,6 @@ class WRScaffoldState extends State<FFScaffold> {
       ),
     );
   }
-
-  Widget _logo(Widget logo, double size) => SizedBox.square(
-    dimension: size,
-    child: FittedBox(child: logo),
-  );
-
-  Widget _tappable(VoidCallback? onTap, Widget child) => onTap == null
-      ? child
-      : InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(8),
-          child: child,
-        );
 
   Widget _collapsedRail(List<FFDestination> items) {
     final selected = _groupOf(items, widget.currentRoute);
@@ -765,7 +672,7 @@ class WRScaffoldState extends State<FFScaffold> {
           ),
           if (widget.brand?.logo case final logo?) ...[
             const SizedBox(height: 8),
-            _tappable(widget.brand!.onTap, _logo(logo, 32)),
+            brandTappable(widget.brand!.onTap, brandLogo(logo, 32)),
           ],
         ],
       ),

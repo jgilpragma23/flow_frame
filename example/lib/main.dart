@@ -108,6 +108,11 @@ class _ExampleShellState extends State<ExampleShell> {
           icon: Icon(Icons.crop_free),
           label: 'Contenedor',
         ),
+        FFDestination(
+          id: 'libreria/app-bar',
+          icon: Icon(Icons.web_asset),
+          label: 'App bar',
+        ),
       ],
     ),
     FFDestination(
@@ -194,47 +199,43 @@ class _ExampleShellState extends State<ExampleShell> {
         subtitle: const Text('Admin'),
         onTap: () => setState(() => _selected = 'ejemplos'),
       ),
-      appBar: AppBar(
+      appBar: FFAppBar(
         title: Text(_title),
         actions: [
-          FFActions(
-            actions: [
-              FFAction(
-                icon: const Icon(Icons.add),
-                label: 'Nuevo pedido',
-                onPressed: () {},
-                display: const FFValue(
-                  xs: FFActionDisplay.icon,
-                  md: FFActionDisplay.full,
-                ),
-              ),
-              FFAction(
-                icon: const Icon(Icons.download_outlined),
-                label: 'Exportar',
-                onPressed: () {},
-                display: const FFValue(
-                  xs: FFActionDisplay.menu,
-                  lg: FFActionDisplay.full,
-                ),
-              ),
-              FFAction(
-                icon: const Icon(Icons.print_outlined),
-                label: 'Imprimir',
-                onPressed: () {},
-                display: const FFValue(
-                  xs: FFActionDisplay.hidden,
-                  md: FFActionDisplay.menu,
-                ),
-              ),
-              FFAction(
-                icon: const Icon(Icons.notifications_outlined),
-                label: 'Notificaciones',
-                onPressed: () {},
-              ),
-            ],
+          FFAction(
+            icon: const Icon(Icons.add),
+            label: 'Nuevo pedido',
+            onPressed: () {},
+            display: const FFValue(
+              xs: FFActionDisplay.icon,
+              md: FFActionDisplay.full,
+            ),
           ),
-          const SizedBox(width: 8),
+          FFAction(
+            icon: const Icon(Icons.download_outlined),
+            label: 'Exportar',
+            onPressed: () {},
+            display: const FFValue(
+              xs: FFActionDisplay.menu,
+              lg: FFActionDisplay.full,
+            ),
+          ),
+          FFAction(
+            icon: const Icon(Icons.print_outlined),
+            label: 'Imprimir',
+            onPressed: () {},
+            display: const FFValue(
+              xs: FFActionDisplay.hidden,
+              md: FFActionDisplay.menu,
+            ),
+          ),
+          FFAction(
+            icon: const Icon(Icons.notifications_outlined),
+            label: 'Notificaciones',
+            onPressed: () {},
+          ),
         ],
+        trailing: const [SizedBox(width: 8)],
       ),
       backgroundColor: AppColors.background.resolve(context),
       currentRoute: _selected,
@@ -268,6 +269,7 @@ class _ExampleShellState extends State<ExampleShell> {
         'libreria/espaciado' => const EspaciadoDemo(),
         'libreria/colores' => const ColoresDemo(),
         'libreria/contenedor' => const ContenedorDemo(),
+        'libreria/app-bar' => const AppBarDemo(),
         _ => _Placeholder(_selected),
       },
     );

@@ -17,6 +17,7 @@ Herramientas para hacer interfaces responsive en Flutter con una idea parecida a
 | [`FFFlex` y `FFItem`](#ffflex-y-ffitem) | Grilla de 12 columnas, filas o columnas que cambian por breakpoint | [imagen](#ffflex-y-ffitem) |
 | [`FFScaffold`](#ffscaffold-navegación-según-el-breakpoint) | Barra abajo, rail, sidebar, drawer o enlaces en el app bar, según el ancho | [GIF](#ffscaffold-navegación-según-el-breakpoint) |
 | [`FFBrand`](#ffscaffold-navegación-según-el-breakpoint) | Logo y nombre de la app junto al ☰ | |
+| [`FFAppBar`](#ffappbar-app-bar-sin-el-layout) | App bar responsive que se usa solo, en cualquier `Scaffold`: marca, título, enlaces y acciones, y se oculta por breakpoint | [imagen](#ffappbar-app-bar-sin-el-layout) |
 | [`FFActions`](#ffactions-acciones-del-app-bar) | Acciones del app bar: con texto, solo ícono, en el menú ⋮ u ocultas | [imagen](#ffactions-acciones-del-app-bar) |
 
 ## Instalación
@@ -26,7 +27,7 @@ dependencies:
   flow_frame:
     git:
       url: https://github.com/jgilpragma23/flow_frame.git
-      ref: v0.0.3
+      ref: v0.0.4
 ```
 
 ```dart
@@ -98,24 +99,20 @@ class _ShellState extends State<Shell> {
         title: Text('Mi Tienda'),
         subtitle: Text('Admin'),
       ),
-      appBar: AppBar(
+      appBar: FFAppBar(
         title: const Text('Pedidos'),
         actions: [
-          FFActions(
-            actions: [
-              FFAction(
-                icon: const Icon(Icons.add),
-                label: 'Nuevo pedido',
-                onPressed: () {},
-                display: const FFValue(xs: FFActionDisplay.icon, md: FFActionDisplay.full),
-              ),
-              FFAction(
-                icon: const Icon(Icons.download_outlined),
-                label: 'Exportar',
-                onPressed: () {},
-                display: const FFValue(xs: FFActionDisplay.menu, lg: FFActionDisplay.full),
-              ),
-            ],
+          FFAction(
+            icon: const Icon(Icons.add),
+            label: 'Nuevo pedido',
+            onPressed: () {},
+            display: const FFValue(xs: FFActionDisplay.icon, md: FFActionDisplay.full),
+          ),
+          FFAction(
+            icon: const Icon(Icons.download_outlined),
+            label: 'Exportar',
+            onPressed: () {},
+            display: const FFValue(xs: FFActionDisplay.menu, lg: FFActionDisplay.full),
           ),
         ],
       ),
@@ -468,7 +465,7 @@ FFFlex(
 
 ## `FFScaffold`: navegación según el breakpoint
 
-Funciona como un `Scaffold` (recibe `appBar`, `body`, `floatingActionButton`, `floatingActionButtonLocation` y `backgroundColor`), pero además arma la navegación según el breakpoint.
+Funciona como un `Scaffold` (recibe `appBar`, `body`, `floatingActionButton`, `floatingActionButtonLocation` y `backgroundColor`), pero además arma la navegación según el breakpoint. El `appBar` puede ser un `AppBar` o un [`FFAppBar`](#ffappbar-app-bar-sin-el-layout).
 
 ![La app de ejemplo de 400 a 1800 px: barra abajo, rail y sidebar, con la grilla reacomodándose](doc/responsive.gif)
 
@@ -679,3 +676,66 @@ AppBar(
 - `display` funciona en cascada. Sin `display`, la acción se muestra solo con el ícono.
 - El ⋮ aparece solo si alguna acción está en `menu` en ese breakpoint. `menuIcon` y `menuTooltip` cambian su ícono y su tooltip.
 - `onPressed: null` muestra la acción deshabilitada.
+
+## `FFAppBar`: app bar sin el layout
+
+![Tres FFAppBar en xs, md y lg: marca y enlaces, título con marca y uno que se oculta en xs](doc/app-bar.png)
+
+Un app bar responsive que va en el `appBar` de cualquier `Scaffold`, sin `FFScaffold`. Sirve si ya tienes tu propio layout (por ejemplo con go_router) y solo quieres que el app bar se adapte al ancho.
+
+```dart
+Scaffold(
+  appBar: FFAppBar(
+    brand: const FFBrand(logo: Icon(Icons.storefront), title: Text('Mi Tienda')),
+    title: const Text('Pedidos'),
+    destinations: links,              // opcional: enlaces y grupos con dropdown
+    currentRoute: 'inicio',
+    onRouteSelected: (id) => context.go('/$id'),
+    actions: [
+      FFAction(icon: const Icon(Icons.search), label: 'Buscar', onPressed: _buscar),
+      FFAction(
+        icon: const Icon(Icons.shopping_cart),
+        label: 'Carrito',
+        onPressed: _carrito,
+        display: const FFValue(xs: FFActionDisplay.icon, lg: FFActionDisplay.full),
+      ),
+    ],
+    responsive: const FFValue(
+      xs: FFAppBarStyle(showBrand: false, centerTitle: true),
+      md: FFAppBarStyle(showBrand: true, centerTitle: false),
+    ),
+  ),
+  body: ...,
+)
+```
+
+| Parámetro | Para qué |
+|---|---|
+| `brand` | Logo y nombre de la app, al inicio |
+| `title` | Después de la marca, separado por una línea. Por ejemplo, el nombre de la página |
+| `actions` | `FFAction` que cambian de forma por breakpoint, como en [`FFActions`](#ffactions-acciones-del-app-bar) |
+| `trailing` | Widgets después de las acciones, por ejemplo un avatar |
+| `destinations`, `currentRoute`, `onRouteSelected` | Enlaces después del título, con grupos en dropdown. Respetan `FFDestination.visible`. Sin `onRouteSelected` no se muestran |
+| `leading`, `automaticallyImplyLeading`, `bottom`, `toolbarHeight` | Como en `AppBar` |
+| `responsive` | `FFValue<FFAppBarStyle>`, en cascada |
+
+**`FFAppBarStyle`**
+
+| Propiedad | Qué cambia |
+|---|---|
+| `visible` | `false` oculta el app bar completo y el contenido sube |
+| `showBrand`, `showTitle` | `false` oculta la marca o el título |
+| `centerTitle` | Marca y título al centro. Por defecto a la izquierda en todas las plataformas; con enlaces, siempre a la izquierda |
+| `backgroundColor`, `foregroundColor` | Fondo; color del título y los íconos (`FFColor`) |
+| `elevation` | Sombra |
+| `linkColor`, `selectedLinkColor`, `selectedLinkBackgroundColor` | Colores de los enlaces y del enlace de la ruta actual |
+
+**Dentro de `FFScaffold`**
+
+Si lo pasas como `appBar` de un `FFScaffold`, toma de él lo que no definas:
+- La marca del scaffold, si el `FFAppBar` no tiene `brand` ni `title` y la navegación no es rail.
+- Con `FFNavigation.appBar`, los destinos y la ruta para los enlaces, y el fondo de la navegación.
+- Los colores de los enlaces, desde el `FFNavStyle`.
+
+Lo que pongas en `responsive` siempre gana. Si lo ocultas con `visible: false` y la navegación es drawer, se va también el ☰.
+
