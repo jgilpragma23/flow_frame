@@ -153,12 +153,12 @@ class EspaciadoDemo extends StatelessWidget {
           padding: vertical == null
               ? FFSpacing(all: padding)
               : FFSpacing(horizontal: padding, vertical: vertical),
-          backgroundColor: _paddingColor,
+          backgroundColor: FFValue(xs: _paddingColor),
         ),
         child: FFContainer(
           style: const FFStyle(
             padding: FFSpacing(all: FFValue.all(12)),
-            backgroundColor: AppColors.primarySoft,
+            backgroundColor: FFValue(xs: AppColors.primarySoft),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -186,21 +186,23 @@ const _badge = FFStyle(
   ),
   fontWeight: FFValue.all(FontWeight.w600),
   fontSize: FFValue(xs: 13, md: 15),
-  backgroundColor: AppColors.surface,
+  backgroundColor: FFValue(xs: AppColors.surface),
 );
 
 const _variants = [
   ('base', FFStyle()),
   (
     'primario',
-    FFStyle(backgroundColor: AppColors.primarySoft, color: AppColors.primary),
+    FFStyle(
+      backgroundColor: FFValue(xs: AppColors.primarySoft),
+      color: AppColors.primary,
+    ),
   ),
   (
     'éxito',
     FFStyle(
-      backgroundColor: FFColor.adaptive(
-        light: Color(0xFFDCFCE7),
-        dark: Color(0xFF14361F),
+      backgroundColor: FFValue(
+        xs: FFColor.adaptive(light: Color(0xFFDCFCE7), dark: Color(0xFF14361F)),
       ),
       color: FFColor.adaptive(
         light: Color(0xFF15803D),
@@ -211,9 +213,8 @@ const _variants = [
   (
     'peligro',
     FFStyle(
-      backgroundColor: FFColor.adaptive(
-        light: Color(0xFFFEE2E2),
-        dark: Color(0xFF451A1A),
+      backgroundColor: FFValue(
+        xs: FFColor.adaptive(light: Color(0xFFFEE2E2), dark: Color(0xFF451A1A)),
       ),
       color: FFColor.adaptive(
         light: Color(0xFFB91C1C),
@@ -283,7 +284,7 @@ class EstilosDemo extends StatelessWidget {
             style: FFStyle(
               width: FFValue(xs: double.infinity, md: 360, lg: 480),
               height: FFValue(xs: 64, md: 96),
-              backgroundColor: AppColors.primarySoft,
+              backgroundColor: FFValue(xs: AppColors.primarySoft),
               padding: FFSpacing(all: FFValue.all(12)),
               color: AppColors.primary,
             ),
@@ -341,7 +342,9 @@ class ColoresDemo extends StatelessWidget {
             for (final (name, color) in _palette)
               FFItem(
                 col: const FFValue(xs: 6, md: 4, lg: 2),
-                style: const FFStyle(backgroundColor: AppColors.surface),
+                style: const FFStyle(
+                  backgroundColor: FFValue(xs: AppColors.surface),
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -375,7 +378,7 @@ class ColoresDemo extends StatelessWidget {
         FFContainer(
           style: const FFStyle(
             padding: FFSpacing(all: FFValue(xs: 16, md: 24)),
-            backgroundColor: AppColors.surface,
+            backgroundColor: FFValue(xs: AppColors.surface),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -427,7 +430,7 @@ class ContenedorDemo extends StatelessWidget {
                 maxSize: max,
                 style: const FFStyle(
                   padding: FFSpacing(all: FFValue(xs: 12, md: 16)),
-                  backgroundColor: AppColors.primarySoft,
+                  backgroundColor: FFValue(xs: AppColors.primarySoft),
                   color: AppColors.primary,
                   fontWeight: FFValue.all(FontWeight.w600),
                 ),
