@@ -1,4 +1,4 @@
-## Sin publicar
+## 0.0.5 - 2026-10-30
 
 * `FFStyle.maxHeight`: alto máximo por breakpoint, también en `WRResolvedStyle`.
 * **Cambio**: `FFFlex` es horizontal por defecto, como un `row` de Bootstrap, y un hijo sin `col` ni `fill` (o que no es un `FFItem`) ocupa la fila completa. Así `col` funciona sin escribir `direction`, y los `FFFlex` sin `col` se siguen viendo apilados. Para que un elemento tome su tamaño natural en una fila, usa `fill: FFValue(...: false)` (`col-auto`). La vertical queda para cuando importa el alto: `fill` en altura y alineación vertical.
