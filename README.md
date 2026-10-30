@@ -147,7 +147,7 @@ class PedidosPage extends StatelessWidget {
             ),
             // Lista y detalle: uno debajo del otro en xs/sm, lado a lado desde md
             FFFlex(
-              direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
+              direction: const FFValue(xs: FFDirection.vertical, md: FFDirection.horizontal),
               gap: const FFValue(xs: 12, md: 16),
               children: [
                 const FFItem(col: FFValue(md: 7, xl: 8), style: card, child: ListaDePedidos()),
@@ -447,7 +447,7 @@ Si un `FFItem` tiene `col` y `fill`, gana el que esté definido en el breakpoint
 
 ### Vertical
 
-Con `direction: Axis.vertical` los elementos se apilan, ocupan todo el ancho y `col` se ignora. Úsalo cuando importa el alto:
+Con `direction: FFDirection.vertical` los elementos se apilan, ocupan todo el ancho y `col` se ignora. Úsalo cuando importa el alto:
 
 - `fill` reparte la altura que sobra, como un `Expanded` en un `Column` (solo si el `FFFlex` tiene un alto limitado).
 - `mainAxisAlignment` alinea en vertical, por ejemplo un login centrado en la pantalla o un pie empujado hasta abajo.
@@ -455,7 +455,7 @@ Con `direction: Axis.vertical` los elementos se apilan, ocupan todo el ancho y `
 
 ```dart
 FFFlex(
-  direction: const FFValue.all(Axis.vertical),
+  direction: const FFValue.all(FFDirection.vertical),
   children: [
     const Encabezado(),
     FFItem(fill: const FFValue.all(true), child: ListView(...)), // toma el alto libre
@@ -464,12 +464,37 @@ FFFlex(
 )
 ```
 
-La dirección también cambia por breakpoint, por ejemplo `FFValue(xs: Axis.vertical, md: Axis.horizontal)`.
+La dirección también cambia por breakpoint, por ejemplo `FFValue(xs: FFDirection.vertical, md: FFDirection.horizontal)`.
+
+### Invertir el orden
+
+`FFDirection` tiene cuatro valores, como las clases de Bootstrap:
+
+| `FFDirection` | Bootstrap | Resultado |
+|---|---|---|
+| `horizontal` (por defecto) | `flex-row` | Filas de 12 columnas |
+| `horizontalReverse` | `flex-row-reverse` | Igual, con los hijos en orden inverso |
+| `vertical` | `flex-column` | Apilados de arriba hacia abajo |
+| `verticalReverse` | `flex-column-reverse` | Apilados de abajo hacia arriba |
+
+Por ejemplo, la imagen a la izquierda en el teléfono y a la derecha desde `md`:
+
+```dart
+FFFlex(
+  direction: const FFValue(xs: FFDirection.horizontal, md: FFDirection.horizontalReverse),
+  children: [
+    FFItem(col: const FFValue(xs: 4), child: Imagen()),
+    FFItem(col: const FFValue(xs: 8), child: Texto()),
+  ],
+)
+```
+
+Se invierte la lista completa: en una fila el último queda a la izquierda y, si están apilados, el último queda arriba. Primero se aplica `order` y después se invierte. Al invertir, los elementos no pierden su estado.
 
 ### Referencia
 
 **`FFFlex`**
-- `direction`: por defecto horizontal.
+- `direction`: un `FFDirection` por breakpoint: `horizontal` (por defecto), `horizontalReverse`, `vertical` o `verticalReverse`.
 - `gap`: separación entre elementos y, en horizontal, también entre filas.
 - `mainAxisAlignment`: por defecto `start`. En horizontal se aplica a cada fila.
 - `crossAxisAlignment`: por defecto `stretch` en vertical (los elementos ocupan todo el ancho) y `start` en horizontal. En horizontal se aplica dentro de cada fila; `stretch` iguala la altura de la fila.
