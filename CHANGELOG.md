@@ -1,7 +1,8 @@
-## Sin publicar
+## 0.0.4 - 2026-10-29
 
+* `FFAppBar`: app bar responsive que se usa en cualquier `Scaffold`, sin `FFScaffold`. Marca, título, enlaces con grupos en dropdown y acciones (`FFAction`), con `FFAppBarStyle` por breakpoint: `visible`, `showBrand`, `showTitle`, `centerTitle`, colores y elevación. Dentro de un `FFScaffold` recibe la marca, los destinos y los colores que no defina.
 * README: índice de lo que trae la librería, instalación, ejemplo completo e imágenes en xs, md y lg de cada tema.
-* Ejemplo: sección "Librería" con una página para estilos, espaciado, colores y contenedor.
+* Ejemplo: sección "Librería" con una página para estilos, espaciado, colores, contenedor y app bar.
 
 ## 0.0.3 - 2026-10-29
 
