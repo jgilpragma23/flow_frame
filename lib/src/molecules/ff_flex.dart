@@ -5,13 +5,15 @@ import 'package:flutter/widgets.dart';
 
 import '../atoms/ff_item.dart';
 import '../models/breakpoint.dart';
+import '../models/ff_direction.dart';
 import '../models/ff_style.dart';
 import '../models/ff_value.dart';
 import '../utils/context_extensions.dart';
 import '../utils/ff_style_builder.dart';
 
 /// Una fila o columna cuya dirección, separación y alineación cambian según
-/// el breakpoint (equivale a `d-flex flex-column flex-md-row`).
+/// el breakpoint (equivale a `d-flex flex-column flex-md-row`). La dirección
+/// también puede invertir el orden de los hijos ([FFDirection]).
 ///
 /// Por defecto es horizontal y funciona como un `row` de Bootstrap: cada
 /// [FFItem] ocupa su `col` (de 12), lo que sobra en la fila (`fill: true`)
@@ -27,7 +29,7 @@ import '../utils/ff_style_builder.dart';
 class FFFlex extends StatelessWidget {
   const FFFlex({
     super.key,
-    this.direction = const FFValue.all(Axis.horizontal),
+    this.direction = const FFValue.all(FFDirection.horizontal),
     this.gap,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
@@ -35,8 +37,9 @@ class FFFlex extends StatelessWidget {
     required this.children,
   });
 
-  /// Por defecto horizontal en todos los breakpoints.
-  final FFValue<Axis> direction;
+  /// Por defecto [FFDirection.horizontal] en todos los breakpoints. Con
+  /// `horizontalReverse` o `verticalReverse` los hijos van en orden inverso.
+  final FFValue<FFDirection> direction;
 
   /// Separación entre elementos y, en horizontal, también entre filas.
   final FFValue<double>? gap;
@@ -54,7 +57,8 @@ class FFFlex extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final breakpoint = context.breakpoint;
-    final axis = direction.resolve(breakpoint) ?? Axis.horizontal;
+    final dir = direction.resolve(breakpoint) ?? FFDirection.horizontal;
+    final axis = dir.axis;
 
     return buildFFStyle(
       context,
@@ -70,15 +74,16 @@ class FFFlex extends StatelessWidget {
                 ? CrossAxisAlignment.stretch
                 : CrossAxisAlignment.start),
         textDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
-        children: _slots(breakpoint),
+        children: _slots(breakpoint, reverse: dir.isReverse),
       ),
     );
   }
 
-  /// Quita los ocultos, ordena por `order` y le dice al layout cómo medir
+  /// Quita los ocultos, ordena por `order` (y lo invierte con [reverse]) y
+  /// le dice al layout cómo medir
   /// cada hijo. Cada hijo lleva una key con su índice original para que no
   /// pierda su estado al reordenarse u ocultarse otro.
-  List<Widget> _slots(Breakpoint breakpoint) {
+  List<Widget> _slots(Breakpoint breakpoint, {required bool reverse}) {
     final entries = <({int index, int order, Widget child})>[];
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
@@ -96,7 +101,7 @@ class FFFlex extends StatelessWidget {
     );
 
     return [
-      for (final e in entries)
+      for (final e in reverse ? entries.reversed : entries)
         _WRSlot(
           key: _SlotKey(e.index),
           size: e.child is FFItem

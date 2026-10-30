@@ -334,7 +334,7 @@ class ExamplePage extends StatelessWidget {
               ),
             ),
             FFFlex(
-              direction: const FFValue.all(Axis.horizontal),
+              direction: const FFValue.all(FFDirection.horizontal),
               gap: const FFValue(xs: 12, md: 16),
               children: [
                 for (var i = 1; i <= 5; i++)
@@ -353,7 +353,7 @@ class ExamplePage extends StatelessWidget {
               ),
             ),
             FFFlex(
-              direction: const FFValue.all(Axis.horizontal),
+              direction: const FFValue.all(FFDirection.horizontal),
               gap: const FFValue(xs: 12, md: 16),
               crossAxisAlignment: const FFValue.all(CrossAxisAlignment.center),
               children: [
@@ -382,7 +382,10 @@ class ExamplePage extends StatelessWidget {
               ),
             ),
             FFFlex(
-              direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
+              direction: const FFValue(
+                xs: FFDirection.vertical,
+                md: FFDirection.horizontal,
+              ),
               gap: const FFValue(xs: 12, md: 16),
               children: [
                 _card('A', 'fill: md true'),
@@ -409,7 +412,10 @@ class ExamplePage extends StatelessWidget {
               ),
             ),
             FFFlex(
-              direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
+              direction: const FFValue(
+                xs: FFDirection.vertical,
+                md: FFDirection.horizontal,
+              ),
               gap: const FFValue(xs: 12, md: 16),
               children: [
                 FFItem(
@@ -488,7 +494,7 @@ class PedidosPage extends StatelessWidget {
               child: Text('Pedidos'),
             ),
             FFFlex(
-              direction: const FFValue.all(Axis.horizontal),
+              direction: const FFValue.all(FFDirection.horizontal),
               gap: const FFValue(xs: 12, md: 16),
               children: [
                 for (final (title, value) in [
@@ -505,7 +511,7 @@ class PedidosPage extends StatelessWidget {
               ],
             ),
             FFFlex(
-              direction: const FFValue.all(Axis.horizontal),
+              direction: const FFValue.all(FFDirection.horizontal),
               gap: const FFValue.all(12),
               crossAxisAlignment: const FFValue.all(CrossAxisAlignment.center),
               children: [
@@ -529,7 +535,10 @@ class PedidosPage extends StatelessWidget {
               ],
             ),
             FFFlex(
-              direction: const FFValue(xs: Axis.vertical, md: Axis.horizontal),
+              direction: const FFValue(
+                xs: FFDirection.vertical,
+                md: FFDirection.horizontal,
+              ),
               gap: const FFValue(xs: 12, md: 16),
               children: [
                 FFItem(

@@ -335,7 +335,7 @@ class ColoresDemo extends StatelessWidget {
           'Theme. Ahora: modo ${dark ? 'oscuro' : 'claro'}.',
       children: [
         FFFlex(
-          direction: const FFValue.all(Axis.horizontal),
+          direction: const FFValue.all(FFDirection.horizontal),
           gap: const FFValue.all(12),
           children: [
             for (final (name, color) in _palette)

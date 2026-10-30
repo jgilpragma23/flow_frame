@@ -1,3 +1,7 @@
+## Sin publicar
+
+* **Cambio**: `FFFlex.direction` ahora recibe un `FFDirection` en vez de un `Axis`: `horizontal`, `horizontalReverse`, `vertical` y `verticalReverse` (como `flex-row`, `flex-row-reverse`, `flex-column` y `flex-column-reverse`). Para migrar, cambia `Axis.horizontal` por `FFDirection.horizontal` y `Axis.vertical` por `FFDirection.vertical`.
+
 ## 0.0.5 - 2026-10-30
 
 * `FFStyle.maxHeight`: alto máximo por breakpoint, también en `WRResolvedStyle`.
