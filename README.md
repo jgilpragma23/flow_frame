@@ -277,6 +277,7 @@ const card = FFStyle(
   maxHeight: FFValue(xs: 240, lg: 400),
 
   visible: FFValue(xs: false, md: true), // como d-none d-md-block
+  clip: FFValue(xs: true), // como overflow: hidden
 );
 ```
 
@@ -296,6 +297,20 @@ FFContainer(
 )
 ```
 
+- **`clip`** recorta lo que no quepa, como `overflow: hidden`. El contenido toma su alto natural y lo que pase de `height` o `maxHeight` se corta, sin el aviso de overflow de Flutter. Sigue las esquinas de `borderRadius` por dentro del borde:
+
+```dart
+FFItem(
+  style: const FFStyle(
+    maxHeight: FFValue(xs: 120),
+    borderRadius: FFValue(xs: 12),
+    clip: FFValue(xs: true),
+  ),
+  child: Image.network(url, fit: BoxFit.cover),
+)
+```
+
+  No lo uses con un hijo con scroll (`ListView`): ese ya recorta y necesita un alto fijo.
 - **`merge`** combina dos estilos; el segundo gana donde define algo:
 
 ```dart
