@@ -1,3 +1,7 @@
+## Unreleased
+
+* **Cambio**: `FFStyle.borderRadius` ahora recibe un `BorderRadiusGeometry` por breakpoint en vez de un número, así se puede poner uno por esquina (`BorderRadius.only`, `.vertical`, `BorderRadiusDirectional`…). Con borde, cada esquina recorta con su radio interno. Para migrar, cambia `FFValue(xs: 12)` por `FFValue(xs: BorderRadius.all(Radius.circular(12)))`.
+
 ## 0.0.10 - 2026-10-30
 
 * `FFStyle.clip`: recorta lo que no quepa por breakpoint, como `overflow: hidden`, siguiendo las esquinas de `borderRadius`. También en `WRResolvedStyle`.

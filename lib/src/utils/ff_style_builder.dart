@@ -32,13 +32,11 @@ Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
       child: current,
     );
   }
-  final radius = BorderRadius.circular(s.borderRadius);
+  final rounded = s.borderRadius != BorderRadius.zero;
   // Las esquinas recortan por dentro del borde, con el radio interno.
-  if (s.borderRadius > 0) {
+  if (rounded) {
     current = ClipRRect(
-      borderRadius: BorderRadius.circular(
-        (s.borderRadius - s.borderWidth).clamp(0, double.infinity),
-      ),
+      borderRadius: _inner(s.borderRadius, s.borderWidth),
       child: current,
     );
   }
@@ -48,14 +46,14 @@ Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
   }
   if (s.backgroundImage != null ||
       s.shadow.isNotEmpty ||
-      s.borderRadius > 0 ||
+      rounded ||
       s.borderWidth > 0) {
     current = DecoratedBox(
       decoration: BoxDecoration(
         color: s.backgroundColor,
         image: s.backgroundImage,
         boxShadow: s.shadow,
-        borderRadius: s.borderRadius > 0 ? radius : null,
+        borderRadius: rounded ? s.borderRadius : null,
         border: s.borderWidth > 0
             ? Border.all(color: s.borderColor, width: s.borderWidth)
             : null,
@@ -82,4 +80,18 @@ Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
     current = Padding(padding: s.margin, child: current);
   }
   return current;
+}
+
+/// [radius] menos el grosor del borde en cada esquina, sin bajar de 0.
+BorderRadius _inner(BorderRadius radius, double width) {
+  Radius shrink(Radius r) => Radius.elliptical(
+    (r.x - width).clamp(0, double.infinity),
+    (r.y - width).clamp(0, double.infinity),
+  );
+  return BorderRadius.only(
+    topLeft: shrink(radius.topLeft),
+    topRight: shrink(radius.topRight),
+    bottomLeft: shrink(radius.bottomLeft),
+    bottomRight: shrink(radius.bottomRight),
+  );
 }

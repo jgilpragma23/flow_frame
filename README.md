@@ -266,7 +266,10 @@ const card = FFStyle(
     md: DecorationImage(image: AssetImage('assets/fondo.jpg'), fit: BoxFit.cover),
   ),
   shadow: FFValue(xs: FFShadow.sm, md: FFShadow.lg), // como shadow-sm / shadow-lg
-  borderRadius: FFValue(xs: 8, md: 16),
+  borderRadius: FFValue(
+    xs: BorderRadius.all(Radius.circular(8)),
+    md: BorderRadius.vertical(top: Radius.circular(16)), // solo arriba
+  ),
   borderWidth: FFValue(xs: 1),
   borderColor: AppColors.border, // por defecto outlineVariant del tema
 
@@ -286,7 +289,7 @@ const card = FFStyle(
 - **`shadow`** recibe una `List<BoxShadow>` por breakpoint. `FFShadow` trae `sm`, `md` y `lg` (los de Bootstrap) y `none` para quitarla en un breakpoint mayor. La sombra va alrededor del fondo y del padding.
 - **`backgroundColor`** es un `FFValue<FFColor>`: cambia por breakpoint y cada color sigue al modo claro/oscuro.
 - **`backgroundImage`** recibe un `DecorationImage` por breakpoint (imagen, `fit`, `alignment`, opacidad…) y va encima de `backgroundColor`. Sirve para usar una imagen más liviana en el móvil.
-- **`borderRadius`** redondea el fondo, la sombra y el borde, y recorta el contenido a esa forma, así una imagen sin padding queda con las esquinas redondeadas.
+- **`borderRadius`** recibe un `BorderRadius` de Flutter por breakpoint, así se puede poner uno por esquina: `BorderRadius.all`, `.vertical(top: ...)`, `.horizontal(left: ...)`, `.only(...)` o `BorderRadiusDirectional` (inicio y fin, para RTL). Redondea el fondo, la sombra y el borde, y recorta el contenido a esa forma, así una imagen sin padding queda con las esquinas redondeadas. Usa `BorderRadius.all(Radius.circular(12))` en vez de `BorderRadius.circular(12)` para que el estilo pueda ser `const`.
 - **`borderWidth`** se dibuja por dentro de la caja y se suma al padding, así el contenido no queda debajo del borde.
 - **`maxHeight` limita el alto pero no agrega scroll:** si el contenido es más alto, se desborda. Para una lista o un texto largo, pon adentro un `ListView` o un `SingleChildScrollView`:
 
@@ -303,7 +306,7 @@ FFContainer(
 FFItem(
   style: const FFStyle(
     maxHeight: FFValue(xs: 120),
-    borderRadius: FFValue(xs: 12),
+    borderRadius: FFValue(xs: BorderRadius.all(Radius.circular(12))),
     clip: FFValue(xs: true),
   ),
   child: Image.network(url, fit: BoxFit.cover),
