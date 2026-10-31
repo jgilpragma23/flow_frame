@@ -1,4 +1,4 @@
-## Unreleased
+## 0.0.10 - 2026-10-30
 
 * `FFStyle.clip`: recorta lo que no quepa por breakpoint, como `overflow: hidden`, siguiendo las esquinas de `borderRadius`. También en `WRResolvedStyle`.
 * `borderRadius` ahora recorta el contenido por dentro del borde, con el radio interno.
