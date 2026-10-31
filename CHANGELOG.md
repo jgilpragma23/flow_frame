@@ -1,4 +1,4 @@
-## Unreleased
+## 0.0.11 - 2026-10-30
 
 * **Cambio**: `FFStyle.borderRadius` ahora recibe un `BorderRadiusGeometry` por breakpoint en vez de un número, así se puede poner uno por esquina (`BorderRadius.only`, `.vertical`, `BorderRadiusDirectional`…). Con borde, cada esquina recorta con su radio interno. Para migrar, cambia `FFValue(xs: 12)` por `FFValue(xs: BorderRadius.all(Radius.circular(12)))`.
 
