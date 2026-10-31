@@ -360,6 +360,66 @@ void main() {
       expect(rect(tester).width, 500 - 20);
     });
 
+    testWidgets('clip recorta lo que pasa de maxHeight sin desbordar', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        phone,
+        const FFContainer(
+          style: FFStyle(maxHeight: FFValue(xs: 100), clip: FFValue(xs: true)),
+          child: Column(key: Key('c'), children: [SizedBox(height: 300)]),
+        ),
+      );
+      expect(tester.takeException(), isNull);
+      // El contenido conserva su alto y la caja se queda en 100.
+      expect(rect(tester).height, 300);
+      expect(tester.getSize(find.byType(UnconstrainedBox)).height, 100);
+      expect(
+        tester
+            .widget<UnconstrainedBox>(find.byType(UnconstrainedBox))
+            .clipBehavior,
+        Clip.hardEdge,
+      );
+    });
+
+    testWidgets('clip cambia por breakpoint', (tester) async {
+      const container = FFContainer(
+        style: FFStyle(clip: FFValue(xs: true, md: false)),
+        child: SizedBox(key: Key('c'), height: 10),
+      );
+      await pump(tester, phone, container);
+      expect(find.byType(UnconstrainedBox), findsOneWidget);
+
+      await pump(tester, tablet, container);
+      expect(find.byType(UnconstrainedBox), findsNothing);
+    });
+
+    testWidgets('clip sigue el borderRadius por dentro del borde', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        phone,
+        const FFContainer(
+          style: FFStyle(
+            maxHeight: FFValue(xs: 100),
+            clip: FFValue(xs: true),
+            borderRadius: FFValue(xs: 12),
+            borderWidth: FFValue(xs: 2),
+          ),
+          child: SizedBox(key: Key('c'), height: 300),
+        ),
+      );
+      final clip = tester.widget<ClipRRect>(find.byType(ClipRRect));
+      expect(clip.borderRadius, BorderRadius.circular(10));
+      // El recorte queda dentro del borde.
+      expect(
+        tester.getRect(find.byType(ClipRRect)),
+        tester.getRect(find.byType(DecoratedBox).first).deflate(2),
+      );
+    });
+
     testWidgets('maxHeight limita el alto por breakpoint', (tester) async {
       const container = FFContainer(
         style: FFStyle(maxHeight: FFValue(xs: 200, md: 300)),

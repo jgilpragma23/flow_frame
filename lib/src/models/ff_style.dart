@@ -31,6 +31,7 @@ class FFStyle {
     this.maxWidth,
     this.height,
     this.maxHeight,
+    this.clip,
     this.visible,
   });
 
@@ -84,6 +85,12 @@ class FFStyle {
   /// `false` oculta el widget en ese breakpoint (equivale a `d-none`).
   final FFValue<bool>? visible;
 
+  /// `true` recorta lo que no quepa, como `overflow: hidden`: el contenido
+  /// toma su alto natural y lo que pase de [height] o [maxHeight] se corta
+  /// en el borde del padding, siguiendo [borderRadius]. No sirve para hijos
+  /// con scroll (`ListView`), que necesitan un alto fijo.
+  final FFValue<bool>? clip;
+
   /// Combina dos estilos; [other] gana donde define algo.
   FFStyle merge(FFStyle? other) {
     if (other == null) return this;
@@ -108,6 +115,7 @@ class FFStyle {
       height: FFValue.combine(height, other.height),
       maxHeight: FFValue.combine(maxHeight, other.maxHeight),
       visible: FFValue.combine(visible, other.visible),
+      clip: FFValue.combine(clip, other.clip),
     );
   }
 
@@ -147,6 +155,7 @@ class FFStyle {
       height: height?.resolve(breakpoint),
       maxHeight: maxHeight?.resolve(breakpoint),
       visible: visible?.resolve(breakpoint) ?? true,
+      clip: clip?.resolve(breakpoint) ?? false,
     );
   }
 }
@@ -171,6 +180,7 @@ class WRResolvedStyle {
     this.height,
     this.maxHeight,
     this.visible = true,
+    this.clip = false,
   });
 
   final EdgeInsets padding;
@@ -189,4 +199,5 @@ class WRResolvedStyle {
   final double? height;
   final double? maxHeight;
   final bool visible;
+  final bool clip;
 }
