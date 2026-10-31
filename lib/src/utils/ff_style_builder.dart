@@ -4,8 +4,8 @@ import '../models/ff_style.dart';
 
 /// Envuelve [child] con los widgets que aplican [style].
 ///
-/// De adentro hacia afuera: texto, padding, fondo e imagen, borde, esquinas y sombra, tamaño, límites de
-/// ancho y alto, y margin. Uso interno de los widgets de la librería.
+/// De adentro hacia afuera: texto, padding, recorte, esquinas, borde,
+/// fondo, imagen y sombra, tamaño, límites de ancho y alto, y margin. Uso interno de los widgets de la librería.
 Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
   if (style == null) return child;
   final s = style.resolve(context);
@@ -19,14 +19,32 @@ Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
       child: current,
     );
   }
-  // El borde va por dentro de la caja, así que se suma al padding.
-  final padding = s.padding + EdgeInsets.all(s.borderWidth);
-  if (padding != EdgeInsets.zero) {
-    current = Padding(padding: padding, child: current);
+  if (s.padding != EdgeInsets.zero) {
+    current = Padding(padding: s.padding, child: current);
+  }
+  // Como overflow: hidden. El contenido toma su alto natural y lo que no
+  // quepa se corta en el borde del padding.
+  if (s.clip) {
+    current = UnconstrainedBox(
+      constrainedAxis: Axis.horizontal,
+      alignment: AlignmentDirectional.topStart,
+      clipBehavior: Clip.hardEdge,
+      child: current,
+    );
   }
   final radius = BorderRadius.circular(s.borderRadius);
+  // Las esquinas recortan por dentro del borde, con el radio interno.
   if (s.borderRadius > 0) {
-    current = ClipRRect(borderRadius: radius, child: current);
+    current = ClipRRect(
+      borderRadius: BorderRadius.circular(
+        (s.borderRadius - s.borderWidth).clamp(0, double.infinity),
+      ),
+      child: current,
+    );
+  }
+  // El borde va por dentro de la caja, así que se suma al padding.
+  if (s.borderWidth > 0) {
+    current = Padding(padding: EdgeInsets.all(s.borderWidth), child: current);
   }
   if (s.backgroundImage != null ||
       s.shadow.isNotEmpty ||
