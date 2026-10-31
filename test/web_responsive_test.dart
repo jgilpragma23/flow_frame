@@ -405,7 +405,7 @@ void main() {
           style: FFStyle(
             maxHeight: FFValue(xs: 100),
             clip: FFValue(xs: true),
-            borderRadius: FFValue(xs: 12),
+            borderRadius: FFValue(xs: BorderRadius.all(Radius.circular(12))),
             borderWidth: FFValue(xs: 2),
           ),
           child: SizedBox(key: Key('c'), height: 300),
@@ -483,7 +483,10 @@ void main() {
       const container = FFContainer(
         style: FFStyle(
           padding: FFSpacing(all: FFValue(xs: 8)),
-          borderRadius: FFValue(xs: 8, md: 16),
+          borderRadius: FFValue(
+            xs: BorderRadius.all(Radius.circular(8)),
+            md: BorderRadius.all(Radius.circular(16)),
+          ),
           borderWidth: FFValue(xs: 1, md: 2),
           borderColor: FFColor.fixed(Color(0xFFFF0000)),
         ),
@@ -508,6 +511,64 @@ void main() {
       expect(
         decoration().border,
         Border.all(color: const Color(0xFFFF0000), width: 2),
+      );
+    });
+
+    testWidgets('borderRadius por esquina y radio interno con borde', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        phone,
+        const FFContainer(
+          style: FFStyle(
+            borderRadius: FFValue(
+              xs: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            borderWidth: FFValue(xs: 2),
+          ),
+          child: SizedBox(key: Key('c'), height: 50),
+        ),
+      );
+      final box = tester.widget<DecoratedBox>(
+        find
+            .ancestor(
+              of: find.byKey(const Key('c')),
+              matching: find.byType(DecoratedBox),
+            )
+            .first,
+      );
+      expect(
+        (box.decoration as BoxDecoration).borderRadius,
+        const BorderRadius.vertical(top: Radius.circular(16)),
+      );
+      expect(
+        tester.widget<ClipRRect>(find.byType(ClipRRect)).borderRadius,
+        const BorderRadius.vertical(top: Radius.circular(14)),
+      );
+    });
+
+    testWidgets('BorderRadiusDirectional sigue la dirección del texto', (
+      tester,
+    ) async {
+      await pump(
+        tester,
+        phone,
+        const Directionality(
+          textDirection: TextDirection.rtl,
+          child: FFContainer(
+            style: FFStyle(
+              borderRadius: FFValue(
+                xs: BorderRadiusDirectional.only(topStart: Radius.circular(12)),
+              ),
+            ),
+            child: SizedBox(key: Key('c'), height: 50),
+          ),
+        ),
+      );
+      expect(
+        tester.widget<ClipRRect>(find.byType(ClipRRect)).borderRadius,
+        const BorderRadius.only(topRight: Radius.circular(12)),
       );
     });
 

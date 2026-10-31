@@ -63,9 +63,13 @@ class FFStyle {
   /// quita en un breakpoint mayor.
   final FFValue<List<BoxShadow>>? shadow;
 
-  /// Radio de las esquinas. Redondea el fondo, la sombra y el borde, y
-  /// recorta el contenido (por ejemplo una imagen) a esa forma.
-  final FFValue<double>? borderRadius;
+  /// Esquinas por breakpoint, con un `BorderRadius` de Flutter: iguales
+  /// (`BorderRadius.all(Radius.circular(12))`), solo arriba
+  /// (`BorderRadius.vertical(top: ...)`) o una por esquina
+  /// (`BorderRadius.only(...)`, o `BorderRadiusDirectional` para inicio y
+  /// fin). Redondea el fondo, la sombra y el borde, y recorta el contenido
+  /// a esa forma.
+  final FFValue<BorderRadiusGeometry>? borderRadius;
 
   /// Grosor del borde. Se suma al padding, así el contenido no lo tapa.
   final FFValue<double>? borderWidth;
@@ -144,7 +148,11 @@ class FFStyle {
       backgroundColor: backgroundColor?.resolve(breakpoint)?.resolve(context),
       backgroundImage: backgroundImage?.resolve(breakpoint),
       shadow: shadow?.resolve(breakpoint) ?? const [],
-      borderRadius: borderRadius?.resolve(breakpoint) ?? 0,
+      borderRadius:
+          borderRadius
+              ?.resolve(breakpoint)
+              ?.resolve(Directionality.of(context)) ??
+          BorderRadius.zero,
       borderWidth: borderWidth?.resolve(breakpoint) ?? 0,
       borderColor:
           borderColor?.resolve(context) ??
@@ -171,7 +179,7 @@ class WRResolvedStyle {
     this.backgroundColor,
     this.backgroundImage,
     this.shadow = const [],
-    this.borderRadius = 0,
+    this.borderRadius = BorderRadius.zero,
     this.borderWidth = 0,
     this.borderColor = const Color(0x00000000),
     this.width,
@@ -190,7 +198,7 @@ class WRResolvedStyle {
   final Color? backgroundColor;
   final DecorationImage? backgroundImage;
   final List<BoxShadow> shadow;
-  final double borderRadius;
+  final BorderRadius borderRadius;
   final double borderWidth;
   final Color borderColor;
   final double? width;
