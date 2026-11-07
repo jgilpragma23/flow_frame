@@ -98,10 +98,10 @@ class FFAppBarStyle {
 /// Combina en cascada los [FFAppBarStyle] de un `FFValue`.
 extension FFAppBarStyleValue on FFValue<FFAppBarStyle> {
   /// Une los estilos desde `xs` hasta [breakpoint]; los mayores ganan.
-  FFAppBarStyle resolveMerged(Breakpoint breakpoint) {
+  FFAppBarStyle resolveMerged(BreakpointEnum breakpoint) {
     var result = const FFAppBarStyle();
     for (var i = 0; i <= breakpoint.index; i++) {
-      result = result.merge(at(Breakpoint.values[i]));
+      result = result.merge(at(BreakpointEnum.values[i]));
     }
     return result;
   }

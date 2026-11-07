@@ -1,21 +1,8 @@
 import 'package:flutter/foundation.dart';
 
-/// Rangos de ancho de pantalla, ordenados de menor a mayor.
-enum Breakpoint {
-  xs,
-  sm,
-  md,
-  lg,
-  xl;
+import '../enums/breakpoint_enum.dart';
 
-  /// El breakpoint que corresponde a [width], según [FFBreakpoints.current].
-  static Breakpoint fromWidth(double width) => FFBreakpoints.current.of(width);
-
-  bool operator >=(Breakpoint other) => index >= other.index;
-  bool operator >(Breakpoint other) => index > other.index;
-  bool operator <=(Breakpoint other) => index <= other.index;
-  bool operator <(Breakpoint other) => index < other.index;
-}
+export '../enums/breakpoint_enum.dart';
 
 /// Ancho mínimo (en píxeles lógicos) desde el que empieza cada breakpoint.
 ///
@@ -46,12 +33,12 @@ class FFBreakpoints {
   final double xl;
 
   /// Devuelve el breakpoint que corresponde a [width].
-  Breakpoint of(double width) {
-    if (width >= xl) return Breakpoint.xl;
-    if (width >= lg) return Breakpoint.lg;
-    if (width >= md) return Breakpoint.md;
-    if (width >= sm) return Breakpoint.sm;
-    return Breakpoint.xs;
+  BreakpointEnum of(double width) {
+    if (width >= xl) return BreakpointEnum.xl;
+    if (width >= lg) return BreakpointEnum.lg;
+    if (width >= md) return BreakpointEnum.md;
+    if (width >= sm) return BreakpointEnum.sm;
+    return BreakpointEnum.xs;
   }
 
   @override

@@ -29,7 +29,7 @@ class FFSpacing {
   final FFValue<double>? right;
 
   /// Espaciado para [breakpoint]; los lados sin valor quedan en 0.
-  EdgeInsets resolve(Breakpoint breakpoint) => EdgeInsets.fromLTRB(
+  EdgeInsets resolve(BreakpointEnum breakpoint) => EdgeInsets.fromLTRB(
     _side(breakpoint, left, horizontal),
     _side(breakpoint, top, vertical),
     _side(breakpoint, right, horizontal),
@@ -37,12 +37,12 @@ class FFSpacing {
   );
 
   double _side(
-    Breakpoint breakpoint,
+    BreakpointEnum breakpoint,
     FFValue<double>? side,
     FFValue<double>? axis,
   ) {
     for (var i = breakpoint.index; i >= 0; i--) {
-      final b = Breakpoint.values[i];
+      final b = BreakpointEnum.values[i];
       final value = side?.at(b) ?? axis?.at(b) ?? all?.at(b);
       if (value != null) return value;
     }

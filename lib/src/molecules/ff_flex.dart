@@ -13,7 +13,7 @@ import '../utils/ff_style_builder.dart';
 
 /// Una fila o columna cuya dirección, separación y alineación cambian según
 /// el breakpoint (equivale a `d-flex flex-column flex-md-row`). La dirección
-/// también puede invertir el orden de los hijos ([FFDirection]).
+/// también puede invertir el orden de los hijos ([FFDirectionEnum]).
 ///
 /// Por defecto es horizontal y funciona como un `row` de Bootstrap: cada
 /// [FFItem] ocupa su `col` (de 12), lo que sobra en la fila (`fill: true`)
@@ -29,7 +29,7 @@ import '../utils/ff_style_builder.dart';
 class FFFlex extends StatelessWidget {
   const FFFlex({
     super.key,
-    this.direction = const FFValue.all(FFDirection.horizontal),
+    this.direction = const FFValue.all(FFDirectionEnum.horizontal),
     this.gap,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
@@ -37,9 +37,9 @@ class FFFlex extends StatelessWidget {
     required this.children,
   });
 
-  /// Por defecto [FFDirection.horizontal] en todos los breakpoints. Con
+  /// Por defecto [FFDirectionEnum.horizontal] en todos los breakpoints. Con
   /// `horizontalReverse` o `verticalReverse` los hijos van en orden inverso.
-  final FFValue<FFDirection> direction;
+  final FFValue<FFDirectionEnum> direction;
 
   /// Separación entre elementos y, en horizontal, también entre filas.
   final FFValue<double>? gap;
@@ -57,7 +57,7 @@ class FFFlex extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final breakpoint = context.breakpoint;
-    final dir = direction.resolve(breakpoint) ?? FFDirection.horizontal;
+    final dir = direction.resolve(breakpoint) ?? FFDirectionEnum.horizontal;
     final axis = dir.axis;
 
     return buildFFStyle(
@@ -83,7 +83,7 @@ class FFFlex extends StatelessWidget {
   /// le dice al layout cómo medir
   /// cada hijo. Cada hijo lleva una key con su índice original para que no
   /// pierda su estado al reordenarse u ocultarse otro.
-  List<Widget> _slots(Breakpoint breakpoint, {required bool reverse}) {
+  List<Widget> _slots(BreakpointEnum breakpoint, {required bool reverse}) {
     final entries = <({int index, int order, Widget child})>[];
     for (var i = 0; i < children.length; i++) {
       final child = children[i];
@@ -114,9 +114,9 @@ class FFFlex extends StatelessWidget {
 
   /// Entre `col` y `fill` gana el breakpoint más cercano; en el mismo
   /// breakpoint gana `col`. Sin ninguno, la fila completa.
-  static _SlotSize _sizeOf(FFItem item, Breakpoint breakpoint) {
+  static _SlotSize _sizeOf(FFItem item, BreakpointEnum breakpoint) {
     for (var i = breakpoint.index; i >= 0; i--) {
-      final b = Breakpoint.values[i];
+      final b = BreakpointEnum.values[i];
       final col = item.col?.at(b);
       if (col != null) return _SlotSize.col(col);
       final fill = item.fill?.at(b);

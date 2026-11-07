@@ -35,13 +35,13 @@ class FFScaffold extends StatefulWidget {
   /// como sidebar desde `lg`.
   static const defaults = FFValue(
     xs: FFNavStyle(
-      type: FFNavigation.bottom,
-      expandMode: FFRailExpand.overlay,
+      type: FFNavigationEnum.bottom,
+      expandMode: FFRailExpandEnum.overlay,
       expanded: false,
       subRoutesAlwaysVisible: false,
     ),
-    md: FFNavStyle(type: FFNavigation.rail),
-    lg: FFNavStyle(expandMode: FFRailExpand.sidebar, expanded: true),
+    md: FFNavStyle(type: FFNavigationEnum.rail),
+    lg: FFNavStyle(expandMode: FFRailExpandEnum.sidebar, expanded: true),
   );
 
   final List<FFDestination> destinations;
@@ -60,7 +60,7 @@ class FFScaffold extends StatefulWidget {
   /// en cada tipo de navegación.
   final FFBrand? brand;
 
-  /// Con [FFNavigation.drawer] muestra el botón ☰. Si es `null` y la
+  /// Con [FFNavigationEnum.drawer] muestra el botón ☰. Si es `null` y la
   /// navegación es drawer, se usa un `AppBar` vacío para tener el botón.
   final PreferredSizeWidget? appBar;
   final Widget body;
@@ -82,11 +82,12 @@ class FFScaffoldState extends State<FFScaffold> {
 
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
-  Breakpoint? _breakpoint;
+  BreakpointEnum? _breakpoint;
   FFNavStyle _style = const FFNavStyle();
 
-  FFNavigation get _navigation => _style.type ?? FFNavigation.bottom;
-  FFRailExpand get _expandMode => _style.expandMode ?? FFRailExpand.overlay;
+  FFNavigationEnum get _navigation => _style.type ?? FFNavigationEnum.bottom;
+  FFRailExpandEnum get _expandMode =>
+      _style.expandMode ?? FFRailExpandEnum.overlay;
   bool get _expandedByDefault => _style.expanded ?? false;
 
   /// Lo que eligió el usuario con ☰ en modo sidebar; se descarta al cambiar
@@ -100,10 +101,10 @@ class FFScaffoldState extends State<FFScaffold> {
 
   /// Si el menú completo (con textos) está abierto.
   bool get isMenuOpen => switch (_navigation) {
-    FFNavigation.bottom || FFNavigation.appBar => false,
-    FFNavigation.drawer => _scaffoldKey.currentState?.isDrawerOpen ?? false,
-    FFNavigation.rail =>
-      _expandMode == FFRailExpand.overlay
+    FFNavigationEnum.bottom || FFNavigationEnum.appBar => false,
+    FFNavigationEnum.drawer => _scaffoldKey.currentState?.isDrawerOpen ?? false,
+    FFNavigationEnum.rail =>
+      _expandMode == FFRailExpandEnum.overlay
           ? _overlayOpen
           : _sidebarOpen ?? _expandedByDefault,
   };
@@ -114,15 +115,15 @@ class FFScaffoldState extends State<FFScaffold> {
 
   void _setMenu(bool open) {
     switch (_navigation) {
-      case FFNavigation.bottom || FFNavigation.appBar:
+      case FFNavigationEnum.bottom || FFNavigationEnum.appBar:
         break;
-      case FFNavigation.drawer:
+      case FFNavigationEnum.drawer:
         open
             ? _scaffoldKey.currentState?.openDrawer()
             : _scaffoldKey.currentState?.closeDrawer();
-      case FFNavigation.rail:
+      case FFNavigationEnum.rail:
         setState(() {
-          if (_expandMode == FFRailExpand.overlay) {
+          if (_expandMode == FFRailExpandEnum.overlay) {
             _overlayOpen = open;
           } else {
             _sidebarOpen = open;
@@ -152,18 +153,18 @@ class FFScaffoldState extends State<FFScaffold> {
       key: _scaffoldKey,
       appBar: switch (_navigation) {
         _ when widget.appBar is FFAppBar => _adapt(widget.appBar! as FFAppBar),
-        FFNavigation.drawer => _appBarWithBrand(widget.appBar ?? AppBar()),
-        FFNavigation.appBar => _appBarWithNav(items),
-        FFNavigation.bottom => _appBarWithBrand(widget.appBar),
-        FFNavigation.rail => widget.appBar,
+        FFNavigationEnum.drawer => _appBarWithBrand(widget.appBar ?? AppBar()),
+        FFNavigationEnum.appBar => _appBarWithNav(items),
+        FFNavigationEnum.bottom => _appBarWithBrand(widget.appBar),
+        FFNavigationEnum.rail => widget.appBar,
       },
       backgroundColor: widget.backgroundColor,
       floatingActionButton: widget.floatingActionButton,
       floatingActionButtonLocation: widget.floatingActionButtonLocation,
-      bottomNavigationBar: _navigation == FFNavigation.bottom
+      bottomNavigationBar: _navigation == FFNavigationEnum.bottom
           ? _bottomBar(items)
           : null,
-      drawer: _navigation == FFNavigation.drawer
+      drawer: _navigation == FFNavigationEnum.drawer
           ? Drawer(
               width: _menuWidth + 24,
               backgroundColor: _color(_style.backgroundColor),
@@ -182,7 +183,7 @@ class FFScaffoldState extends State<FFScaffold> {
     );
     // El rail y el sidebar van por fuera del Scaffold para ocupar toda la
     // altura; el app bar queda solo sobre el contenido.
-    return _navigation == FFNavigation.rail
+    return _navigation == FFNavigationEnum.rail
         ? _railLayout(items, scaffold)
         : scaffold;
   }
@@ -360,9 +361,9 @@ class FFScaffoldState extends State<FFScaffold> {
 
   /// Un [FFAppBar] con lo que no define tomado de este scaffold: la marca
   /// (si no tiene título y la navegación no es rail), los destinos con
-  /// [FFNavigation.appBar] y los colores de la navegación como base.
+  /// [FFNavigationEnum.appBar] y los colores de la navegación como base.
   FFAppBar _adapt(FFAppBar bar) {
-    final linksInBar = _navigation == FFNavigation.appBar;
+    final linksInBar = _navigation == FFNavigationEnum.appBar;
     final base = FFAppBarStyle(
       backgroundColor: linksInBar ? _style.backgroundColor : null,
       linkColor: _style.labelColor,
@@ -374,7 +375,7 @@ class FFScaffoldState extends State<FFScaffold> {
       brand:
           bar.brand == null &&
               bar.title == null &&
-              _navigation != FFNavigation.rail
+              _navigation != FFNavigationEnum.rail
           ? widget.brand
           : null,
       destinations: linksInBar && bar.destinations.isEmpty
@@ -437,7 +438,7 @@ class FFScaffoldState extends State<FFScaffold> {
     final theme = Theme.of(context);
     final background = _color(_style.backgroundColor);
     final sidebarOpen =
-        _expandMode == FFRailExpand.sidebar &&
+        _expandMode == FFRailExpandEnum.sidebar &&
         (_sidebarOpen ?? _expandedByDefault);
 
     final row = Row(
@@ -486,7 +487,7 @@ class FFScaffoldState extends State<FFScaffold> {
         ),
       ],
     );
-    if (_expandMode == FFRailExpand.sidebar) {
+    if (_expandMode == FFRailExpandEnum.sidebar) {
       return Material(
         color: widget.backgroundColor ?? theme.scaffoldBackgroundColor,
         child: row,

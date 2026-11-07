@@ -32,7 +32,7 @@ class FFBrand {
   /// Por ejemplo, ir al inicio.
   final VoidCallback? onTap;
 
-  /// Con `FFNavigation.drawer`, si se repite arriba dentro del drawer
+  /// Con `FFNavigationEnum.drawer`, si se repite arriba dentro del drawer
   /// además del app bar.
   final bool showInDrawer;
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../enums/ff_action_display_enum.dart';
 import '../models/ff_action.dart';
 import '../utils/context_extensions.dart';
 
@@ -7,7 +8,7 @@ import '../utils/context_extensions.dart';
 /// ícono, dentro del menú ⋮ u ocultas.
 ///
 /// Va en `AppBar.actions` (o en cualquier fila). El ⋮ aparece solo si
-/// alguna acción está en [FFActionDisplay.menu] en el breakpoint actual.
+/// alguna acción está en [FFActionDisplayEnum.menu] en el breakpoint actual.
 class FFActions extends StatelessWidget {
   const FFActions({
     super.key,
@@ -25,11 +26,11 @@ class FFActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final breakpoint = context.breakpoint;
-    FFActionDisplay displayOf(FFAction a) =>
-        a.display?.resolve(breakpoint) ?? FFActionDisplay.icon;
+    FFActionDisplayEnum displayOf(FFAction a) =>
+        a.display?.resolve(breakpoint) ?? FFActionDisplayEnum.icon;
     final inMenu = [
       for (final a in actions)
-        if (displayOf(a) == FFActionDisplay.menu) a,
+        if (displayOf(a) == FFActionDisplayEnum.menu) a,
     ];
 
     return Row(
@@ -37,7 +38,7 @@ class FFActions extends StatelessWidget {
       children: [
         for (final a in actions)
           switch (displayOf(a)) {
-            FFActionDisplay.full => Padding(
+            FFActionDisplayEnum.full => Padding(
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: TextButton.icon(
                 onPressed: a.onPressed,
@@ -45,13 +46,13 @@ class FFActions extends StatelessWidget {
                 label: Text(a.label),
               ),
             ),
-            FFActionDisplay.icon => IconButton(
+            FFActionDisplayEnum.icon => IconButton(
               tooltip: a.label,
               onPressed: a.onPressed,
               icon: a.icon,
             ),
-            FFActionDisplay.menu ||
-            FFActionDisplay.hidden => const SizedBox.shrink(),
+            FFActionDisplayEnum.menu ||
+            FFActionDisplayEnum.hidden => const SizedBox.shrink(),
           },
         if (inMenu.isNotEmpty)
           MenuAnchor(

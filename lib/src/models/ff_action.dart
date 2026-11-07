@@ -1,21 +1,7 @@
 import 'package:flutter/widgets.dart';
 
+import '../enums/ff_action_display_enum.dart';
 import 'ff_value.dart';
-
-/// Cómo se muestra un [FFAction] en un breakpoint.
-enum FFActionDisplay {
-  /// Ícono y texto, como botón.
-  full,
-
-  /// Solo el ícono; el texto queda como tooltip.
-  icon,
-
-  /// Dentro del menú ⋮, con ícono y texto.
-  menu,
-
-  /// No se muestra.
-  hidden,
-}
 
 /// Una acción de un `FFActions`, como las del app bar.
 @immutable
@@ -34,6 +20,6 @@ class FFAction {
   final VoidCallback? onPressed;
 
   /// Cómo se muestra en cada breakpoint, en cascada. Por defecto
-  /// [FFActionDisplay.icon].
-  final FFValue<FFActionDisplay>? display;
+  /// [FFActionDisplayEnum.icon].
+  final FFValue<FFActionDisplayEnum>? display;
 }

@@ -336,7 +336,7 @@ class ColoresDemo extends StatelessWidget {
           'Theme. Ahora: modo ${dark ? 'oscuro' : 'claro'}.',
       children: [
         FFFlex(
-          direction: const FFValue.all(FFDirection.horizontal),
+          direction: const FFValue.all(FFDirectionEnum.horizontal),
           gap: const FFValue.all(12),
           children: [
             for (final (name, color) in _palette)
@@ -497,8 +497,8 @@ class AppBarDemo extends StatelessWidget {
       label: 'Carrito',
       onPressed: () {},
       display: const FFValue(
-        xs: FFActionDisplay.icon,
-        lg: FFActionDisplay.full,
+        xs: FFActionDisplayEnum.icon,
+        lg: FFActionDisplayEnum.full,
       ),
     ),
     FFAction(
@@ -506,8 +506,8 @@ class AppBarDemo extends StatelessWidget {
       label: 'Ayuda',
       onPressed: () {},
       display: const FFValue(
-        xs: FFActionDisplay.menu,
-        md: FFActionDisplay.icon,
+        xs: FFActionDisplayEnum.menu,
+        md: FFActionDisplayEnum.icon,
       ),
     ),
   ];

@@ -1,39 +1,13 @@
 import 'package:flutter/widgets.dart';
 
-import 'breakpoint.dart';
+import '../enums/breakpoint_enum.dart';
+import '../enums/ff_navigation_enum.dart';
+import '../enums/ff_rail_expand_enum.dart';
 import 'ff_color.dart';
 import 'ff_value.dart';
 
-/// Tipo de navegación de un `FFScaffold`. Se elige uno por breakpoint.
-enum FFNavigation {
-  /// Barra abajo con íconos y textos (`NavigationBar`). Las subrutas no se
-  /// muestran: tocar un grupo lleva a su última subruta visitada (o a la
-  /// primera).
-  bottom,
-
-  /// Barra lateral fija de íconos con un botón ☰ que abre el menú completo,
-  /// encima del contenido o empujándolo según [FFRailExpand].
-  rail,
-
-  /// Menú oculto que sale desde el lado al tocar ☰ en el app bar.
-  drawer,
-
-  /// Enlaces dentro del app bar, después del título, como en un sitio web.
-  /// Un grupo es un botón con ▾ que abre un dropdown con sus subrutas.
-  /// Pensado para pantallas medianas y grandes.
-  appBar,
-}
-
-/// Cómo se abre el menú completo (con textos y acordeón) desde el rail.
-enum FFRailExpand {
-  /// Se abre un drawer encima del contenido, que no se mueve. Se cierra al
-  /// elegir una opción o al tocar fuera.
-  overlay,
-
-  /// El rail se ensancha y empuja el contenido. Queda abierto hasta que se
-  /// cierre con ☰.
-  sidebar,
-}
+export '../enums/ff_navigation_enum.dart';
+export '../enums/ff_rail_expand_enum.dart';
 
 /// Cómo se ve y se comporta la navegación de un `FFScaffold` en un
 /// breakpoint. Se usa dentro de un `FFValue`, en cascada: cada breakpoint
@@ -56,12 +30,12 @@ class FFNavStyle {
   });
 
   /// Barra abajo, rail, drawer o enlaces en el app bar.
-  final FFNavigation? type;
+  final FFNavigationEnum? type;
 
   /// Con rail, si el menú completo se abre encima o como sidebar.
-  final FFRailExpand? expandMode;
+  final FFRailExpandEnum? expandMode;
 
-  /// Con [FFRailExpand.sidebar], si el menú empieza abierto. Al cambiar de
+  /// Con [FFRailExpandEnum.sidebar], si el menú empieza abierto. Al cambiar de
   /// breakpoint vuelve a este valor.
   final bool? expanded;
 
@@ -69,7 +43,7 @@ class FFNavStyle {
   /// `FFDestination.alwaysOpen` tiene prioridad.
   final bool? subRoutesAlwaysVisible;
 
-  /// Fondo de la barra, el rail y el menú. Con [FFNavigation.appBar], fondo
+  /// Fondo de la barra, el rail y el menú. Con [FFNavigationEnum.appBar], fondo
   /// del app bar si este no define el suyo.
   final FFColor? backgroundColor;
   final FFColor? iconColor;
@@ -144,10 +118,10 @@ class FFNavStyle {
 /// Combina en cascada los [FFNavStyle] de un `FFValue`.
 extension FFNavStyleValue on FFValue<FFNavStyle> {
   /// Une los estilos desde `xs` hasta [breakpoint]; los mayores ganan.
-  FFNavStyle resolveMerged(Breakpoint breakpoint) {
+  FFNavStyle resolveMerged(BreakpointEnum breakpoint) {
     var result = const FFNavStyle();
     for (var i = 0; i <= breakpoint.index; i++) {
-      result = result.merge(at(Breakpoint.values[i]));
+      result = result.merge(at(BreakpointEnum.values[i]));
     }
     return result;
   }

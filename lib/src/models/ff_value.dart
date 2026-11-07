@@ -25,19 +25,19 @@ class FFValue<T> {
   final T? xl;
 
   /// Valor definido exactamente en [breakpoint], sin cascada.
-  T? at(Breakpoint breakpoint) => switch (breakpoint) {
-    Breakpoint.xs => xs,
-    Breakpoint.sm => sm,
-    Breakpoint.md => md,
-    Breakpoint.lg => lg,
-    Breakpoint.xl => xl,
+  T? at(BreakpointEnum breakpoint) => switch (breakpoint) {
+    BreakpointEnum.xs => xs,
+    BreakpointEnum.sm => sm,
+    BreakpointEnum.md => md,
+    BreakpointEnum.lg => lg,
+    BreakpointEnum.xl => xl,
   };
 
   /// Valor para [breakpoint], o `null` si no hay ninguno definido en él
   /// ni en los breakpoints menores.
-  T? resolve(Breakpoint breakpoint) {
+  T? resolve(BreakpointEnum breakpoint) {
     for (var i = breakpoint.index; i >= 0; i--) {
-      final value = at(Breakpoint.values[i]);
+      final value = at(BreakpointEnum.values[i]);
       if (value != null) return value;
     }
     return null;
@@ -75,10 +75,10 @@ class FFValue<T> {
 extension FFTextStyleValue on FFValue<TextStyle> {
   /// Combina los estilos desde `xs` hasta [breakpoint]; en cada propiedad
   /// gana el breakpoint mayor.
-  TextStyle? resolveMerged(Breakpoint breakpoint) {
+  TextStyle? resolveMerged(BreakpointEnum breakpoint) {
     TextStyle? result;
     for (var i = 0; i <= breakpoint.index; i++) {
-      final style = at(Breakpoint.values[i]);
+      final style = at(BreakpointEnum.values[i]);
       if (style != null) result = result?.merge(style) ?? style;
     }
     return result;

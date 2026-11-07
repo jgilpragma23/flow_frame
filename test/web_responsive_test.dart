@@ -48,42 +48,42 @@ void main() {
     const breakpoints = FFBreakpoints();
 
     test('asigna cada ancho a su breakpoint', () {
-      expect(breakpoints.of(0), Breakpoint.xs);
-      expect(breakpoints.of(599), Breakpoint.xs);
-      expect(breakpoints.of(600), Breakpoint.sm);
-      expect(breakpoints.of(840), Breakpoint.md);
-      expect(breakpoints.of(1200), Breakpoint.lg);
-      expect(breakpoints.of(1600), Breakpoint.xl);
+      expect(breakpoints.of(0), BreakpointEnum.xs);
+      expect(breakpoints.of(599), BreakpointEnum.xs);
+      expect(breakpoints.of(600), BreakpointEnum.sm);
+      expect(breakpoints.of(840), BreakpointEnum.md);
+      expect(breakpoints.of(1200), BreakpointEnum.lg);
+      expect(breakpoints.of(1600), BreakpointEnum.xl);
     });
 
     test('compara breakpoints por orden', () {
-      expect(Breakpoint.md >= Breakpoint.sm, isTrue);
-      expect(Breakpoint.xs < Breakpoint.xl, isTrue);
-      expect(Breakpoint.lg <= Breakpoint.md, isFalse);
+      expect(BreakpointEnum.md >= BreakpointEnum.sm, isTrue);
+      expect(BreakpointEnum.xs < BreakpointEnum.xl, isTrue);
+      expect(BreakpointEnum.lg <= BreakpointEnum.md, isFalse);
     });
 
     testWidgets('respeta breakpoints personalizados', (tester) async {
       FFBreakpoints.current = const FFBreakpoints(sm: 500, md: 650);
       addTearDown(() => FFBreakpoints.current = const FFBreakpoints());
       final context = await pumpContext(tester, const Size(700, 800));
-      expect(context.breakpoint, Breakpoint.md);
-      expect(Breakpoint.fromWidth(550), Breakpoint.sm);
+      expect(context.breakpoint, BreakpointEnum.md);
+      expect(BreakpointEnum.fromWidth(550), BreakpointEnum.sm);
     });
   });
 
   group('FFValue', () {
     test('hace cascada mobile-first', () {
       const value = FFValue(xs: 8, md: 16);
-      expect(value.resolve(Breakpoint.xs), 8);
-      expect(value.resolve(Breakpoint.sm), 8);
-      expect(value.resolve(Breakpoint.md), 16);
-      expect(value.resolve(Breakpoint.xl), 16);
+      expect(value.resolve(BreakpointEnum.xs), 8);
+      expect(value.resolve(BreakpointEnum.sm), 8);
+      expect(value.resolve(BreakpointEnum.md), 16);
+      expect(value.resolve(BreakpointEnum.xl), 16);
     });
 
     test('devuelve null antes del primer valor', () {
       const value = FFValue(md: 1);
-      expect(value.resolve(Breakpoint.sm), isNull);
-      expect(value.resolve(Breakpoint.lg), 1);
+      expect(value.resolve(BreakpointEnum.sm), isNull);
+      expect(value.resolve(BreakpointEnum.lg), 1);
     });
 
     test('merge combina breakpoint por breakpoint', () {
@@ -99,7 +99,7 @@ void main() {
         xs: TextStyle(fontSize: 14, fontFamily: 'Inter'),
         md: TextStyle(fontSize: 18),
       );
-      final md = value.resolveMerged(Breakpoint.lg)!;
+      final md = value.resolveMerged(BreakpointEnum.lg)!;
       expect(md.fontSize, 18);
       expect(md.fontFamily, 'Inter');
     });
@@ -114,24 +114,24 @@ void main() {
     );
 
     test('gana el breakpoint más cercano y luego el más específico', () {
-      double top(Breakpoint b) => spacing.resolve(b).top;
-      expect(top(Breakpoint.xs), 8);
-      expect(top(Breakpoint.sm), 12);
-      expect(top(Breakpoint.md), 20);
-      expect(top(Breakpoint.lg), 20);
-      expect(top(Breakpoint.xl), 24);
+      double top(BreakpointEnum b) => spacing.resolve(b).top;
+      expect(top(BreakpointEnum.xs), 8);
+      expect(top(BreakpointEnum.sm), 12);
+      expect(top(BreakpointEnum.md), 20);
+      expect(top(BreakpointEnum.lg), 20);
+      expect(top(BreakpointEnum.xl), 24);
     });
 
     test('resuelve los cuatro lados', () {
       expect(
-        spacing.resolve(Breakpoint.lg),
+        spacing.resolve(BreakpointEnum.lg),
         const EdgeInsets.fromLTRB(32, 20, 32, 16),
       );
     });
 
     test('los lados sin valor quedan en 0', () {
       expect(
-        const FFSpacing(top: FFValue(xs: 4)).resolve(Breakpoint.md),
+        const FFSpacing(top: FFValue(xs: 4)).resolve(BreakpointEnum.md),
         const EdgeInsets.only(top: 4),
       );
     });
@@ -244,11 +244,11 @@ void main() {
         ),
       );
       expect(
-        merged.padding!.resolve(Breakpoint.xs),
+        merged.padding!.resolve(BreakpointEnum.xs),
         const EdgeInsets.fromLTRB(8, 20, 8, 8),
       );
       expect(
-        merged.textStyle!.resolveMerged(Breakpoint.xs),
+        merged.textStyle!.resolveMerged(BreakpointEnum.xs),
         const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
       );
       expect(merged.color, muted);
@@ -643,8 +643,8 @@ void main() {
     test('merge de shadow: el segundo gana', () {
       final style = const FFStyle(shadow: FFValue(xs: FFShadow.sm))
           .merge(const FFStyle(shadow: FFValue(md: FFShadow.md)));
-      expect(style.shadow?.resolve(Breakpoint.xs), FFShadow.sm);
-      expect(style.shadow?.resolve(Breakpoint.md), FFShadow.md);
+      expect(style.shadow?.resolve(BreakpointEnum.xs), FFShadow.sm);
+      expect(style.shadow?.resolve(BreakpointEnum.md), FFShadow.md);
     });
 
     testWidgets('sin maxHeight el contenido toma su alto', (tester) async {
@@ -723,7 +723,10 @@ void main() {
         tester.getRect(find.byKey(Key(key)));
 
     Widget layout() => const FFFlex(
-      direction: FFValue(xs: FFDirection.vertical, md: FFDirection.horizontal),
+      direction: FFValue(
+        xs: FFDirectionEnum.vertical,
+        md: FFDirectionEnum.horizontal,
+      ),
       gap: FFValue(xs: 8, md: 20),
       children: [
         FFItem(
@@ -762,7 +765,7 @@ void main() {
         tester,
         tablet,
         const FFFlex(
-          direction: FFValue.all(FFDirection.horizontal),
+          direction: FFValue.all(FFDirectionEnum.horizontal),
           children: [
             FFItem(
               fill: FFValue.all(true),
@@ -781,7 +784,7 @@ void main() {
 
     testWidgets('fill cambia por breakpoint', (tester) async {
       const flex = FFFlex(
-        direction: FFValue.all(FFDirection.horizontal),
+        direction: FFValue.all(FFDirectionEnum.horizontal),
         children: [
           FFItem(
             fill: FFValue(xs: false, sm: true, lg: false),
@@ -853,7 +856,7 @@ void main() {
 
     group('col', () {
       Widget grid(int count) => FFFlex(
-        direction: const FFValue.all(FFDirection.horizontal),
+        direction: const FFValue.all(FFDirectionEnum.horizontal),
         gap: const FFValue.all(16),
         children: [
           for (var i = 0; i < count; i++)
@@ -895,7 +898,7 @@ void main() {
           tester,
           tablet,
           const FFFlex(
-            direction: FFValue.all(FFDirection.horizontal),
+            direction: FFValue.all(FFDirectionEnum.horizontal),
             gap: FFValue.all(16),
             children: [
               FFItem(
@@ -924,7 +927,7 @@ void main() {
         tester,
       ) async {
         const flex = FFFlex(
-          direction: FFValue.all(FFDirection.horizontal),
+          direction: FFValue.all(FFDirectionEnum.horizontal),
           children: [
             FFItem(
               fill: FFValue.all(false),
@@ -949,7 +952,7 @@ void main() {
           tester,
           tablet,
           const FFFlex(
-            direction: FFValue.all(FFDirection.horizontal),
+            direction: FFValue.all(FFDirectionEnum.horizontal),
             mainAxisAlignment: FFValue.all(MainAxisAlignment.center),
             children: [
               FFItem(
@@ -971,7 +974,7 @@ void main() {
           tester,
           tablet,
           const FFFlex(
-            direction: FFValue.all(FFDirection.horizontal),
+            direction: FFValue.all(FFDirectionEnum.horizontal),
             crossAxisAlignment: FFValue.all(CrossAxisAlignment.stretch),
             children: [
               FFItem(
@@ -996,7 +999,7 @@ void main() {
           const Directionality(
             textDirection: TextDirection.rtl,
             child: FFFlex(
-              direction: FFValue.all(FFDirection.horizontal),
+              direction: FFValue.all(FFDirectionEnum.horizontal),
               children: [
                 FFItem(
                   col: FFValue.all(6),
@@ -1014,7 +1017,7 @@ void main() {
           tester,
           tablet,
           const FFFlex(
-            direction: FFValue.all(FFDirection.vertical),
+            direction: FFValue.all(FFDirectionEnum.vertical),
             children: [
               FFItem(
                 col: FFValue.all(6),
@@ -1056,8 +1059,8 @@ void main() {
       ) async {
         const flex = FFFlex(
           direction: FFValue(
-            xs: FFDirection.horizontal,
-            md: FFDirection.horizontalReverse,
+            xs: FFDirectionEnum.horizontal,
+            md: FFDirectionEnum.horizontalReverse,
           ),
           children: [
             FFItem(
@@ -1085,7 +1088,7 @@ void main() {
           tester,
           phone,
           const FFFlex(
-            direction: FFValue.all(FFDirection.horizontalReverse),
+            direction: FFValue.all(FFDirectionEnum.horizontalReverse),
             children: [
               SizedBox(key: Key('a'), height: 10),
               SizedBox(key: Key('b'), height: 10),
@@ -1103,7 +1106,7 @@ void main() {
           tester,
           phone,
           const FFFlex(
-            direction: FFValue.all(FFDirection.verticalReverse),
+            direction: FFValue.all(FFDirectionEnum.verticalReverse),
             gap: FFValue.all(4),
             children: [
               SizedBox(key: Key('a'), height: 10),
@@ -1122,16 +1125,16 @@ void main() {
       });
 
       testWidgets('invertir no hace perder el estado', (tester) async {
-        Widget flex(FFDirection d) => FFFlex(
+        Widget flex(FFDirectionEnum d) => FFFlex(
           direction: FFValue.all(d),
           children: const [
             _Counter(key: Key('a')),
             _Counter(key: Key('b')),
           ],
         );
-        await pump(tester, phone, flex(FFDirection.vertical));
+        await pump(tester, phone, flex(FFDirectionEnum.vertical));
         tester.state<_CounterState>(find.byKey(const Key('b'))).value = 7;
-        await pump(tester, phone, flex(FFDirection.verticalReverse));
+        await pump(tester, phone, flex(FFDirectionEnum.verticalReverse));
         expect(
           tester.state<_CounterState>(find.byKey(const Key('b'))).value,
           7,
@@ -1397,7 +1400,9 @@ void main() {
       await pumpScaffold(
         tester,
         phone,
-        responsive: const FFValue.all(FFNavStyle(type: FFNavigation.drawer)),
+        responsive: const FFValue.all(
+          FFNavStyle(type: FFNavigationEnum.drawer),
+        ),
         onRouteSelected: (id) => selected = id,
       );
       await tester.tap(find.byIcon(Icons.menu));
@@ -1418,7 +1423,7 @@ void main() {
           backgroundColor: FFColor.fixed(Color(0xFF112233)),
           iconColor: FFColor.fixed(Color(0xFF445566)),
         ),
-        md: FFNavStyle(type: FFNavigation.drawer),
+        md: FFNavStyle(type: FFNavigationEnum.drawer),
       );
       // xs: sigue siendo barra (por defecto) con los colores de xs.
       await pumpScaffold(tester, phone, responsive: style);
@@ -1445,17 +1450,17 @@ void main() {
 
     test('FFNavStyle.resolveMerged une desde xs', () {
       const value = FFValue(
-        xs: FFNavStyle(type: FFNavigation.bottom, expanded: false),
-        md: FFNavStyle(type: FFNavigation.rail),
+        xs: FFNavStyle(type: FFNavigationEnum.bottom, expanded: false),
+        md: FFNavStyle(type: FFNavigationEnum.rail),
         lg: FFNavStyle(expanded: true),
       );
       expect(
-        value.resolveMerged(Breakpoint.sm),
-        const FFNavStyle(type: FFNavigation.bottom, expanded: false),
+        value.resolveMerged(BreakpointEnum.sm),
+        const FFNavStyle(type: FFNavigationEnum.bottom, expanded: false),
       );
       expect(
-        value.resolveMerged(Breakpoint.xl),
-        const FFNavStyle(type: FFNavigation.rail, expanded: true),
+        value.resolveMerged(BreakpointEnum.xl),
+        const FFNavStyle(type: FFNavigationEnum.rail, expanded: true),
       );
     });
 
@@ -1466,7 +1471,9 @@ void main() {
       await pumpScaffold(
         tester,
         tablet,
-        responsive: const FFValue(md: FFNavStyle(type: FFNavigation.appBar)),
+        responsive: const FFValue(
+          md: FFNavStyle(type: FFNavigationEnum.appBar),
+        ),
         onRouteSelected: (id) => selected = id,
       );
       expect(find.byType(NavigationRail), findsNothing);
@@ -1507,7 +1514,7 @@ void main() {
             onRouteSelected: (_) {},
             destinations: destinations,
             responsive: const FFValue(
-              md: FFNavStyle(type: FFNavigation.appBar),
+              md: FFNavStyle(type: FFNavigationEnum.appBar),
             ),
             body: const Text('cuerpo'),
           ),
@@ -1636,7 +1643,9 @@ void main() {
           tester,
           phone,
           brand: brand,
-          responsive: const FFValue(xs: FFNavStyle(type: FFNavigation.drawer)),
+          responsive: const FFValue(
+            xs: FFNavStyle(type: FFNavigationEnum.drawer),
+          ),
         );
         expect(inAppBar(find.text('Mi Tienda')), findsOneWidget);
         expect(inAppBar(find.text('Admin')), findsNothing);
@@ -1655,7 +1664,9 @@ void main() {
           tester,
           phone,
           brand: const FFBrand(title: Text('Mi Tienda'), showInDrawer: false),
-          responsive: const FFValue(xs: FFNavStyle(type: FFNavigation.drawer)),
+          responsive: const FFValue(
+            xs: FFNavStyle(type: FFNavigationEnum.drawer),
+          ),
         );
         await tester.tap(find.byTooltip('Open navigation menu'));
         await tester.pumpAndSettle();
@@ -1684,7 +1695,9 @@ void main() {
           tester,
           tablet,
           brand: brand,
-          responsive: const FFValue(xs: FFNavStyle(type: FFNavigation.appBar)),
+          responsive: const FFValue(
+            xs: FFNavStyle(type: FFNavigationEnum.appBar),
+          ),
         );
         expect(
           tester.getCenter(inAppBar(find.text('Mi Tienda'))).dx,
@@ -1743,7 +1756,7 @@ void main() {
               icon: const Icon(Icons.add),
               label: 'Nuevo',
               onPressed: () {},
-              display: const FFValue(md: FFActionDisplay.full),
+              display: const FFValue(md: FFActionDisplayEnum.full),
             ),
           ],
         ),
@@ -1845,7 +1858,9 @@ void main() {
           tester,
           tablet,
           const FFAppBar(),
-          responsive: const FFValue(xs: FFNavStyle(type: FFNavigation.appBar)),
+          responsive: const FFValue(
+            xs: FFNavStyle(type: FFNavigationEnum.appBar),
+          ),
         );
         expect(inBar('Mi Tienda'), findsOneWidget);
         expect(inBar('Reportes'), findsOneWidget);
@@ -1901,8 +1916,8 @@ void main() {
                       label: 'Nuevo',
                       onPressed: () => tap('nuevo'),
                       display: const FFValue(
-                        xs: FFActionDisplay.icon,
-                        md: FFActionDisplay.full,
+                        xs: FFActionDisplayEnum.icon,
+                        md: FFActionDisplayEnum.full,
                       ),
                     ),
                     FFAction(
@@ -1910,8 +1925,8 @@ void main() {
                       label: 'Exportar',
                       onPressed: () => tap('exportar'),
                       display: const FFValue(
-                        xs: FFActionDisplay.menu,
-                        md: FFActionDisplay.full,
+                        xs: FFActionDisplayEnum.menu,
+                        md: FFActionDisplayEnum.full,
                       ),
                     ),
                     FFAction(
@@ -1919,8 +1934,8 @@ void main() {
                       label: 'Imprimir',
                       onPressed: () => tap('imprimir'),
                       display: const FFValue(
-                        xs: FFActionDisplay.hidden,
-                        md: FFActionDisplay.menu,
+                        xs: FFActionDisplayEnum.hidden,
+                        md: FFActionDisplayEnum.menu,
                       ),
                     ),
                   ],

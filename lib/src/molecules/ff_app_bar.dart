@@ -21,7 +21,7 @@ const _duration = Duration(milliseconds: 220);
 ///
 /// Dentro de un `FFScaffold` recibe de él lo que no defina: la marca (si
 /// no tiene [title]), los destinos y la ruta para los enlaces con
-/// `FFNavigation.appBar`, y los colores del `FFNavStyle`.
+/// `FFNavigationEnum.appBar`, y los colores del `FFNavStyle`.
 class FFAppBar extends StatelessWidget implements PreferredSizeWidget {
   const FFAppBar({
     super.key,
@@ -178,7 +178,7 @@ class FFAppBar extends StatelessWidget implements PreferredSizeWidget {
 /// sin subrutas visibles.
 List<FFDestination> visibleDestinations(
   List<FFDestination> destinations,
-  Breakpoint breakpoint,
+  BreakpointEnum breakpoint,
 ) {
   bool shown(FFDestination d) => d.visible?.resolve(breakpoint) != false;
   return [

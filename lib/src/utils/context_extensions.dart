@@ -4,9 +4,9 @@ import '../models/breakpoint.dart';
 import '../models/ff_value.dart';
 
 extension FFContextExtensions on BuildContext {
-  /// Breakpoint actual, según el ancho de la pantalla.
-  Breakpoint get breakpoint =>
-      Breakpoint.fromWidth(MediaQuery.sizeOf(this).width);
+  /// BreakpointEnum actual, según el ancho de la pantalla.
+  BreakpointEnum get breakpoint =>
+      BreakpointEnum.fromWidth(MediaQuery.sizeOf(this).width);
 
   /// Elige un valor según el breakpoint actual (cascada mobile-first).
   T? responsive<T>({T? xs, T? sm, T? md, T? lg, T? xl}) =>

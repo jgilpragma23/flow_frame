@@ -207,8 +207,8 @@ class _ExampleShellState extends State<ExampleShell> {
             label: 'Nuevo pedido',
             onPressed: () {},
             display: const FFValue(
-              xs: FFActionDisplay.icon,
-              md: FFActionDisplay.full,
+              xs: FFActionDisplayEnum.icon,
+              md: FFActionDisplayEnum.full,
             ),
           ),
           FFAction(
@@ -216,8 +216,8 @@ class _ExampleShellState extends State<ExampleShell> {
             label: 'Exportar',
             onPressed: () {},
             display: const FFValue(
-              xs: FFActionDisplay.menu,
-              lg: FFActionDisplay.full,
+              xs: FFActionDisplayEnum.menu,
+              lg: FFActionDisplayEnum.full,
             ),
           ),
           FFAction(
@@ -225,8 +225,8 @@ class _ExampleShellState extends State<ExampleShell> {
             label: 'Imprimir',
             onPressed: () {},
             display: const FFValue(
-              xs: FFActionDisplay.hidden,
-              md: FFActionDisplay.menu,
+              xs: FFActionDisplayEnum.hidden,
+              md: FFActionDisplayEnum.menu,
             ),
           ),
           FFAction(
@@ -243,7 +243,7 @@ class _ExampleShellState extends State<ExampleShell> {
       destinations: _destinations,
       responsive: FFValue(
         xs: FFNavStyle(
-          type: drawer ? FFNavigation.drawer : FFNavigation.bottom,
+          type: drawer ? FFNavigationEnum.drawer : FFNavigationEnum.bottom,
           backgroundColor: AppColors.surface,
           iconColor: AppColors.muted,
           labelColor: AppColors.muted,
@@ -253,14 +253,17 @@ class _ExampleShellState extends State<ExampleShell> {
         ),
         md: FFNavStyle(
           type: drawer
-              ? FFNavigation.drawer
+              ? FFNavigationEnum.drawer
               : top
-              ? FFNavigation.appBar
-              : FFNavigation.rail,
-          expandMode: FFRailExpand.overlay,
+              ? FFNavigationEnum.appBar
+              : FFNavigationEnum.rail,
+          expandMode: FFRailExpandEnum.overlay,
           shadow: true,
         ),
-        lg: const FFNavStyle(expandMode: FFRailExpand.sidebar, expanded: true),
+        lg: const FFNavStyle(
+          expandMode: FFRailExpandEnum.sidebar,
+          expanded: true,
+        ),
       ),
       body: switch (_selected) {
         'ejemplos' => const ExamplePage(),
@@ -334,7 +337,7 @@ class ExamplePage extends StatelessWidget {
               ),
             ),
             FFFlex(
-              direction: const FFValue.all(FFDirection.horizontal),
+              direction: const FFValue.all(FFDirectionEnum.horizontal),
               gap: const FFValue(xs: 12, md: 16),
               children: [
                 for (var i = 1; i <= 5; i++)
@@ -353,7 +356,7 @@ class ExamplePage extends StatelessWidget {
               ),
             ),
             FFFlex(
-              direction: const FFValue.all(FFDirection.horizontal),
+              direction: const FFValue.all(FFDirectionEnum.horizontal),
               gap: const FFValue(xs: 12, md: 16),
               crossAxisAlignment: const FFValue.all(CrossAxisAlignment.center),
               children: [
@@ -383,8 +386,8 @@ class ExamplePage extends StatelessWidget {
             ),
             FFFlex(
               direction: const FFValue(
-                xs: FFDirection.vertical,
-                md: FFDirection.horizontal,
+                xs: FFDirectionEnum.vertical,
+                md: FFDirectionEnum.horizontal,
               ),
               gap: const FFValue(xs: 12, md: 16),
               children: [
@@ -415,8 +418,8 @@ class ExamplePage extends StatelessWidget {
             ),
             FFFlex(
               direction: const FFValue(
-                xs: FFDirection.vertical,
-                md: FFDirection.horizontal,
+                xs: FFDirectionEnum.vertical,
+                md: FFDirectionEnum.horizontal,
               ),
               gap: const FFValue(xs: 12, md: 16),
               children: [
@@ -496,7 +499,7 @@ class PedidosPage extends StatelessWidget {
               child: Text('Pedidos'),
             ),
             FFFlex(
-              direction: const FFValue.all(FFDirection.horizontal),
+              direction: const FFValue.all(FFDirectionEnum.horizontal),
               gap: const FFValue(xs: 12, md: 16),
               children: [
                 for (final (title, value) in [
@@ -513,7 +516,7 @@ class PedidosPage extends StatelessWidget {
               ],
             ),
             FFFlex(
-              direction: const FFValue.all(FFDirection.horizontal),
+              direction: const FFValue.all(FFDirectionEnum.horizontal),
               gap: const FFValue.all(12),
               crossAxisAlignment: const FFValue.all(CrossAxisAlignment.center),
               children: [
@@ -538,8 +541,8 @@ class PedidosPage extends StatelessWidget {
             ),
             FFFlex(
               direction: const FFValue(
-                xs: FFDirection.vertical,
-                md: FFDirection.horizontal,
+                xs: FFDirectionEnum.vertical,
+                md: FFDirectionEnum.horizontal,
               ),
               gap: const FFValue(xs: 12, md: 16),
               children: [
