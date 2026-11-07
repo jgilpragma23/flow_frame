@@ -72,7 +72,7 @@ class FFValue<T> {
   int get hashCode => Object.hash(xs, sm, md, lg, xl);
 }
 
-extension WRTextStyleValue on FFValue<TextStyle> {
+extension FFTextStyleValue on FFValue<TextStyle> {
   /// Combina los estilos desde `xs` hasta [breakpoint]; en cada propiedad
   /// gana el breakpoint mayor.
   TextStyle? resolveMerged(Breakpoint breakpoint) {

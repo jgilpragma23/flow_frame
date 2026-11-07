@@ -36,12 +36,12 @@ class FFScaffold extends StatefulWidget {
   static const defaults = FFValue(
     xs: FFNavStyle(
       type: FFNavigation.bottom,
-      expandMode: WRRailExpand.overlay,
+      expandMode: FFRailExpand.overlay,
       expanded: false,
       subRoutesAlwaysVisible: false,
     ),
     md: FFNavStyle(type: FFNavigation.rail),
-    lg: FFNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
+    lg: FFNavStyle(expandMode: FFRailExpand.sidebar, expanded: true),
   );
 
   final List<FFDestination> destinations;
@@ -69,14 +69,14 @@ class FFScaffold extends StatefulWidget {
   final Color? backgroundColor;
 
   /// El estado del [FFScaffold] más cercano, para abrir o cerrar el menú.
-  static WRScaffoldState of(BuildContext context) =>
-      context.findAncestorStateOfType<WRScaffoldState>()!;
+  static FFScaffoldState of(BuildContext context) =>
+      context.findAncestorStateOfType<FFScaffoldState>()!;
 
   @override
-  State<FFScaffold> createState() => WRScaffoldState();
+  State<FFScaffold> createState() => FFScaffoldState();
 }
 
-class WRScaffoldState extends State<FFScaffold> {
+class FFScaffoldState extends State<FFScaffold> {
   static const _menuWidth = 280.0;
   static const _duration = Duration(milliseconds: 220);
 
@@ -86,7 +86,7 @@ class WRScaffoldState extends State<FFScaffold> {
   FFNavStyle _style = const FFNavStyle();
 
   FFNavigation get _navigation => _style.type ?? FFNavigation.bottom;
-  WRRailExpand get _expandMode => _style.expandMode ?? WRRailExpand.overlay;
+  FFRailExpand get _expandMode => _style.expandMode ?? FFRailExpand.overlay;
   bool get _expandedByDefault => _style.expanded ?? false;
 
   /// Lo que eligió el usuario con ☰ en modo sidebar; se descarta al cambiar
@@ -103,7 +103,7 @@ class WRScaffoldState extends State<FFScaffold> {
     FFNavigation.bottom || FFNavigation.appBar => false,
     FFNavigation.drawer => _scaffoldKey.currentState?.isDrawerOpen ?? false,
     FFNavigation.rail =>
-      _expandMode == WRRailExpand.overlay
+      _expandMode == FFRailExpand.overlay
           ? _overlayOpen
           : _sidebarOpen ?? _expandedByDefault,
   };
@@ -122,7 +122,7 @@ class WRScaffoldState extends State<FFScaffold> {
             : _scaffoldKey.currentState?.closeDrawer();
       case FFNavigation.rail:
         setState(() {
-          if (_expandMode == WRRailExpand.overlay) {
+          if (_expandMode == FFRailExpand.overlay) {
             _overlayOpen = open;
           } else {
             _sidebarOpen = open;
@@ -437,7 +437,7 @@ class WRScaffoldState extends State<FFScaffold> {
     final theme = Theme.of(context);
     final background = _color(_style.backgroundColor);
     final sidebarOpen =
-        _expandMode == WRRailExpand.sidebar &&
+        _expandMode == FFRailExpand.sidebar &&
         (_sidebarOpen ?? _expandedByDefault);
 
     final row = Row(
@@ -486,7 +486,7 @@ class WRScaffoldState extends State<FFScaffold> {
         ),
       ],
     );
-    if (_expandMode == WRRailExpand.sidebar) {
+    if (_expandMode == FFRailExpand.sidebar) {
       return Material(
         color: widget.backgroundColor ?? theme.scaffoldBackgroundColor,
         child: row,

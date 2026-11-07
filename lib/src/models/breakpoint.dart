@@ -8,8 +8,8 @@ enum Breakpoint {
   lg,
   xl;
 
-  /// El breakpoint que corresponde a [width], según [WRBreakpoints.current].
-  static Breakpoint fromWidth(double width) => WRBreakpoints.current.of(width);
+  /// El breakpoint que corresponde a [width], según [FFBreakpoints.current].
+  static Breakpoint fromWidth(double width) => FFBreakpoints.current.of(width);
 
   bool operator >=(Breakpoint other) => index >= other.index;
   bool operator >(Breakpoint other) => index > other.index;
@@ -24,13 +24,13 @@ enum Breakpoint {
 ///
 /// ```dart
 /// void main() {
-///   WRBreakpoints.current = const WRBreakpoints(md: 900);
+///   FFBreakpoints.current = const FFBreakpoints(md: 900);
 ///   runApp(const MyApp());
 /// }
 /// ```
 @immutable
-class WRBreakpoints {
-  const WRBreakpoints({
+class FFBreakpoints {
+  const FFBreakpoints({
     this.sm = 600,
     this.md = 840,
     this.lg = 1200,
@@ -38,7 +38,7 @@ class WRBreakpoints {
   }) : assert(0 < sm && sm < md && md < lg && lg < xl);
 
   /// Medidas que usa la librería. Por defecto 600 / 840 / 1200 / 1600.
-  static WRBreakpoints current = const WRBreakpoints();
+  static FFBreakpoints current = const FFBreakpoints();
 
   final double sm;
   final double md;
@@ -56,7 +56,7 @@ class WRBreakpoints {
 
   @override
   bool operator ==(Object other) =>
-      other is WRBreakpoints &&
+      other is FFBreakpoints &&
       other.sm == sm &&
       other.md == md &&
       other.lg == lg &&

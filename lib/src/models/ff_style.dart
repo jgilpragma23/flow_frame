@@ -138,9 +138,9 @@ class FFStyle {
   }
 
   /// Todos los valores ya calculados para el breakpoint y el modo actuales.
-  WRResolvedStyle resolve(BuildContext context) {
+  FFResolvedStyle resolve(BuildContext context) {
     final breakpoint = context.breakpoint;
-    return WRResolvedStyle(
+    return FFResolvedStyle(
       padding: padding?.resolve(breakpoint) ?? EdgeInsets.zero,
       margin: margin?.resolve(breakpoint) ?? EdgeInsets.zero,
       textStyle: toTextStyle(context),
@@ -170,8 +170,8 @@ class FFStyle {
 
 /// Un [FFStyle] con valores normales de Flutter, ya calculados.
 @immutable
-class WRResolvedStyle {
-  const WRResolvedStyle({
+class FFResolvedStyle {
+  const FFResolvedStyle({
     this.padding = EdgeInsets.zero,
     this.margin = EdgeInsets.zero,
     this.textStyle = const TextStyle(),

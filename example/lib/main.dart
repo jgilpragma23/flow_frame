@@ -257,10 +257,10 @@ class _ExampleShellState extends State<ExampleShell> {
               : top
               ? FFNavigation.appBar
               : FFNavigation.rail,
-          expandMode: WRRailExpand.overlay,
+          expandMode: FFRailExpand.overlay,
           shadow: true,
         ),
-        lg: const FFNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
+        lg: const FFNavStyle(expandMode: FFRailExpand.sidebar, expanded: true),
       ),
       body: switch (_selected) {
         'ejemplos' => const ExamplePage(),

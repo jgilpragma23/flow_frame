@@ -12,7 +12,7 @@ enum FFNavigation {
   bottom,
 
   /// Barra lateral fija de íconos con un botón ☰ que abre el menú completo,
-  /// encima del contenido o empujándolo según [WRRailExpand].
+  /// encima del contenido o empujándolo según [FFRailExpand].
   rail,
 
   /// Menú oculto que sale desde el lado al tocar ☰ en el app bar.
@@ -25,7 +25,7 @@ enum FFNavigation {
 }
 
 /// Cómo se abre el menú completo (con textos y acordeón) desde el rail.
-enum WRRailExpand {
+enum FFRailExpand {
   /// Se abre un drawer encima del contenido, que no se mueve. Se cierra al
   /// elegir una opción o al tocar fuera.
   overlay,
@@ -59,9 +59,9 @@ class FFNavStyle {
   final FFNavigation? type;
 
   /// Con rail, si el menú completo se abre encima o como sidebar.
-  final WRRailExpand? expandMode;
+  final FFRailExpand? expandMode;
 
-  /// Con [WRRailExpand.sidebar], si el menú empieza abierto. Al cambiar de
+  /// Con [FFRailExpand.sidebar], si el menú empieza abierto. Al cambiar de
   /// breakpoint vuelve a este valor.
   final bool? expanded;
 
@@ -142,7 +142,7 @@ class FFNavStyle {
 }
 
 /// Combina en cascada los [FFNavStyle] de un `FFValue`.
-extension WRNavStyleValue on FFValue<FFNavStyle> {
+extension FFNavStyleValue on FFValue<FFNavStyle> {
   /// Une los estilos desde `xs` hasta [breakpoint]; los mayores ganan.
   FFNavStyle resolveMerged(Breakpoint breakpoint) {
     var result = const FFNavStyle();

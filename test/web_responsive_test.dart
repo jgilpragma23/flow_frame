@@ -44,8 +44,8 @@ const brand = FFColor.adaptive(light: purple, dark: lightPurple);
 const muted = FFColor.fixed(gray);
 
 void main() {
-  group('WRBreakpoints', () {
-    const breakpoints = WRBreakpoints();
+  group('FFBreakpoints', () {
+    const breakpoints = FFBreakpoints();
 
     test('asigna cada ancho a su breakpoint', () {
       expect(breakpoints.of(0), Breakpoint.xs);
@@ -63,8 +63,8 @@ void main() {
     });
 
     testWidgets('respeta breakpoints personalizados', (tester) async {
-      WRBreakpoints.current = const WRBreakpoints(sm: 500, md: 650);
-      addTearDown(() => WRBreakpoints.current = const WRBreakpoints());
+      FFBreakpoints.current = const FFBreakpoints(sm: 500, md: 650);
+      addTearDown(() => FFBreakpoints.current = const FFBreakpoints());
       final context = await pumpContext(tester, const Size(700, 800));
       expect(context.breakpoint, Breakpoint.md);
       expect(Breakpoint.fromWidth(550), Breakpoint.sm);

@@ -63,7 +63,7 @@ class FFFlex extends StatelessWidget {
     return buildFFStyle(
       context,
       style,
-      _WRFlexLayout(
+      _FFFlexLayout(
         direction: axis,
         gap: gap?.resolve(breakpoint) ?? 0,
         mainAxisAlignment:
@@ -102,7 +102,7 @@ class FFFlex extends StatelessWidget {
 
     return [
       for (final e in reverse ? entries.reversed : entries)
-        _WRSlot(
+        _FFSlot(
           key: _SlotKey(e.index),
           size: e.child is FFItem
               ? _sizeOf(e.child as FFItem, breakpoint)
@@ -155,18 +155,18 @@ class _SlotSize {
 
 enum _SlotKind { natural, fill, col }
 
-class _WRSlotParentData extends ContainerBoxParentData<RenderBox> {
+class _FFSlotParentData extends ContainerBoxParentData<RenderBox> {
   _SlotSize size = _SlotSize.natural;
 }
 
-class _WRSlot extends ParentDataWidget<_WRSlotParentData> {
-  const _WRSlot({super.key, required this.size, required super.child});
+class _FFSlot extends ParentDataWidget<_FFSlotParentData> {
+  const _FFSlot({super.key, required this.size, required super.child});
 
   final _SlotSize size;
 
   @override
   void applyParentData(RenderObject renderObject) {
-    final parentData = renderObject.parentData! as _WRSlotParentData;
+    final parentData = renderObject.parentData! as _FFSlotParentData;
     if (parentData.size != size) {
       parentData.size = size;
       renderObject.parent?.markNeedsLayout();
@@ -174,11 +174,11 @@ class _WRSlot extends ParentDataWidget<_WRSlotParentData> {
   }
 
   @override
-  Type get debugTypicalAncestorWidgetClass => _WRFlexLayout;
+  Type get debugTypicalAncestorWidgetClass => _FFFlexLayout;
 }
 
-class _WRFlexLayout extends MultiChildRenderObjectWidget {
-  const _WRFlexLayout({
+class _FFFlexLayout extends MultiChildRenderObjectWidget {
+  const _FFFlexLayout({
     required this.direction,
     required this.gap,
     required this.mainAxisAlignment,
@@ -194,7 +194,7 @@ class _WRFlexLayout extends MultiChildRenderObjectWidget {
   final TextDirection textDirection;
 
   @override
-  _RenderWRFlex createRenderObject(BuildContext context) => _RenderWRFlex(
+  _RenderFFFlex createRenderObject(BuildContext context) => _RenderFFFlex(
     direction: direction,
     gap: gap,
     mainAxisAlignment: mainAxisAlignment,
@@ -203,7 +203,7 @@ class _WRFlexLayout extends MultiChildRenderObjectWidget {
   );
 
   @override
-  void updateRenderObject(BuildContext context, _RenderWRFlex renderObject) {
+  void updateRenderObject(BuildContext context, _RenderFFFlex renderObject) {
     renderObject
       ..direction = direction
       ..gap = gap
@@ -213,11 +213,11 @@ class _WRFlexLayout extends MultiChildRenderObjectWidget {
   }
 }
 
-class _RenderWRFlex extends RenderBox
+class _RenderFFFlex extends RenderBox
     with
-        ContainerRenderObjectMixin<RenderBox, _WRSlotParentData>,
-        RenderBoxContainerDefaultsMixin<RenderBox, _WRSlotParentData> {
-  _RenderWRFlex({
+        ContainerRenderObjectMixin<RenderBox, _FFSlotParentData>,
+        RenderBoxContainerDefaultsMixin<RenderBox, _FFSlotParentData> {
+  _RenderFFFlex({
     required Axis direction,
     required double gap,
     required MainAxisAlignment mainAxisAlignment,
@@ -271,13 +271,13 @@ class _RenderWRFlex extends RenderBox
 
   @override
   void setupParentData(RenderBox child) {
-    if (child.parentData is! _WRSlotParentData) {
-      child.parentData = _WRSlotParentData();
+    if (child.parentData is! _FFSlotParentData) {
+      child.parentData = _FFSlotParentData();
     }
   }
 
   _SlotSize _sizeOf(RenderBox child) =>
-      (child.parentData! as _WRSlotParentData).size;
+      (child.parentData! as _FFSlotParentData).size;
 
   @override
   void performLayout() {
@@ -409,7 +409,7 @@ class _RenderWRFlex extends RenderBox
           final dx = textDirection == TextDirection.rtl
               ? result.width - x - sizes[i].width
               : x;
-          (children[i].parentData! as _WRSlotParentData).offset = Offset(
+          (children[i].parentData! as _FFSlotParentData).offset = Offset(
             dx,
             y + dy,
           );
@@ -479,7 +479,7 @@ class _RenderWRFlex extends RenderBox
         if (textDirection == TextDirection.rtl) {
           dx = result.width - dx - sizes[i].width;
         }
-        (children[i].parentData! as _WRSlotParentData).offset = Offset(dx, y);
+        (children[i].parentData! as _FFSlotParentData).offset = Offset(dx, y);
         y += sizes[i].height + gap + between;
       }
     }

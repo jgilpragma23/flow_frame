@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../models/breakpoint.dart';
 import '../models/ff_value.dart';
 
-extension WRContextExtensions on BuildContext {
+extension FFContextExtensions on BuildContext {
   /// Breakpoint actual, según el ancho de la pantalla.
   Breakpoint get breakpoint =>
       Breakpoint.fromWidth(MediaQuery.sizeOf(this).width);
