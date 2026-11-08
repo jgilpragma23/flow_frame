@@ -1,61 +1,61 @@
 ## 0.0.11 - 2026-10-30
 
-* **Cambio**: `FFStyle.borderRadius` ahora recibe un `BorderRadiusGeometry` por breakpoint en vez de un número, así se puede poner uno por esquina (`BorderRadius.only`, `.vertical`, `BorderRadiusDirectional`…). Con borde, cada esquina recorta con su radio interno. Para migrar, cambia `FFValue(xs: 12)` por `FFValue(xs: BorderRadius.all(Radius.circular(12)))`.
+* **Breaking change**: `FFStyle.borderRadius` now accepts a `BorderRadiusGeometry` per breakpoint instead of a number, allowing each corner to be configured independently (`BorderRadius.only`, `.vertical`, `BorderRadiusDirectional`, etc.). When a border is present, each corner clips using its inner radius. To migrate, replace `FFValue(xs: 12)` with `FFValue(xs: BorderRadius.all(Radius.circular(12)))`.
 
 ## 0.0.10 - 2026-10-30
 
-* `FFStyle.clip`: recorta lo que no quepa por breakpoint, como `overflow: hidden`, siguiendo las esquinas de `borderRadius`. También en `WRResolvedStyle`.
-* `borderRadius` ahora recorta el contenido por dentro del borde, con el radio interno.
+* `FFStyle.clip`: clips overflowing content per breakpoint, like `overflow: hidden`, following the `borderRadius` corners. Also available in `FFResolvedStyle`.
+* `borderRadius` now clips content inside the border, using the inner radius.
 
 ## 0.0.9 - 2026-10-30
 
-* Arreglo: `maxWidth` y `width` del `FFStyle` no tenían efecto en un `FFContainer` ni en un `FFItem` dentro de una columna de `FFFlex`. Ahora limitan la caja: en `FFContainer` queda centrada y en `FFItem` al inicio de su columna, que sigue ocupando su espacio.
+* Fix: `FFStyle.maxWidth` and `width` had no effect in an `FFContainer` or in an `FFItem` inside an `FFFlex` column. They now constrain the box: it is centered in `FFContainer` and aligned to the start of its column in `FFItem`, which still occupies its allocated space.
 
 ## 0.0.8 - 2026-10-30
 
-* **Cambio**: `FFStyle.backgroundColor` ahora es un `FFValue<FFColor>`, así el fondo cambia por breakpoint. Para migrar, envuelve el color: `backgroundColor: AppColors.surface` pasa a `backgroundColor: FFValue(xs: AppColors.surface)`.
+* **Breaking change**: `FFStyle.backgroundColor` is now an `FFValue<FFColor>`, allowing the background to change per breakpoint. To migrate, wrap the color: `backgroundColor: AppColors.surface` becomes `backgroundColor: FFValue(xs: AppColors.surface)`.
 
 ## 0.0.7 - 2026-10-30
 
-* `FFStyle.shadow`: sombra por breakpoint (`List<BoxShadow>`), también en `WRResolvedStyle`. `FFShadow` trae `sm`, `md`, `lg` y `none`, como `shadow-sm`, `shadow` y `shadow-lg` de Bootstrap.
-* `FFStyle.backgroundImage`: imagen de fondo por breakpoint (`DecorationImage`), encima de `backgroundColor`.
-* `FFStyle.borderRadius`, `borderWidth` y `borderColor`: esquinas y borde por breakpoint. El radio recorta el contenido y el borde se suma al padding; sin `borderColor` usa `outlineVariant` del tema.
+* `FFStyle.shadow`: shadows per breakpoint (`List<BoxShadow>`), also available in `FFResolvedStyle`. `FFShadow` provides `sm`, `md`, `lg`, and `none`, similar to Bootstrap's `shadow-sm`, `shadow`, and `shadow-lg`.
+* `FFStyle.backgroundImage`: background image per breakpoint (`DecorationImage`), painted over `backgroundColor`.
+* `FFStyle.borderRadius`, `borderWidth`, and `borderColor`: corners and border per breakpoint. The radius clips content, and the border is added to the padding; without `borderColor`, the theme's `outlineVariant` is used.
 
 ## 0.0.6 - 2026-10-30
 
-* **Cambio**: `FFFlex.direction` ahora recibe un `FFDirection` en vez de un `Axis`: `horizontal`, `horizontalReverse`, `vertical` y `verticalReverse` (como `flex-row`, `flex-row-reverse`, `flex-column` y `flex-column-reverse`). Para migrar, cambia `Axis.horizontal` por `FFDirection.horizontal` y `Axis.vertical` por `FFDirection.vertical`.
+* **Breaking change**: `FFFlex.direction` now accepts an `FFDirection` instead of an `Axis`: `horizontal`, `horizontalReverse`, `vertical`, and `verticalReverse` (like `flex-row`, `flex-row-reverse`, `flex-column`, and `flex-column-reverse`). To migrate, replace `Axis.horizontal` with `FFDirection.horizontal` and `Axis.vertical` with `FFDirection.vertical`.
 
 ## 0.0.5 - 2026-10-30
 
-* `FFStyle.maxHeight`: alto máximo por breakpoint, también en `WRResolvedStyle`.
-* **Cambio**: `FFFlex` es horizontal por defecto, como un `row` de Bootstrap, y un hijo sin `col` ni `fill` (o que no es un `FFItem`) ocupa la fila completa. Así `col` funciona sin escribir `direction`, y los `FFFlex` sin `col` se siguen viendo apilados. Para que un elemento tome su tamaño natural en una fila, usa `fill: FFValue(...: false)` (`col-auto`). La vertical queda para cuando importa el alto: `fill` en altura y alineación vertical.
+* `FFStyle.maxHeight`: maximum height per breakpoint, also available in `FFResolvedStyle`.
+* **Breaking change**: `FFFlex` is now horizontal by default, like a Bootstrap `row`, and a child without `col` or `fill` (or a child that is not an `FFItem`) occupies the full row. This lets `col` work without specifying `direction`, while `FFFlex` instances without `col` still stack their children. To size an item to its natural width in a row, use `fill: FFValue(...: false)` (`col-auto`). Use vertical layout when height matters: `fill` applies to height and alignment is vertical.
 
 ## 0.0.4 - 2026-10-29
 
-* `FFAppBar`: app bar responsive que se usa en cualquier `Scaffold`, sin `FFScaffold`. Marca, título, enlaces con grupos en dropdown y acciones (`FFAction`), con `FFAppBarStyle` por breakpoint: `visible`, `showBrand`, `showTitle`, `centerTitle`, colores y elevación. Dentro de un `FFScaffold` recibe la marca, los destinos y los colores que no defina.
-* README: índice de lo que trae la librería, instalación, ejemplo completo e imágenes en xs, md y lg de cada tema.
-* Ejemplo: sección "Librería" con una página para estilos, espaciado, colores, contenedor y app bar.
+* `FFAppBar`: a responsive app bar that can be used in any `Scaffold`, without `FFScaffold`. It supports branding, a title, links with dropdown groups, and actions (`FFAction`), with `FFAppBarStyle` per breakpoint: `visible`, `showBrand`, `showTitle`, `centerTitle`, colors, and elevation. Inside `FFScaffold`, it inherits any unspecified branding, destinations, and colors.
+* README: feature index, installation instructions, a complete example, and images at xs, md, and lg for each topic.
+* Example: a "Library" section with pages for styles, spacing, colors, containers, and the app bar.
 
 ## 0.0.3 - 2026-10-29
 
-* `FFScaffold`: el rail y el sidebar ocupan toda la altura y el app bar queda solo sobre el contenido. El ☰ y el encabezado del menú se alinean con el app bar.
+* `FFScaffold`: the rail and sidebar occupy the full height, and the app bar appears only above the content. The ☰ button and menu header align with the app bar.
 
 ## 0.0.2 - 2026-10-29
 
-* **Cambio de nombre**: el paquete ahora es `flow_frame` (`import 'package:flow_frame/flow_frame.dart'`) y las clases usan el prefijo `FF` en vez de `WR` (`FFScaffold`, `FFValue`, `FFNavStyle`...).
-* `FFScaffold`: se quitó la línea entre el rail o sidebar y el contenido.
-* `FFNavStyle`: `shadow` y `shadowColor` para una sombra opcional que separa la navegación del contenido.
-* `FFBrand` y `FFScaffold.brand`: logo y nombre de la app junto al ☰, acomodados según la navegación (encabezado del menú, rail, drawer o app bar).
+* **Rename**: the package is now `flow_frame` (`import 'package:flow_frame/flow_frame.dart'`), and classes use the `FF` prefix instead of `WR` (`FFScaffold`, `FFValue`, `FFNavStyle`, etc.).
+* `FFScaffold`: removed the divider between the rail or sidebar and the content.
+* `FFNavStyle`: added `shadow` and `shadowColor` for an optional shadow separating navigation from content.
+* `FFBrand` and `FFScaffold.brand`: app logo and name next to ☰, positioned according to the navigation type (menu header, rail, drawer, or app bar).
 
 ## 0.0.1 - 2026-10-28
 
-* Breakpoints `xs`/`sm`/`md`/`lg`/`xl`, configurables con `WRBreakpoints.current`.
-* `FFValue<T>`: valores por breakpoint con cascada mobile-first.
-* `FFSpacing`: padding y margin responsive con `all`, ejes y lados.
-* `FFStyle`: estilos reutilizables con `merge`, `toTextStyle` y `resolve`.
-* `FFColor`: colores fijos o con versión clara y oscura, según el `Theme` de la app.
-* `FFContainer`: contenedor con ancho máximo centrado.
-* `FFFlex`: fila o columna con dirección, separación y alineación por breakpoint; en horizontal arma filas y baja lo que no cabe.
-* `FFItem`: elemento con `col`, `fill`, `order` y `style`; los ocultos no dejan separación.
-* `FFScaffold`: `Scaffold` con navegación por breakpoint (barra abajo, rail, drawer o enlaces en el app bar con grupos en dropdown), ruta por `id` (`currentRoute`/`onRouteSelected`), subrutas en acordeón, destinos con `visible` por breakpoint y `FFNavStyle` en cascada para tipo, menú del rail encima (`overlay`) o como `sidebar`, grupos siempre abiertos y colores; el menú se abre desde código con `FFScaffold.of(context)`.
-* `FFActions` y `FFAction`: acciones que por breakpoint se ven con ícono y texto, solo ícono, dentro del menú ⋮ u ocultas.
+* `xs`/`sm`/`md`/`lg`/`xl` breakpoints, configurable with `FFBreakpoints.current`.
+* `FFValue<T>`: values per breakpoint with mobile-first cascading.
+* `FFSpacing`: responsive padding and margin with `all`, axes, and sides.
+* `FFStyle`: reusable styles with `merge`, `toTextStyle`, and `resolve`.
+* `FFColor`: fixed colors or light and dark variants based on the app's `Theme`.
+* `FFContainer`: centered container with a maximum width.
+* `FFFlex`: row or column with direction, spacing, and alignment per breakpoint; horizontal layouts create rows and wrap overflowing content.
+* `FFItem`: item with `col`, `fill`, `order`, and `style`; hidden items do not leave gaps.
+* `FFScaffold`: `Scaffold` with breakpoint-based navigation (bottom bar, rail, drawer, or app bar links with dropdown groups), routes by `id` (`currentRoute`/`onRouteSelected`), accordion subroutes, destinations with `visible` per breakpoint, and cascading `FFNavStyle` for navigation type, rail menu overlay or sidebar, always-open groups, and colors. The menu can be opened in code with `FFScaffold.of(context)`.
+* `FFActions` and `FFAction`: actions that can show an icon and text, an icon only, appear in the ⋮ menu, or be hidden depending on the breakpoint.

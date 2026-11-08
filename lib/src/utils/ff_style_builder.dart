@@ -2,10 +2,11 @@ import 'package:flutter/widgets.dart';
 
 import '../models/ff_style.dart';
 
-/// Envuelve [child] con los widgets que aplican [style].
+/// Wraps [child] in the widgets that apply [style].
 ///
-/// De adentro hacia afuera: texto, padding, recorte, esquinas, borde,
-/// fondo, imagen y sombra, tamaño, límites de ancho y alto, y margin. Uso interno de los widgets de la librería.
+/// From inside out: text, padding, clipping, corners, border, background,
+/// image and shadow, size, width and height constraints, and margin. Used
+/// internally by package widgets.
 Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
   if (style == null) return child;
   final s = style.resolve(context);
@@ -22,8 +23,8 @@ Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
   if (s.padding != EdgeInsets.zero) {
     current = Padding(padding: s.padding, child: current);
   }
-  // Como overflow: hidden. El contenido toma su alto natural y lo que no
-  // quepa se corta en el borde del padding.
+  // Like overflow: hidden. Content uses its natural height and anything that
+  // does not fit is clipped at the padding edge.
   if (s.clip) {
     current = UnconstrainedBox(
       constrainedAxis: Axis.horizontal,
@@ -33,14 +34,14 @@ Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
     );
   }
   final rounded = s.borderRadius != BorderRadius.zero;
-  // Las esquinas recortan por dentro del borde, con el radio interno.
+  // Corners clip inside the border, using the inner radius.
   if (rounded) {
     current = ClipRRect(
       borderRadius: _inner(s.borderRadius, s.borderWidth),
       child: current,
     );
   }
-  // El borde va por dentro de la caja, así que se suma al padding.
+  // The border is inside the box, so add it to the padding.
   if (s.borderWidth > 0) {
     current = Padding(padding: EdgeInsets.all(s.borderWidth), child: current);
   }
@@ -82,7 +83,7 @@ Widget buildFFStyle(BuildContext context, FFStyle? style, Widget child) {
   return current;
 }
 
-/// [radius] menos el grosor del borde en cada esquina, sin bajar de 0.
+/// [radius] minus the border width at each corner, clamped to 0.
 BorderRadius _inner(BorderRadius radius, double width) {
   Radius shrink(Radius r) => Radius.elliptical(
     (r.x - width).clamp(0, double.infinity),

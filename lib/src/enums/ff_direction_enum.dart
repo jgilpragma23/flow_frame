@@ -1,19 +1,19 @@
 import 'package:flutter/widgets.dart';
 
-/// Dirección de un `FFFlex`, como `flex-row`, `flex-row-reverse`,
-/// `flex-column` y `flex-column-reverse` de Bootstrap.
+/// Direction for an `FFFlex`, similar to Bootstrap's `flex-row`,
+/// `flex-row-reverse`, `flex-column`, and `flex-column-reverse`.
 enum FFDirectionEnum {
-  /// En filas de 12 columnas; lo que no cabe baja a la siguiente.
+  /// Arranges items in 12-column rows; items that do not fit wrap to the next.
   horizontal,
 
-  /// Como [horizontal], con los hijos en orden inverso: en una fila el
-  /// último queda a la izquierda y, apilados, el último queda arriba.
+  /// Like [horizontal], but with children in reverse order: the last item
+  /// moves to the left in a row or to the top when stacked.
   horizontalReverse,
 
-  /// Apilados de arriba hacia abajo.
+  /// Stacks items from top to bottom.
   vertical,
 
-  /// Apilados de abajo hacia arriba.
+  /// Stacks items from bottom to top.
   verticalReverse;
 
   Axis get axis => switch (this) {

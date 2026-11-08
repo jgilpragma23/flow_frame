@@ -3,11 +3,11 @@ import 'package:flutter/widgets.dart';
 import 'breakpoint.dart';
 import 'ff_value.dart';
 
-/// Espaciado (padding o margin) que cambia según el breakpoint.
+/// Spacing (padding or margin) that changes per breakpoint.
 ///
-/// Para cada lado gana el breakpoint más cercano al actual. Si en ese
-/// breakpoint hay varios valores, gana el más específico: el lado (`top`)
-/// sobre el eje (`vertical`), y el eje sobre `all`.
+/// For each side, the value from the closest breakpoint takes precedence. If
+/// multiple values are defined at that breakpoint, the most specific one
+/// wins: a side (`top`) over an axis (`vertical`), and an axis over `all`.
 @immutable
 class FFSpacing {
   const FFSpacing({
@@ -28,7 +28,7 @@ class FFSpacing {
   final FFValue<double>? left;
   final FFValue<double>? right;
 
-  /// Espaciado para [breakpoint]; los lados sin valor quedan en 0.
+  /// Spacing for [breakpoint]; sides without a value default to 0.
   EdgeInsets resolve(BreakpointEnum breakpoint) => EdgeInsets.fromLTRB(
     _side(breakpoint, left, horizontal),
     _side(breakpoint, top, vertical),
@@ -49,7 +49,8 @@ class FFSpacing {
     return 0;
   }
 
-  /// Combina breakpoint por breakpoint; [other] gana donde define un valor.
+  /// Merges breakpoint by breakpoint; [other] takes precedence where it
+  /// defines a value.
   FFSpacing merge(FFSpacing? other) {
     if (other == null) return this;
     return FFSpacing(

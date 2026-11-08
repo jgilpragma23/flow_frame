@@ -11,21 +11,22 @@ import '../models/ff_value.dart';
 import '../utils/context_extensions.dart';
 import '../utils/ff_style_builder.dart';
 
-/// Una fila o columna cuya dirección, separación y alineación cambian según
-/// el breakpoint (equivale a `d-flex flex-column flex-md-row`). La dirección
-/// también puede invertir el orden de los hijos ([FFDirectionEnum]).
+/// A row or column whose direction, spacing, and alignment adapt per
+/// breakpoint (similar to `d-flex flex-column flex-md-row`). The direction
+/// can also reverse the order of its children ([FFDirectionEnum]).
 ///
-/// Por defecto es horizontal y funciona como un `row` de Bootstrap: cada
-/// [FFItem] ocupa su `col` (de 12), lo que sobra en la fila (`fill: true`)
-/// o su tamaño natural (`fill: false`), y lo que no cabe baja a la
-/// siguiente fila. Un hijo sin `col` ni `fill`, o que no es un [FFItem],
-/// ocupa la fila completa, así que sin `col` los hijos quedan apilados.
+/// Defaults to horizontal and works like a Bootstrap `row`: each [FFItem]
+/// occupies its `col` (out of 12), the remaining row space (`fill: true`), or
+/// its natural size (`fill: false`). Items that do not fit wrap to the next
+/// row. A child without `col` or `fill`, or one that is not an [FFItem],
+/// occupies the full row, so children stack when no `col` is specified.
 ///
-/// En vertical los apila siempre; sirve cuando importa el alto: `fill`
-/// reparte la altura que sobra y `mainAxisAlignment` alinea en vertical.
+/// In vertical mode, children are always stacked; use it when height matters:
+/// `fill` distributes remaining height and `mainAxisAlignment` aligns
+/// vertically.
 ///
-/// Los [FFItem] también pueden cambiar de posición con `order` y ocultarse
-/// con `visible`; los ocultos no dejan separación.
+/// [FFItem]s can also change position with `order` and be hidden with
+/// `visible`; hidden items leave no gap.
 class FFFlex extends StatelessWidget {
   const FFFlex({
     super.key,
@@ -37,19 +38,19 @@ class FFFlex extends StatelessWidget {
     required this.children,
   });
 
-  /// Por defecto [FFDirectionEnum.horizontal] en todos los breakpoints. Con
-  /// `horizontalReverse` o `verticalReverse` los hijos van en orden inverso.
+  /// Defaults to [FFDirectionEnum.horizontal] at every breakpoint. With
+  /// `horizontalReverse` or `verticalReverse`, children are in reverse order.
   final FFValue<FFDirectionEnum> direction;
 
-  /// Separación entre elementos y, en horizontal, también entre filas.
+  /// Spacing between items and, in horizontal layouts, between rows.
   final FFValue<double>? gap;
 
-  /// Por defecto `start`. En horizontal se aplica a cada fila.
+  /// Defaults to `start`. In horizontal layouts, applies to each row.
   final FFValue<MainAxisAlignment>? mainAxisAlignment;
 
-  /// Por defecto `stretch` en vertical (los elementos ocupan todo el ancho)
-  /// y `start` en horizontal. En horizontal se aplica dentro de cada fila.
-  /// `baseline` se trata como `start`.
+  /// Defaults to `stretch` in vertical layouts (items use the full width) and
+  /// `start` in horizontal layouts. In horizontal layouts, applies within
+  /// each row. `baseline` is treated as `start`.
   final FFValue<CrossAxisAlignment>? crossAxisAlignment;
   final FFStyle? style;
   final List<Widget> children;
@@ -79,10 +80,10 @@ class FFFlex extends StatelessWidget {
     );
   }
 
-  /// Quita los ocultos, ordena por `order` (y lo invierte con [reverse]) y
-  /// le dice al layout cómo medir
-  /// cada hijo. Cada hijo lleva una key con su índice original para que no
-  /// pierda su estado al reordenarse u ocultarse otro.
+  /// Removes hidden items, sorts by `order` (and reverses it when [reverse]
+  /// is true), and tells the layout how to measure each child. Each child has
+  /// a key with its original index so it retains its state when reordered or
+  /// when another child is hidden.
   List<Widget> _slots(BreakpointEnum breakpoint, {required bool reverse}) {
     final entries = <({int index, int order, Widget child})>[];
     for (var i = 0; i < children.length; i++) {
@@ -112,8 +113,8 @@ class FFFlex extends StatelessWidget {
     ];
   }
 
-  /// Entre `col` y `fill` gana el breakpoint más cercano; en el mismo
-  /// breakpoint gana `col`. Sin ninguno, la fila completa.
+  /// Between `col` and `fill`, the closest breakpoint wins; at the same
+  /// breakpoint, `col` wins. If neither is set, the item uses the full row.
   static _SlotSize _sizeOf(FFItem item, BreakpointEnum breakpoint) {
     for (var i = breakpoint.index; i >= 0; i--) {
       final b = BreakpointEnum.values[i];
@@ -130,7 +131,7 @@ class _SlotKey extends ValueKey<int> {
   const _SlotKey(super.value);
 }
 
-/// Cómo se mide un hijo en el eje principal.
+/// How a child is measured along the main axis.
 @immutable
 class _SlotSize {
   const _SlotSize._(this.kind, this.col);
@@ -139,7 +140,7 @@ class _SlotSize {
   static const natural = _SlotSize._(_SlotKind.natural, 0);
   static const fill = _SlotSize._(_SlotKind.fill, 0);
 
-  /// La fila completa, como `col: 12`.
+  /// The full row, equivalent to `col: 12`.
   static const row = _SlotSize._(_SlotKind.col, 12);
 
   final _SlotKind kind;
@@ -299,7 +300,7 @@ class _RenderFFFlex extends RenderBox
         : _layoutColumn(children, constraints, layoutChild, place);
   }
 
-  /// Horizontal: arma filas de izquierda a derecha y baja lo que no cabe.
+  /// Horizontal: lays out rows from left to right and wraps items that do not fit.
   Size _layoutRows(
     List<RenderBox> children,
     BoxConstraints constraints,
@@ -309,18 +310,18 @@ class _RenderFFFlex extends RenderBox
     final maxWidth = constraints.maxWidth;
     final bounded = maxWidth.isFinite;
     final sizes = List<Size>.filled(children.length, Size.zero);
-    // Sin ancho límite no hay columnas que calcular ni espacio que llenar.
+    // Without a width constraint, there are no columns to calculate or space to fill.
     final isFill = [
       for (final child in children)
         bounded && _sizeOf(child).kind == _SlotKind.fill,
     ];
 
-    // 1. Medir los que no son fill: col con su fracción, el resto natural.
+    // 1. Measure non-fill items: col at its fraction, the rest at natural size.
     for (var i = 0; i < children.length; i++) {
       if (isFill[i]) continue;
       final slot = _sizeOf(children[i]);
       if (bounded && slot.kind == _SlotKind.col) {
-        // Así `12 / col` elementos con sus gaps llenan la fila exacta.
+        // This lets `12 / col` items and their gaps exactly fill the row.
         final width = (slot.col.clamp(1, 12) / 12 * (maxWidth + gap) - gap)
             .clamp(0.0, maxWidth);
         sizes[i] = layoutChild(
@@ -332,8 +333,8 @@ class _RenderFFFlex extends RenderBox
       }
     }
 
-    // 2. Cortar filas: si el siguiente no cabe, empieza una fila nueva.
-    // Los fill cuentan como 0 porque toman lo que sobre.
+    // 2. Break into rows: if the next item does not fit, start a new row.
+    // Fill items count as 0 because they take the remaining space.
     final rows = <List<int>>[];
     var row = <int>[];
     var used = 0.0;
@@ -351,8 +352,8 @@ class _RenderFFFlex extends RenderBox
     }
     if (row.isNotEmpty) rows.add(row);
 
-    // 3. En cada fila, repartir lo que sobra entre los fill y, con
-    // stretch, igualar la altura de todos.
+    // 3. In each row, distribute remaining space among fill items and, with
+    // stretch, make all items the same height.
     final rowHeights = <double>[];
     var contentWidth = 0.0;
     for (final row in rows) {
@@ -421,7 +422,7 @@ class _RenderFFFlex extends RenderBox
     return result;
   }
 
-  /// Vertical: apila; los fill se reparten la altura que sobra si hay límite.
+  /// Vertical: stacks items; fill items share the remaining height if bounded.
   Size _layoutColumn(
     List<RenderBox> children,
     BoxConstraints constraints,
@@ -486,7 +487,7 @@ class _RenderFFFlex extends RenderBox
     return result;
   }
 
-  /// Espacio antes del primer hijo y extra entre hijos, según
+  /// Space before the first child and extra between children, based on
   /// [mainAxisAlignment].
   (double, double) _distribute(double free, int count) {
     if (count == 0) return (0, 0);

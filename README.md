@@ -1,26 +1,26 @@
 # flow_frame
 
-Herramientas para hacer interfaces responsive en Flutter con una idea parecida a Bootstrap: breakpoints mobile-first, estilos reutilizables, colores con modo claro u oscuro y una navegación que cambia sola según el ancho de la pantalla.
+Tools for building responsive Flutter interfaces with a Bootstrap-like approach: mobile-first breakpoints, reusable styles, light and dark colors, and navigation that adapts to the screen width.
 
-![La misma pantalla de pedidos en teléfono, tablet y escritorio](doc/app.png)
+![The same orders screen on a phone, tablet, and desktop](doc/app.png)
 
-## Qué trae
+## Features
 
-| | Para qué sirve | |
+| | What it does | |
 |---|---|---|
 | [Breakpoints](#breakpoints) | `xs` `sm` `md` `lg` `xl`, mobile-first | |
-| [`FFValue`](#ffvalue-un-valor-por-breakpoint) | Un valor distinto por breakpoint, en cascada | |
-| [`FFSpacing`](#ffspacing-padding-y-margin) | Padding y margin por breakpoint | [imagen](#ffspacing-padding-y-margin) |
-| [`FFStyle`](#ffstyle-estilos-reutilizables) | Estilos reutilizables tipo clase de CSS: texto, color, tamaño, visible | [imagen](#ffstyle-estilos-reutilizables) |
-| [Colores](#colores-y-modo-oscuro) | `FFColor` con versión clara y oscura | [imagen](#colores-y-modo-oscuro) |
-| [`FFContainer`](#ffcontainer) | Contenedor centrado con ancho máximo | [imagen](#ffcontainer) |
-| [`FFFlex` y `FFItem`](#ffflex-y-ffitem) | Grilla de 12 columnas, filas o columnas que cambian por breakpoint | [imagen](#ffflex-y-ffitem) |
-| [`FFScaffold`](#ffscaffold-navegación-según-el-breakpoint) | Barra abajo, rail, sidebar, drawer o enlaces en el app bar, según el ancho | [GIF](#ffscaffold-navegación-según-el-breakpoint) |
-| [`FFBrand`](#ffscaffold-navegación-según-el-breakpoint) | Logo y nombre de la app junto al ☰ | |
-| [`FFAppBar`](#ffappbar-app-bar-sin-el-layout) | App bar responsive que se usa solo, en cualquier `Scaffold`: marca, título, enlaces y acciones, y se oculta por breakpoint | [imagen](#ffappbar-app-bar-sin-el-layout) |
-| [`FFActions`](#ffactions-acciones-del-app-bar) | Acciones del app bar: con texto, solo ícono, en el menú ⋮ u ocultas | [imagen](#ffactions-acciones-del-app-bar) |
+| [`FFValue`](#ffvalue-a-value-per-breakpoint) | A cascading value per breakpoint | |
+| [`FFSpacing`](#ffspacing-padding-and-margin) | Padding and margin per breakpoint | [image](#ffspacing-padding-and-margin) |
+| [`FFStyle`](#ffstyle-reusable-styles) | CSS-class-like reusable styles: text, color, size, visibility | [image](#ffstyle-reusable-styles) |
+| [Colors](#colors-and-dark-mode) | `FFColor` with light and dark variants | [image](#colors-and-dark-mode) |
+| [`FFContainer`](#ffcontainer) | Centered container with a maximum width | [image](#ffcontainer) |
+| [`FFFlex` and `FFItem`](#ffflex-and-ffitem) | A 12-column grid with rows or columns that adapt per breakpoint | [image](#ffflex-and-ffitem) |
+| [`FFScaffold`](#ffscaffold-breakpoint-based-navigation) | Bottom bar, rail, sidebar, drawer, or app bar links based on screen width | [GIF](#ffscaffold-breakpoint-based-navigation) |
+| [`FFBrand`](#ffscaffold-breakpoint-based-navigation) | App logo and name next to ☰ | |
+| [`FFAppBar`](#ffappbar-standalone-app-bar) | A standalone responsive app bar for any `Scaffold`: branding, title, links, actions, and breakpoint-based visibility | [image](#ffappbar-standalone-app-bar) |
+| [`FFActions`](#ffactions-app-bar-actions) | App bar actions with text, icons only, in the ⋮ menu, or hidden | [image](#ffactions-app-bar-actions) |
 
-## Instalación
+## Installation
 
 ```yaml
 dependencies:
@@ -34,9 +34,9 @@ dependencies:
 import 'package:flow_frame/flow_frame.dart';
 ```
 
-## Ejemplo completo
+## Complete example
 
-Una app con navegación responsive, marca, acciones y una página en grilla. Es una versión resumida de la pantalla de la imagen de arriba; el código completo está en [`example/`](example/lib/main.dart).
+An app with responsive navigation, branding, actions, and a grid-based page. This is a condensed version of the screen shown above; the full code is in [`example/`](example/lib/main.dart).
 
 ```dart
 class AppColors {
@@ -59,7 +59,7 @@ class Shell extends StatefulWidget {
 }
 
 class _ShellState extends State<Shell> {
-  String _route = 'ventas/pedidos';
+  String _route = 'sales/orders';
 
   @override
   Widget build(BuildContext context) {
@@ -67,62 +67,62 @@ class _ShellState extends State<Shell> {
       currentRoute: _route,
       onRouteSelected: (id) => setState(() => _route = id),
       destinations: const [
-        FFDestination(id: 'inicio', icon: Icon(Icons.home_outlined), label: 'Inicio'),
+        FFDestination(id: 'home', icon: Icon(Icons.home_outlined), label: 'Home'),
         FFDestination(
-          id: 'ventas',
+          id: 'sales',
           icon: Icon(Icons.storefront_outlined),
-          label: 'Ventas',
+          label: 'Sales',
           children: [
-            FFDestination(id: 'ventas/pedidos', icon: Icon(Icons.receipt_long_outlined), label: 'Pedidos'),
-            FFDestination(id: 'ventas/clientes', icon: Icon(Icons.people_outline), label: 'Clientes'),
+            FFDestination(id: 'sales/orders', icon: Icon(Icons.receipt_long_outlined), label: 'Orders'),
+            FFDestination(id: 'sales/customers', icon: Icon(Icons.people_outline), label: 'Customers'),
           ],
         ),
         FFDestination(
-          id: 'reportes',
+          id: 'reports',
           icon: Icon(Icons.bar_chart_outlined),
-          label: 'Reportes',
-          visible: FFValue(xs: false, md: true), // no cabe en la barra de abajo
+          label: 'Reports',
+          visible: FFValue(xs: false, md: true), // Does not fit in the bottom bar.
         ),
       ],
-      // Barra abajo en el teléfono, rail en tablet y sidebar en escritorio
+      // Bottom bar on phones, rail on tablets, and sidebar on desktop.
       responsive: const FFValue(
         xs: FFNavStyle(
-          type: FFNavigation.bottom,
+          type: FFNavigationEnum.bottom,
           selectedIconColor: AppColors.primary,
           selectedBackgroundColor: AppColors.primarySoft,
         ),
-        md: FFNavStyle(type: FFNavigation.rail, shadow: true),
-        lg: FFNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
+        md: FFNavStyle(type: FFNavigationEnum.rail, shadow: true),
+        lg: FFNavStyle(expandMode: FFRailExpandEnum.sidebar, expanded: true),
       ),
       brand: const FFBrand(
         logo: Icon(Icons.storefront),
-        title: Text('Mi Tienda'),
+        title: Text('My Store'),
         subtitle: Text('Admin'),
       ),
       appBar: FFAppBar(
-        title: const Text('Pedidos'),
+        title: const Text('Orders'),
         actions: [
           FFAction(
             icon: const Icon(Icons.add),
-            label: 'Nuevo pedido',
+            label: 'New order',
             onPressed: () {},
-            display: const FFValue(xs: FFActionDisplay.icon, md: FFActionDisplay.full),
+            display: const FFValue(xs: FFActionDisplayEnum.icon, md: FFActionDisplayEnum.full),
           ),
           FFAction(
             icon: const Icon(Icons.download_outlined),
-            label: 'Exportar',
+            label: 'Export',
             onPressed: () {},
-            display: const FFValue(xs: FFActionDisplay.menu, lg: FFActionDisplay.full),
+            display: const FFValue(xs: FFActionDisplayEnum.menu, lg: FFActionDisplayEnum.full),
           ),
         ],
       ),
-      body: const PedidosPage(),
+      body: const OrdersPage(),
     );
   }
 }
 
-class PedidosPage extends StatelessWidget {
-  const PedidosPage({super.key});
+class OrdersPage extends StatelessWidget {
+  const OrdersPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -133,11 +133,11 @@ class PedidosPage extends StatelessWidget {
         child: FFFlex(
           gap: const FFValue(xs: 16, md: 24),
           children: [
-            // Resumen: 1 por fila en xs, 2 en sm, 4 desde lg
+            // Summary: 1 per row on xs, 2 on sm, and 4 from lg onward.
             FFFlex(
               gap: const FFValue(xs: 12, md: 16),
               children: [
-                for (final (title, value) in [('Hoy', '24'), ('Semana', '183'), ('Pendientes', '7'), ('Ingresos', '\$4.2k')])
+                for (final (title, value) in [('Today', '24'), ('This week', '183'), ('Pending', '7'), ('Revenue', '\$4.2k')])
                   FFItem(
                     col: const FFValue(xs: 12, sm: 6, lg: 3),
                     style: card,
@@ -145,19 +145,19 @@ class PedidosPage extends StatelessWidget {
                   ),
               ],
             ),
-            // Lista y detalle: uno debajo del otro en xs/sm, lado a lado desde md
+            // List and details: stacked on xs/sm, side by side from md onward.
             FFFlex(
-              direction: const FFValue(xs: FFDirection.vertical, md: FFDirection.horizontal),
+              direction: const FFValue(xs: FFDirectionEnum.vertical, md: FFDirectionEnum.horizontal),
               gap: const FFValue(xs: 12, md: 16),
               children: [
-                const FFItem(col: FFValue(md: 7, xl: 8), style: card, child: ListaDePedidos()),
+                const FFItem(col: FFValue(md: 7, xl: 8), style: card, child: OrdersList()),
                 FFItem(
                   fill: const FFValue(md: true),
                   style: card.merge(const FFStyle(
                     backgroundColor: FFValue(xs: AppColors.primarySoft),
-                    visible: FFValue(xs: false, md: true), // el detalle no se ve en el teléfono
+                    visible: FFValue(xs: false, md: true), // Hide details on phones.
                   )),
-                  child: const DetalleDelPedido(),
+                  child: const OrderDetails(),
                 ),
               ],
             ),
@@ -169,59 +169,67 @@ class PedidosPage extends StatelessWidget {
 }
 ```
 
-Lo mismo en modo oscuro, sin cambiar nada del código (los `FFColor` eligen su versión según el `Theme`):
+The same screen in dark mode, with no code changes (`FFColor` selects a variant based on the `Theme`):
 
-![La pantalla de pedidos en modo oscuro](doc/app-oscuro.png)
+![The orders screen in dark mode](doc/app-oscuro.png)
 
-### Ver el ejemplo
+### Run the example
 
 ```bash
 cd example && flutter run -d chrome
 ```
 
-En el menú **Librería** hay una página por tema (estilos, espaciado, colores y contenedor); de ahí salen las imágenes de este README. Achica la ventana para ver cómo cambia cada cosa.
+The **Library** menu has a page for each topic (styles, spacing, colors, and containers); these pages are the source of the images in this README. Resize the window to see how each element adapts.
 
 ## Breakpoints
 
-| Nombre | Desde (px) | Uso típico |
+| Name | From (px) | Typical use |
 |---|---|---|
-| `xs` | 0 | Teléfono |
-| `sm` | 600 | Teléfono horizontal / tablet pequeña |
+| `xs` | 0 | Phone |
+| `sm` | 600 | Landscape phone / small tablet |
 | `md` | 840 | Tablet |
-| `lg` | 1200 | Escritorio |
-| `xl` | 1600 | Pantalla grande |
+| `lg` | 1200 | Desktop |
+| `xl` | 1600 | Large screen |
 
-El breakpoint se calcula con el ancho de la pantalla.
+The breakpoint is determined by the screen width.
 
 ```dart
-if (context.breakpoint >= Breakpoint.md) { ... }
+if (context.breakpoint >= BreakpointEnum.md) { ... }
 ```
 
-Para cambiar las medidas, asígnalas una vez antes de `runApp`:
+The default thresholds are `600 / 840 / 1200 / 1600` logical pixels.
+Consumers can customize them for the entire app by assigning
+`FFBreakpoints.current` before `runApp`. This configuration affects `context.breakpoint`,
+`context.responsive`, and all responsive widgets in the package:
 
 ```dart
 void main() {
-  WRBreakpoints.current = const WRBreakpoints(sm: 600, md: 900, lg: 1200, xl: 1600);
+  FFBreakpoints.current = const FFBreakpoints(
+    sm: 640,
+    md: 900,
+    lg: 1200,
+    xl: 1600,
+  );
   runApp(const MyApp());
 }
 ```
 
-## `FFValue`: un valor por breakpoint
+## `FFValue`: a value per breakpoint
 
-Cada valor aplica desde su breakpoint hacia arriba hasta que otro lo reemplace (mobile-first).
+Each value applies from its breakpoint upward until another value overrides it (mobile-first).
 
 ```dart
-const gap = FFValue(xs: 8, md: 16); // 8 en xs/sm, 16 en md/lg/xl
-const fill = FFValue(md: true);     // null en xs/sm, true desde md
-const same = FFValue.all(12);       // 12 en todos
+const gap = FFValue(xs: 8, md: 16); // 8 on xs/sm, 16 on md/lg/xl
+const fill = FFValue(md: true);     // null on xs/sm, true from md onward
+const same = FFValue.all(12);       // 12 at every breakpoint
 
 gap.resolve(context.breakpoint);
-context.responsive(xs: 1, md: 2, xl: 4); // atajo
+context.responsive(xs: 1, md: 2, xl: 4); // shorthand
 ```
 
-## `FFSpacing`: padding y margin
+## `FFSpacing`: padding and margin
 
-![Padding y margin en xs, md y lg: naranja es el margin, verde el padding y azul el contenido](doc/espaciado.png)
+![Padding and margin on xs, md, and lg: orange is margin, green is padding, and blue is content](doc/espaciado.png)
 
 ```dart
 const FFSpacing(
@@ -232,24 +240,24 @@ const FFSpacing(
 )
 ```
 
-Para cada lado:
-1. Gana el breakpoint más cercano al actual.
-2. Si empatan, gana el más específico: el lado (`top`) sobre el eje (`vertical`), y el eje sobre `all`.
+For each side:
+1. The closest defined breakpoint wins.
+2. If tied, the most specific value wins: side (`top`) over axis (`vertical`), and axis over `all`.
 
-Con el ejemplo de arriba, el `top` vale 8 en `xs`, 12 en `sm`, 20 en `md` y `lg`, y 24 en `xl`.
+In the example above, `top` is 8 on `xs`, 12 on `sm`, 20 on `md` and `lg`, and 24 on `xl`.
 
-## `FFStyle`: estilos reutilizables
+## `FFStyle`: reusable styles
 
-![Texto, variantes con merge y tamaños en xs y lg](doc/estilos.png)
+![Text, variants with merge, and sizes on xs and lg](doc/estilos.png)
 
-Funciona como una clase de CSS. Todo es opcional.
+It works like a CSS class. Every property is optional.
 
 ```dart
 const card = FFStyle(
   padding: FFSpacing(all: FFValue(xs: 12, md: 16)),
   margin: FFSpacing(bottom: FFValue(xs: 8)),
 
-  // Texto: textStyle es la base, lo demás va encima
+  // Text: textStyle is the base; the other properties override it.
   textStyle: FFValue(
     xs: TextStyle(fontSize: 14, fontFamily: 'Inter'),
     md: TextStyle(fontSize: 16),
@@ -265,13 +273,13 @@ const card = FFStyle(
     xs: DecorationImage(image: AssetImage('assets/fondo_movil.jpg'), fit: BoxFit.cover),
     md: DecorationImage(image: AssetImage('assets/fondo.jpg'), fit: BoxFit.cover),
   ),
-  shadow: FFValue(xs: FFShadow.sm, md: FFShadow.lg), // como shadow-sm / shadow-lg
+  shadow: FFValue(xs: FFShadow.sm, md: FFShadow.lg), // Like shadow-sm / shadow-lg.
   borderRadius: FFValue(
     xs: BorderRadius.all(Radius.circular(8)),
-    md: BorderRadius.vertical(top: Radius.circular(16)), // solo arriba
+    md: BorderRadius.vertical(top: Radius.circular(16)), // Top only.
   ),
   borderWidth: FFValue(xs: 1),
-  borderColor: AppColors.border, // por defecto outlineVariant del tema
+  borderColor: AppColors.border, // Defaults to the theme's outlineVariant.
 
   width: FFValue(md: 480),
   minWidth: FFValue(md: 320),
@@ -279,19 +287,19 @@ const card = FFStyle(
   height: FFValue(md: 200),
   maxHeight: FFValue(xs: 240, lg: 400),
 
-  visible: FFValue(xs: false, md: true), // como d-none d-md-block
-  clip: FFValue(xs: true), // como overflow: hidden
+  visible: FFValue(xs: false, md: true), // Like d-none d-md-block.
+  clip: FFValue(xs: true), // Like overflow: hidden.
 );
 ```
 
-- **`textStyle` se combina en cascada:** en `md` se juntan los `TextStyle` de `xs`, `sm` y `md`, y en cada propiedad gana el mayor. En el ejemplo, la fuente `Inter` definida en `xs` se mantiene en `md`.
-- **`color`, `fontWeight`, `fontSize` y `lineHeight` ganan sobre `textStyle`.** `color` va aparte porque un `TextStyle` no sabe del modo oscuro.
-- **`shadow`** recibe una `List<BoxShadow>` por breakpoint. `FFShadow` trae `sm`, `md` y `lg` (los de Bootstrap) y `none` para quitarla en un breakpoint mayor. La sombra va alrededor del fondo y del padding.
-- **`backgroundColor`** es un `FFValue<FFColor>`: cambia por breakpoint y cada color sigue al modo claro/oscuro.
-- **`backgroundImage`** recibe un `DecorationImage` por breakpoint (imagen, `fit`, `alignment`, opacidad…) y va encima de `backgroundColor`. Sirve para usar una imagen más liviana en el móvil.
-- **`borderRadius`** recibe un `BorderRadius` de Flutter por breakpoint, así se puede poner uno por esquina: `BorderRadius.all`, `.vertical(top: ...)`, `.horizontal(left: ...)`, `.only(...)` o `BorderRadiusDirectional` (inicio y fin, para RTL). Redondea el fondo, la sombra y el borde, y recorta el contenido a esa forma, así una imagen sin padding queda con las esquinas redondeadas. Usa `BorderRadius.all(Radius.circular(12))` en vez de `BorderRadius.circular(12)` para que el estilo pueda ser `const`.
-- **`borderWidth`** se dibuja por dentro de la caja y se suma al padding, así el contenido no queda debajo del borde.
-- **`maxHeight` limita el alto pero no agrega scroll:** si el contenido es más alto, se desborda. Para una lista o un texto largo, pon adentro un `ListView` o un `SingleChildScrollView`:
+- **`textStyle` is merged cumulatively:** at `md`, the `TextStyle`s from `xs`, `sm`, and `md` are combined, with the largest breakpoint taking precedence for each property. In the example, the `Inter` font defined at `xs` is retained at `md`.
+- **`color`, `fontWeight`, `fontSize`, and `lineHeight` override `textStyle`.** `color` is separate because `TextStyle` does not account for dark mode.
+- **`shadow`** accepts a `List<BoxShadow>` per breakpoint. `FFShadow` provides `sm`, `md`, and `lg` (Bootstrap-like values), plus `none` to remove the shadow at a larger breakpoint. The shadow surrounds the background and padding.
+- **`backgroundColor`** is an `FFValue<FFColor>`: it changes per breakpoint, and each color adapts to light or dark mode.
+- **`backgroundImage`** accepts a `DecorationImage` per breakpoint (image, `fit`, `alignment`, opacity, etc.) and is painted over `backgroundColor`. This lets you use a lighter image on mobile.
+- **`borderRadius`** accepts a Flutter `BorderRadius` per breakpoint, so each corner can be configured independently: `BorderRadius.all`, `.vertical(top: ...)`, `.horizontal(left: ...)`, `.only(...)`, or `BorderRadiusDirectional` (start and end, for RTL). It rounds the background, shadow, and border, and clips the content to that shape, so an image without padding gets rounded corners. Use `BorderRadius.all(Radius.circular(12))` instead of `BorderRadius.circular(12)` so the style can be `const`.
+- **`borderWidth`** is drawn inside the box and added to the padding so the content does not sit underneath the border.
+- **`maxHeight` limits height but does not add scrolling:** taller content overflows. For a list or long text, put a `ListView` or `SingleChildScrollView` inside:
 
 ```dart
 FFContainer(
@@ -300,7 +308,7 @@ FFContainer(
 )
 ```
 
-- **`clip`** recorta lo que no quepa, como `overflow: hidden`. El contenido toma su alto natural y lo que pase de `height` o `maxHeight` se corta, sin el aviso de overflow de Flutter. Sigue las esquinas de `borderRadius` por dentro del borde:
+- **`clip`** clips overflowing content, like `overflow: hidden`. Content uses its natural height, and anything beyond `height` or `maxHeight` is clipped without Flutter's overflow warning. It follows the `borderRadius` corners inside the border:
 
 ```dart
 FFItem(
@@ -313,23 +321,23 @@ FFItem(
 )
 ```
 
-  No lo uses con un hijo con scroll (`ListView`): ese ya recorta y necesita un alto fijo.
-- **`merge`** combina dos estilos; el segundo gana donde define algo:
+  Do not use it with a scrollable child (`ListView`): scrollables already clip and need a fixed height.
+- **`merge`** combines two styles; the second takes precedence where it defines a value:
 
 ```dart
 final hiddenCard = card.merge(const FFStyle(visible: FFValue(xs: false, lg: true)));
 ```
 
-### Texto
+### Text
 
-Para un texto suelto, `toTextStyle(context)` devuelve un `TextStyle` normal de Flutter:
+For a standalone text widget, `toTextStyle(context)` returns a regular Flutter `TextStyle`:
 
 ```dart
-Text('Título', style: title.toTextStyle(context))
+Text('Title', style: title.toTextStyle(context))
 TextField(style: title.toTextStyle(context))
 ```
 
-Para varios textos, pon el estilo en un contenedor y los `Text` de adentro lo heredan:
+For multiple text widgets, apply the style to a container and its child `Text` widgets inherit it:
 
 ```dart
 FFContainer(
@@ -339,36 +347,36 @@ FFContainer(
   ),
   child: Column(
     children: [
-      const Text('Línea 1'),                               // hereda
-      Text('Título', style: title.toTextStyle(context)),   // hereda y title cambia lo suyo
+      const Text('Line 1'),                                // Inherits the container style.
+      Text('Title', style: title.toTextStyle(context)),    // Inherits it; title overrides its own properties.
     ],
   ),
 )
 ```
 
-`toTextStyle` solo trae lo que define ese estilo, por eso se combina con lo del contenedor. `TextField` no hereda el estilo del contenedor (así funciona Flutter); usa `toTextStyle` con él.
+`toTextStyle` only includes properties defined by that style, so it combines with the container's style. `TextField` does not inherit a container's text style (that is how Flutter works); apply `toTextStyle` directly to it.
 
-### Todos los valores calculados
+### Resolved values
 
-`resolve(context)` devuelve un `WRResolvedStyle` con valores normales de Flutter (`EdgeInsets`, `TextStyle`, `Color`, etc.) para usar con cualquier widget:
+`resolve(context)` returns an `FFResolvedStyle` containing standard Flutter values (`EdgeInsets`, `TextStyle`, `Color`, etc.) that can be used with any widget:
 
 ```dart
 final s = card.resolve(context);
 Padding(padding: s.padding, child: ...)
 ```
 
-## Colores y modo oscuro
+## Colors and dark mode
 
-![La misma paleta en modo claro y oscuro](doc/colores.png)
+![The same palette in light and dark mode](doc/colores.png)
 
-La librería no tiene tema ni paleta propia: los colores se definen en tu código. Un `FFColor` puede tener versión clara y oscura:
+The package has no built-in theme or palette: define colors in your own code. An `FFColor` can have light and dark variants:
 
 ```dart
 FFColor.adaptive(light: Color(0xFFFFF7E6), dark: Color(0xFF3A2E14))
-FFColor.fixed(Color(0xFFFFFFFF)) // no cambia
+FFColor.fixed(Color(0xFFFFFFFF)) // Does not change.
 ```
 
-Lo práctico es juntarlos en una clase y usarlos en los estilos:
+It is practical to group them in a class and use them in styles:
 
 ```dart
 class AppColors {
@@ -382,19 +390,19 @@ class AppColors {
 const card = FFStyle(backgroundColor: FFValue(xs: AppColors.surface), color: AppColors.text);
 ```
 
-Fuera de un estilo, `resolve` devuelve el `Color` del modo actual:
+Outside a style, `resolve` returns the `Color` for the current mode:
 
 ```dart
 Scaffold(backgroundColor: AppColors.surface.resolve(context))
 ```
 
-El modo claro u oscuro se lee del `Theme` de la app, así que sigue al `themeMode` de tu `MaterialApp` sin configurar nada.
+Light or dark mode is read from the app's `Theme`, so it follows your `MaterialApp.themeMode` without any extra setup.
 
 ## `FFContainer`
 
-![Contenedores con maxSize 480, 800 y 1100 en xs y lg: en pantalla ancha se centran](doc/contenedor.png)
+![Containers with maxSize 480, 800, and 1100 on xs and lg: centered on wide screens](doc/contenedor.png)
 
-Ocupa todo el ancho hasta `maxSize` y se centra en pantallas más anchas. El `style` se aplica por dentro de ese ancho.
+It uses the available width up to `maxSize` and centers on wider screens. The `style` is applied inside that width.
 
 ```dart
 FFContainer(
@@ -406,21 +414,21 @@ FFContainer(
 )
 ```
 
-Sin `maxSize` ocupa todo el ancho.
+Without `maxSize`, it uses the full available width.
 
-## `FFFlex` y `FFItem`
+## `FFFlex` and `FFItem`
 
-`FFFlex` es un `row` de Bootstrap: una fila que reparte 12 columnas y baja a la siguiente fila lo que no cabe. `FFItem` es cada elemento. También puede ser vertical, en todos o en algunos breakpoints.
+`FFFlex` is like a Bootstrap `row`: it distributes 12 columns and wraps items that do not fit onto the next row. Each item is an `FFItem`. It can also be vertical at all or selected breakpoints.
 
-### Grilla: filas que se acomodan solas
+### Grid: rows that adapt automatically
 
-![La grilla en xs, md y lg: 1, 2 y 3 productos por fila](doc/flex.png)
+![The grid on xs, md, and lg: 1, 2, and 3 products per row](doc/flex.png)
 
-Por defecto es horizontal: cada hijo dice cuánto ocupa y lo que no cabe baja a la siguiente fila.
+It is horizontal by default: each child specifies how much space it uses, and anything that does not fit wraps to the next row.
 
 ```dart
 FFFlex(
-  gap: const FFValue.all(16), // entre elementos y entre filas
+  gap: const FFValue.all(16), // Between items and rows.
   children: [
     for (final p in products)
       FFItem(col: const FFValue(xs: 12, md: 6, lg: 4), child: ProductCard(p)),
@@ -428,128 +436,128 @@ FFFlex(
 )
 ```
 
-| Breakpoint | `col` | Resultado con 5 productos |
+| Breakpoint | `col` | Result with 5 products |
 |---|---|---|
-| `xs`, `sm` | 12 | 1 por fila, 5 filas |
-| `md` | 6 | 2 por fila: 1-2, 3-4, 5 |
-| `lg`, `xl` | 4 | 3 por fila: 1-2-3, 4-5 |
+| `xs`, `sm` | 12 | 1 per row, 5 rows |
+| `md` | 6 | 2 per row: 1-2, 3-4, 5 |
+| `lg`, `xl` | 4 | 3 per row: 1-2-3, 4-5 |
 
-Cada hijo puede medirse de tres formas:
+Each child can be sized in three ways:
 
-| `FFItem` | Ancho | En Bootstrap |
+| `FFItem` | Width | Bootstrap equivalent |
 |---|---|---|
-| `col: FFValue(md: 6)` | 6 de 12 columnas | `col-md-6` |
-| `fill: FFValue(md: true)` | Lo que sobra en su fila | `col` |
-| `fill: FFValue(md: false)` | Su tamaño natural | `col-auto` |
-| Ninguno | La fila completa | Hijo de `.row` sin `col` |
+| `col: FFValue(md: 6)` | 6 of 12 columns | `col-md-6` |
+| `fill: FFValue(md: true)` | Remaining space in its row | `col` |
+| `fill: FFValue(md: false)` | Natural size | `col-auto` |
+| Neither | Full row | Child of `.row` without `col` |
 
-Como un hijo sin `col` ocupa la fila completa, un `FFFlex` con hijos sin `col` los apila uno debajo del otro. Así funciona para una página, un formulario o una lista de secciones sin escribir nada más.
+Since a child without `col` occupies the full row, an `FFFlex` with children that have no `col` stacks them vertically. This works for a page, form, or list of sections without any additional configuration.
 
-Se pueden mezclar en la misma fila:
+You can mix them in the same row:
 
 ```dart
 FFFlex(
   gap: const FFValue.all(16),
   children: [
-    FFItem(col: const FFValue(xs: 12, md: 3), child: Filtros()),
-    FFItem(fill: const FFValue.all(true), child: Buscador()),
+    FFItem(col: const FFValue(xs: 12, md: 3), child: Filters()),
+    FFItem(fill: const FFValue.all(true), child: OrderSearch()),
     FFItem(
-      fill: const FFValue.all(false), // tamaño natural
+      fill: const FFValue.all(false), // Natural size.
       child: IconButton(icon: const Icon(Icons.tune), onPressed: () {}),
     ),
   ],
 )
 ```
 
-Un ejemplo común: imagen al lado del texto en el teléfono y una debajo de la otra desde `md`:
+A common example: an image next to text on phones, and stacked vertically from `md` onward:
 
 ```dart
 FFFlex(
   children: [
-    FFItem(col: const FFValue(xs: 4, md: 12), child: Imagen()),
-    FFItem(col: const FFValue(xs: 8, md: 12), child: Texto()),
+    FFItem(col: const FFValue(xs: 4, md: 12), child: ImageWidget()),
+    FFItem(col: const FFValue(xs: 8, md: 12), child: TextWidget()),
   ],
 )
 ```
 
-En `md` van los tres en una fila: filtros en 3/12, el ícono con su tamaño y el buscador con el resto. En `xs` los filtros ocupan la fila completa y el buscador y el ícono bajan a la siguiente.
+At `md`, all three fit in one row: filters use 3/12 columns, the icon takes its natural size, and the search field uses the remaining space. At `xs`, the filters use the full row, while the search field and icon wrap onto the next row.
 
-Si un `FFItem` tiene `col` y `fill`, gana el que esté definido en el breakpoint más cercano al actual. Con `col: FFValue(xs: 12)` y `fill: FFValue(md: true)`: fila completa en `xs`/`sm` y lo que sobra desde `md`. Si están en el mismo breakpoint, gana `col`.
+If an `FFItem` has both `col` and `fill`, the value defined at the closest breakpoint wins. With `col: FFValue(xs: 12)` and `fill: FFValue(md: true)`, it takes the full row on `xs`/`sm` and the remaining space from `md` onward. If both are defined at the same breakpoint, `col` wins.
 
-### Vertical
+### Vertical layout
 
-Con `direction: FFDirection.vertical` los elementos se apilan, ocupan todo el ancho y `col` se ignora. Úsalo cuando importa el alto:
+With `direction: FFDirectionEnum.vertical`, items are stacked, use the full width, and `col` is ignored. Use it when height matters:
 
-- `fill` reparte la altura que sobra, como un `Expanded` en un `Column` (solo si el `FFFlex` tiene un alto limitado).
-- `mainAxisAlignment` alinea en vertical, por ejemplo un login centrado en la pantalla o un pie empujado hasta abajo.
-- Con `crossAxisAlignment: center` apila elementos de tamaño natural centrados.
+- `fill` distributes the remaining height, like `Expanded` in a `Column` (only when `FFFlex` has a bounded height).
+- `mainAxisAlignment` aligns vertically, for example centering a login screen or pushing a footer to the bottom.
+- With `crossAxisAlignment: center`, naturally sized items are stacked and centered horizontally.
 
 ```dart
 FFFlex(
-  direction: const FFValue.all(FFDirection.vertical),
+  direction: const FFValue.all(FFDirectionEnum.vertical),
   children: [
-    const Encabezado(),
-    FFItem(fill: const FFValue.all(true), child: ListView(...)), // toma el alto libre
+    const Header(),
+    FFItem(fill: const FFValue.all(true), child: ListView(...)), // Takes the remaining height.
     const BotonGuardar(),
   ],
 )
 ```
 
-La dirección también cambia por breakpoint, por ejemplo `FFValue(xs: FFDirection.vertical, md: FFDirection.horizontal)`.
+The direction can also change per breakpoint, for example `FFValue(xs: FFDirectionEnum.vertical, md: FFDirectionEnum.horizontal)`.
 
-### Invertir el orden
+### Reverse the order
 
-`FFDirection` tiene cuatro valores, como las clases de Bootstrap:
+`FFDirectionEnum` has four values, similar to Bootstrap classes:
 
-| `FFDirection` | Bootstrap | Resultado |
+| `FFDirectionEnum` | Bootstrap | Result |
 |---|---|---|
-| `horizontal` (por defecto) | `flex-row` | Filas de 12 columnas |
-| `horizontalReverse` | `flex-row-reverse` | Igual, con los hijos en orden inverso |
-| `vertical` | `flex-column` | Apilados de arriba hacia abajo |
-| `verticalReverse` | `flex-column-reverse` | Apilados de abajo hacia arriba |
+| `horizontal` (default) | `flex-row` | 12-column rows |
+| `horizontalReverse` | `flex-row-reverse` | Same, with children in reverse order |
+| `vertical` | `flex-column` | Stacked from top to bottom |
+| `verticalReverse` | `flex-column-reverse` | Stacked from bottom to top |
 
-Por ejemplo, la imagen a la izquierda en el teléfono y a la derecha desde `md`:
+For example, show an image on the left on phones and on the right from `md` onward:
 
 ```dart
 FFFlex(
-  direction: const FFValue(xs: FFDirection.horizontal, md: FFDirection.horizontalReverse),
+  direction: const FFValue(xs: FFDirectionEnum.horizontal, md: FFDirectionEnum.horizontalReverse),
   children: [
-    FFItem(col: const FFValue(xs: 4), child: Imagen()),
-    FFItem(col: const FFValue(xs: 8), child: Texto()),
+    FFItem(col: const FFValue(xs: 4), child: ImageWidget()),
+    FFItem(col: const FFValue(xs: 8), child: TextWidget()),
   ],
 )
 ```
 
-Se invierte la lista completa: en una fila el último queda a la izquierda y, si están apilados, el último queda arriba. Primero se aplica `order` y después se invierte. Al invertir, los elementos no pierden su estado.
+The entire list is reversed: in a row, the last child moves to the left; when stacked, it moves to the top. `order` is applied before reversing. Reversing does not cause items to lose their state.
 
-### Referencia
+### Reference
 
 **`FFFlex`**
-- `direction`: un `FFDirection` por breakpoint: `horizontal` (por defecto), `horizontalReverse`, `vertical` o `verticalReverse`.
-- `gap`: separación entre elementos y, en horizontal, también entre filas.
-- `mainAxisAlignment`: por defecto `start`. En horizontal se aplica a cada fila.
-- `crossAxisAlignment`: por defecto `stretch` en vertical (los elementos ocupan todo el ancho) y `start` en horizontal. En horizontal se aplica dentro de cada fila; `stretch` iguala la altura de la fila.
-- `style`: un `FFStyle` para el contenedor.
-- `children`: pueden ser `FFItem` o cualquier widget. En horizontal, un widget que no es `FFItem` ocupa la fila completa.
+- `direction`: an `FFDirectionEnum` per breakpoint: `horizontal` (default), `horizontalReverse`, `vertical`, or `verticalReverse`.
+- `gap`: spacing between items and, in horizontal layouts, between rows.
+- `mainAxisAlignment`: defaults to `start`. In horizontal layouts, it applies to each row.
+- `crossAxisAlignment`: defaults to `stretch` in vertical layouts (items use the full width) and `start` in horizontal layouts. In horizontal layouts, it applies within each row; `stretch` makes items match the row height.
+- `style`: an `FFStyle` for the container.
+- `children`: can be `FFItem`s or any widgets. In a horizontal layout, a widget that is not an `FFItem` occupies the full row.
 
 **`FFItem`**
-- `col`: cuántas de las 12 columnas ocupa (de 1 a 12). Solo en horizontal. Sin `col` ni `fill`, ocupa la fila completa.
-- `fill`: `true` hace que ocupe el espacio que sobra en su fila; si varios lo tienen, se lo reparten en partes iguales. `false`: toma su tamaño natural (`col-auto`). Puede cambiar por breakpoint, por ejemplo `FFValue(xs: false, sm: true, lg: false)`.
-- `order`: posición dentro del `FFFlex`; los menores van primero (por defecto 0).
-- `style`: un `FFStyle`. Con `visible: false` el elemento se quita y no deja separación.
+- `col`: how many of the 12 columns it occupies (1 to 12). Horizontal layouts only. Without `col` or `fill`, it occupies the full row.
+- `fill`: `true` uses the remaining space in its row; if multiple items have it, they split that space equally. `false` uses its natural size (`col-auto`). It can change per breakpoint, for example `FFValue(xs: false, sm: true, lg: false)`.
+- `order`: position within `FFFlex`; lower values come first (defaults to 0).
+- `style`: an `FFStyle`. With `visible: false`, the item is removed and leaves no gap.
 
-**Detalles:**
-- Cada hijo se mide una vez, como en un `Row` o un `Wrap`, así que no pesa más que ellos. Como ellos, construye todos sus hijos aunque no se vean; para listas de cientos de elementos conviene `GridView.builder`.
-- Si el `FFFlex` no tiene un límite en su eje (por ejemplo, vertical dentro de un `SingleChildScrollView`), `fill` y `col` se ignoran en vez de dar error.
-- Cambiar `order` o ocultar un elemento no hace perder el estado de los demás.
-- Respeta `TextDirection.rtl`.
-- Fuera de un `FFFlex`, `FFItem` ignora `col`, `fill` y `order` y solo aplica su `style`. Sirve como un `div` con clases.
+**Details:**
+- Each child is laid out once, like in a `Row` or `Wrap`, so this is no more expensive than those widgets. As with them, all children are built even when not visible; for lists with hundreds of items, consider `GridView.builder`.
+- If `FFFlex` has an unbounded constraint along its main axis (for example, a vertical layout inside a `SingleChildScrollView`), `fill` and `col` are ignored instead of causing an error.
+- Changing `order` or hiding an item does not make other items lose their state.
+- Respects `TextDirection.rtl`.
+- Outside `FFFlex`, `FFItem` ignores `col`, `fill`, and `order, and only applies its `style`. It works like a `div` with classes.
 
-## `FFScaffold`: navegación según el breakpoint
+## `FFScaffold`: breakpoint-based navigation
 
-Funciona como un `Scaffold` (recibe `appBar`, `body`, `floatingActionButton`, `floatingActionButtonLocation` y `backgroundColor`), pero además arma la navegación según el breakpoint. El `appBar` puede ser un `AppBar` o un [`FFAppBar`](#ffappbar-app-bar-sin-el-layout).
+It works like a `Scaffold` (accepting `appBar`, `body`, `floatingActionButton`, `floatingActionButtonLocation`, and `backgroundColor`), and also builds navigation based on the breakpoint. `appBar` can be an `AppBar` or an [`FFAppBar`](#ffappbar-standalone-app-bar).
 
-![La app de ejemplo de 400 a 1800 px: barra abajo, rail y sidebar, con la grilla reacomodándose](doc/responsive.gif)
+![The example app from 400 to 1800 px: bottom bar, rail, and sidebar, with the grid adapting](doc/responsive.gif)
 
 ```dart
 class Home extends StatefulWidget {
@@ -560,48 +568,48 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  String _route = 'inicio';
+  String _route = 'home';
 
   @override
   Widget build(BuildContext context) {
     return FFScaffold(
-      appBar: AppBar(title: const Text('Mi app')),
+      appBar: AppBar(title: const Text('My app')),
       currentRoute: _route,
       onRouteSelected: (id) => setState(() => _route = id),
       destinations: const [
-        FFDestination(id: 'inicio', icon: Icon(Icons.home_outlined), label: 'Inicio'),
+        FFDestination(id: 'home', icon: Icon(Icons.home_outlined), label: 'Home'),
         FFDestination(
-          id: 'ventas',
+          id: 'sales',
           icon: Icon(Icons.storefront_outlined),
-          label: 'Ventas',
+          label: 'Sales',
           children: [
-            FFDestination(id: 'ventas/pedidos', icon: Icon(Icons.receipt_long_outlined), label: 'Pedidos'),
-            FFDestination(id: 'ventas/clientes', icon: Icon(Icons.people_outline), label: 'Clientes'),
+            FFDestination(id: 'sales/orders', icon: Icon(Icons.receipt_long_outlined), label: 'Orders'),
+            FFDestination(id: 'sales/customers', icon: Icon(Icons.people_outline), label: 'Customers'),
           ],
         ),
-        // Solo desde md
+        // Visible from md onward only.
         FFDestination(
-          id: 'reportes',
+          id: 'reports',
           icon: Icon(Icons.bar_chart_outlined),
-          label: 'Reportes',
+          label: 'Reports',
           visible: FFValue(xs: false, md: true),
         ),
-        // Grupo siempre abierto, sin flecha
+        // Always-open group, with no arrow.
         FFDestination(
-          id: 'config',
+          id: 'settings',
           icon: Icon(Icons.settings_outlined),
-          label: 'Configuración',
+          label: 'Settings',
           alwaysOpen: true,
           children: [
-            FFDestination(id: 'config/perfil', icon: Icon(Icons.person_outline), label: 'Perfil'),
+            FFDestination(id: 'settings/profile', icon: Icon(Icons.person_outline), label: 'Profile'),
           ],
         ),
       ],
 
-      // Cada breakpoint pone solo lo que cambia; el resto lo hereda
+      // Each breakpoint defines only what changes; the rest is inherited.
       responsive: const FFValue(
         xs: FFNavStyle(
-          type: FFNavigation.bottom,
+          type: FFNavigationEnum.bottom,
           backgroundColor: AppColors.surface,
           iconColor: AppColors.muted,
           labelColor: AppColors.muted,
@@ -609,8 +617,8 @@ class _HomeState extends State<Home> {
           selectedIconColor: AppColors.primary,
           selectedLabelColor: AppColors.primary,
         ),
-        md: FFNavStyle(type: FFNavigation.rail, expandMode: WRRailExpand.overlay),
-        lg: FFNavStyle(expandMode: WRRailExpand.sidebar, expanded: true),
+        md: FFNavStyle(type: FFNavigationEnum.rail, expandMode: FFRailExpandEnum.overlay),
+        lg: FFNavStyle(expandMode: FFRailExpandEnum.sidebar, expanded: true),
       ),
 
       body: pages[_route]!,
@@ -619,122 +627,122 @@ class _HomeState extends State<Home> {
 }
 ```
 
-| Breakpoint | Con el ejemplo de arriba |
+| Breakpoint | With the example above |
 |---|---|
-| `xs`, `sm` | Barra abajo con los colores de `xs`, sin Reportes |
-| `md` | Rail de íconos; ☰ abre el menú completo encima del contenido |
-| `lg`, `xl` | Menú completo abierto como sidebar, que empuja el contenido |
+| `xs`, `sm` | Bottom bar with the `xs` colors; Reports is hidden |
+| `md` | Icon rail; ☰ opens the full menu over the content |
+| `lg`, `xl` | Full menu open as a sidebar, pushing the content |
 
 **`FFNavStyle`**
 
-| Campo | Qué hace |
+| Field | What it does |
 |---|---|
-| `type` | `FFNavigation.bottom`, `rail`, `drawer` o `appBar` |
-| `expandMode` | Con rail, cómo se abre el menú completo: `WRRailExpand.overlay` o `sidebar` |
-| `expanded` | Con `sidebar`, si el menú empieza abierto |
-| `subRoutesAlwaysVisible` | Todos los grupos siempre abiertos, sin flecha |
-| `backgroundColor` | Fondo de la barra, el rail y el menú; con `appBar`, fondo del app bar si este no tiene uno |
-| `iconColor`, `labelColor` | Íconos y textos sin seleccionar |
-| `selectedBackgroundColor` | Fondo del destino seleccionado |
-| `selectedIconColor`, `selectedLabelColor` | Ícono y texto del destino seleccionado |
-| `shadow` | Sombra que separa la navegación del contenido: a la derecha del rail y del sidebar, y arriba de la barra. Por defecto no hay |
-| `shadowColor` | Color de la sombra; por defecto uno suave según el modo claro u oscuro |
+| `type` | `FFNavigationEnum.bottom`, `rail`, `drawer`, or `appBar` |
+| `expandMode` | For a rail, how the full menu opens: `FFRailExpandEnum.overlay` or `sidebar` |
+| `expanded` | Whether the menu starts open when using `sidebar` |
+| `subRoutesAlwaysVisible` | Keep all groups open, with no arrow |
+| `backgroundColor` | Background of the bar, rail, and menu; for `appBar`, the app bar background if it has none |
+| `iconColor`, `labelColor` | Unselected icons and labels |
+| `selectedBackgroundColor` | Background of the selected destination |
+| `selectedIconColor`, `selectedLabelColor` | Icon and label of the selected destination |
+| `shadow` | Shadow separating navigation from content: on the right of the rail and sidebar, and above the bar. Disabled by default |
+| `shadowColor` | Shadow color; defaults to a subtle color based on light or dark mode |
 
-- `responsive` funciona en cascada, como `FFStyle`: `lg` del ejemplo sigue siendo `rail` y usa los colores de `xs`.
-- Los colores son `FFColor`, así que cambian solos en modo oscuro. Los que no pongas usan los del `Theme`.
-- Lo que no definas sale de `FFScaffold.defaults`: barra abajo en `xs`/`sm`, rail con `overlay` en `md` y `sidebar` abierto desde `lg`.
+- `responsive` cascades like `FFStyle`: `lg` in the example remains a `rail` and uses the colors from `xs`.
+- Colors are `FFColor`, so they adapt automatically to dark mode. Any unspecified colors use the `Theme` values.
+- Unspecified settings come from `FFScaffold.defaults`: bottom bar on `xs`/`sm`, rail with `overlay` on `md`, and an open `sidebar` from `lg` onward.
 
-**Tipos de navegación (`FFNavigation`)**
-- `bottom`: barra abajo con íconos y textos (`NavigationBar`).
-- `rail`: barra lateral de íconos con un botón ☰ arriba que abre el menú completo (íconos, textos y subrutas).
-- `drawer`: menú oculto que sale desde el lado al tocar ☰ en el app bar; se cierra al elegir una opción. Si no pasas `appBar`, se pone uno vacío para que exista el botón.
-- `appBar`: enlaces dentro del app bar, después del título, como en un sitio web. Un grupo es un botón con ▾ que abre un dropdown con sus subrutas. Pensado para `md` en adelante: en pantallas angostas los enlaces que no caben se desplazan de lado. Tu `AppBar` conserva su título, `leading` y `actions`; si pasas otro `PreferredSizeWidget`, los enlaces van en una franja debajo.
+**Navigation types (`FFNavigationEnum`)**
+- `bottom`: bottom bar with icons and labels (`NavigationBar`).
+- `rail`: fixed icon rail with a ☰ button at the top to open the full menu (icons, labels, and subroutes).
+- `drawer`: hidden menu that slides in from the side when ☰ is tapped in the app bar; it closes when a destination is selected. If you do not provide an `appBar`, an empty one is added to provide the button.
+- `appBar`: links inside the app bar, after the title, like on a website. A group is a button with ▾ that opens a dropdown containing its subroutes. Intended for `md` and wider screens: on narrow screens, overflowing links scroll horizontally. Your `AppBar` keeps its title, `leading`, and `actions`; if you pass another `PreferredSizeWidget`, links appear in a strip below.
 
 ```dart
 responsive: const FFValue(
-  xs: FFNavStyle(type: FFNavigation.bottom),
-  md: FFNavStyle(type: FFNavigation.appBar),
+  xs: FFNavStyle(type: FFNavigationEnum.bottom),
+  md: FFNavStyle(type: FFNavigationEnum.appBar),
 ),
 ```
 
-**Cómo se abre el menú desde el rail (`WRRailExpand`)**
-- `overlay`: el menú sale encima del contenido, como un drawer, con fondo oscuro. Se cierra al elegir una opción o al tocar fuera.
-- `sidebar`: el rail se ensancha y empuja el contenido. Queda abierto hasta cerrarlo con ☰.
+**How the menu opens from the rail (`FFRailExpandEnum`)**
+- `overlay`: the menu appears over the content, like a drawer, with a dark backdrop. It closes when a destination is selected or the backdrop is tapped.
+- `sidebar`: the rail expands and pushes the content. It remains open until closed with ☰.
 
-**Subrutas (`children`)**
-- Un destino con `children` es un grupo: no es una página, solo agrupa. Un solo nivel.
-- En el menú completo (sidebar, overlay y drawer) se muestra como acordeón. El grupo que tiene la ruta actual se abre solo.
-- `alwaysOpen: true` deja ese grupo abierto y sin flecha; tiene prioridad sobre `subRoutesAlwaysVisible`.
-- En el app bar, cada grupo es un dropdown con sus subrutas.
-- En la barra abajo y en el rail cerrado solo se ven los grupos. En la barra, tocar un grupo lleva a su última subruta visitada (o a la primera). En el rail cerrado, abre el menú con ese grupo desplegado.
+**Subroutes (`children`)**
+- A destination with `children` is a group, not a page. Groups support one level of nesting.
+- In the full menu (sidebar, overlay, and drawer), groups appear as accordions. The group containing the current route opens automatically.
+- `alwaysOpen: true` keeps a group open with no arrow; it takes precedence over `subRoutesAlwaysVisible`.
+- In the app bar, each group is a dropdown containing its subroutes.
+- The bottom bar and collapsed rail show only groups. Tapping a group in the bottom bar navigates to its last visited subroute (or the first one). Tapping a group in the collapsed rail opens the menu with that group expanded.
 
-**Destinos por breakpoint**
-- `visible: FFValue(...)` oculta un destino o una subruta en los breakpoints que digas. Un grupo sin subrutas visibles se oculta.
+**Destinations per breakpoint**
+- `visible: FFValue(...)` hides a destination or subroute at the specified breakpoints. A group with no visible subroutes is hidden.
 
-**Marca: logo y nombre junto al ☰**
+**Branding: logo and name next to ☰**
 
 ```dart
 FFScaffold(
   brand: FFBrand(
     logo: Image.asset('assets/logo.png'),
-    title: const Text('Mi Tienda'),
-    subtitle: const Text('Admin'),       // opcional, solo en el menú
-    onTap: () => context.go('/'),        // opcional
+    title: const Text('My Store'),
+    subtitle: const Text('Admin'),       // Optional; shown only in the menu.
+    onTap: () => context.go('/'),        // Optional.
   ),
   ...
 )
 ```
 
-Se define una vez y cada navegación la acomoda:
+Define it once; each navigation type positions it accordingly:
 
-| Navegación | Dónde va |
+| Navigation | Position |
 |---|---|
-| sidebar y overlay | `☰ [logo] Mi Tienda / Admin` en el encabezado del menú |
-| rail cerrado | solo el logo, debajo del ☰ |
-| drawer | `☰ [logo] Mi Tienda` en el app bar, y la marca completa arriba del drawer (`showInDrawer: false` la quita de ahí) |
-| appBar | `[logo] Mi Tienda` antes de los enlaces |
-| bottom | `[logo] Mi Tienda` en el app bar |
+| sidebar and overlay | `☰ [logo] My Store / Admin` in the menu header |
+| collapsed rail | Logo only, below ☰ |
+| drawer | `☰ [logo] My Store` in the app bar, and full branding at the top of the drawer (`showInDrawer: false` removes it there) |
+| appBar | `[logo] My Store` before the links |
+| bottom | `[logo] My Store` in the app bar |
 
-En el app bar solo se usa si el `AppBar` no tiene `title`: el título propio siempre manda. El logo se ajusta a 28 px (32 en el rail y arriba del drawer).
+In the app bar, branding is used only if the `AppBar` has no `title`; the app bar's own title takes precedence. The logo is sized to 28 px (32 in the rail and at the top of the drawer).
 
-**Abrir el menú desde código**
-- `FFScaffold.of(context)` da `openMenu()`, `closeMenu()`, `toggleMenu()` e `isMenuOpen`. Sirve para el rail y el drawer.
+**Open the menu from code**
+- `FFScaffold.of(context)` provides `openMenu()`, `closeMenu()`, `toggleMenu()`, and `isMenuOpen`. These work with the rail and drawer.
 
-**Detalles**
-- Se usa un solo tipo por breakpoint.
-- El rail y el sidebar ocupan toda la altura de la pantalla, desde arriba. El `appBar` queda solo sobre el contenido, a su lado, y el ☰ se alinea con su título. El overlay se abre encima de todo, app bar incluido.
-- Si el usuario abre o cierra el menú con ☰, se respeta mientras siga en el mismo breakpoint. Al cambiar de breakpoint vuelve al valor de `expanded`.
-- La ruta actual (`currentRoute`) no cambia al cambiar de navegación.
+**Details**
+- Use one navigation type per breakpoint.
+- The rail and sidebar span the full screen height from the top. The `appBar` appears only above the content, alongside the rail or sidebar, and ☰ aligns with its title. The overlay appears above everything, including the app bar.
+- If the user opens or closes the menu with ☰, that choice is retained while they remain at the same breakpoint. When the breakpoint changes, the menu returns to the `expanded` value.
+- The current route (`currentRoute`) does not change when the navigation type changes.
 
-## `FFActions`: acciones del app bar
+## `FFActions`: app bar actions
 
-![El app bar en xs, md y lg: las acciones pasan de ícono a texto y al menú ⋮](doc/acciones.png)
+![The app bar on xs, md, and lg: actions switch between icons, text, and the ⋮ menu](doc/acciones.png)
 
-Cada acción decide por breakpoint si se ve con ícono y texto, solo con ícono, dentro del menú ⋮ o si no aparece. Va en `AppBar.actions` (con o sin `FFScaffold`) o en cualquier fila.
+Each action can show an icon and text, an icon only, appear in the ⋮ menu, or be hidden at each breakpoint. Use it in `AppBar.actions` (with or without `FFScaffold`) or in any row.
 
 ```dart
 AppBar(
-  title: const Text('Pedidos'),
+  title: const Text('Orders'),
   actions: [
     FFActions(
       actions: [
         FFAction(
           icon: const Icon(Icons.add),
-          label: 'Nuevo pedido',
-          onPressed: _nuevo,
-          display: const FFValue(xs: FFActionDisplay.icon, md: FFActionDisplay.full),
+          label: 'New order',
+          onPressed: _create,
+          display: const FFValue(xs: FFActionDisplayEnum.icon, md: FFActionDisplayEnum.full),
         ),
         FFAction(
           icon: const Icon(Icons.download_outlined),
-          label: 'Exportar',
-          onPressed: _exportar,
-          display: const FFValue(xs: FFActionDisplay.menu, lg: FFActionDisplay.full),
+          label: 'Export',
+          onPressed: _export,
+          display: const FFValue(xs: FFActionDisplayEnum.menu, lg: FFActionDisplayEnum.full),
         ),
         FFAction(
           icon: const Icon(Icons.print_outlined),
-          label: 'Imprimir',
-          onPressed: _imprimir,
-          display: const FFValue(xs: FFActionDisplay.hidden, md: FFActionDisplay.menu),
+          label: 'Print',
+          onPressed: _print,
+          display: const FFValue(xs: FFActionDisplayEnum.hidden, md: FFActionDisplayEnum.menu),
         ),
       ],
     ),
@@ -742,44 +750,44 @@ AppBar(
 )
 ```
 
-| | Nuevo pedido | Exportar | Imprimir |
+| | New order | Export | Print |
 |---|---|---|---|
-| `xs`, `sm` | Ícono | En ⋮ | No aparece |
-| `md` | Ícono y texto | En ⋮ | En ⋮ |
-| `lg`, `xl` | Ícono y texto | Ícono y texto | En ⋮ |
+| `xs`, `sm` | Icon | In ⋮ | Hidden |
+| `md` | Icon and text | In ⋮ | In ⋮ |
+| `lg`, `xl` | Icon and text | Icon and text | In ⋮ |
 
-**`FFActionDisplay`**
-- `full`: ícono y texto, como botón.
-- `icon`: solo el ícono; el texto queda como tooltip.
-- `menu`: dentro del menú ⋮, con ícono y texto.
-- `hidden`: no se muestra.
+**`FFActionDisplayEnum`**
+- `full`: icon and text, like a button.
+- `icon`: icon only; the text is used as a tooltip.
+- `menu`: in the ⋮ menu, with icon and text.
+- `hidden`: not shown.
 
 **Detalles**
-- `display` funciona en cascada. Sin `display`, la acción se muestra solo con el ícono.
-- El ⋮ aparece solo si alguna acción está en `menu` en ese breakpoint. `menuIcon` y `menuTooltip` cambian su ícono y su tooltip.
-- `onPressed: null` muestra la acción deshabilitada.
+- `display` cascades. Without `display`, the action appears with its icon only.
+- The ⋮ appears only if an action uses `menu` at the current breakpoint. `menuIcon` and `menuTooltip` customize its icon and tooltip.
+- `onPressed: null` displays the action as disabled.
 
-## `FFAppBar`: app bar sin el layout
+## `FFAppBar`: standalone app bar
 
-![Tres FFAppBar en xs, md y lg: marca y enlaces, título con marca y uno que se oculta en xs](doc/app-bar.png)
+![Three FFAppBars on xs, md, and lg: branding and links, a title with branding, and one hidden on xs](doc/app-bar.png)
 
-Un app bar responsive que va en el `appBar` de cualquier `Scaffold`, sin `FFScaffold`. Sirve si ya tienes tu propio layout (por ejemplo con go_router) y solo quieres que el app bar se adapte al ancho.
+A responsive app bar for the `appBar` of any `Scaffold`, without `FFScaffold`. Use it when you already have your own layout (for example, with go_router) and only want the app bar to adapt to the screen width.
 
 ```dart
 Scaffold(
   appBar: FFAppBar(
-    brand: const FFBrand(logo: Icon(Icons.storefront), title: Text('Mi Tienda')),
-    title: const Text('Pedidos'),
-    destinations: links,              // opcional: enlaces y grupos con dropdown
-    currentRoute: 'inicio',
+    brand: const FFBrand(logo: Icon(Icons.storefront), title: Text('My Store')),
+    title: const Text('Orders'),
+    destinations: links,              // Optional: links and dropdown groups.
+    currentRoute: 'home',
     onRouteSelected: (id) => context.go('/$id'),
     actions: [
-      FFAction(icon: const Icon(Icons.search), label: 'Buscar', onPressed: _buscar),
+      FFAction(icon: const Icon(Icons.search), label: 'Search', onPressed: _search),
       FFAction(
         icon: const Icon(Icons.shopping_cart),
-        label: 'Carrito',
-        onPressed: _carrito,
-        display: const FFValue(xs: FFActionDisplay.icon, lg: FFActionDisplay.full),
+        label: 'Cart',
+        onPressed: _openCart,
+        display: const FFValue(xs: FFActionDisplayEnum.icon, lg: FFActionDisplayEnum.full),
       ),
     ],
     responsive: const FFValue(
@@ -791,33 +799,32 @@ Scaffold(
 )
 ```
 
-| Parámetro | Para qué |
+| Parameter | Description |
 |---|---|
-| `brand` | Logo y nombre de la app, al inicio |
-| `title` | Después de la marca, separado por una línea. Por ejemplo, el nombre de la página |
-| `actions` | `FFAction` que cambian de forma por breakpoint, como en [`FFActions`](#ffactions-acciones-del-app-bar) |
-| `trailing` | Widgets después de las acciones, por ejemplo un avatar |
-| `destinations`, `currentRoute`, `onRouteSelected` | Enlaces después del título, con grupos en dropdown. Respetan `FFDestination.visible`. Sin `onRouteSelected` no se muestran |
-| `leading`, `automaticallyImplyLeading`, `bottom`, `toolbarHeight` | Como en `AppBar` |
-| `responsive` | `FFValue<FFAppBarStyle>`, en cascada |
+| `brand` | App logo and name, at the beginning |
+| `title` | After the branding, separated by a divider. For example, the page name |
+| `actions` | `FFAction`s that adapt per breakpoint, as in [`FFActions`](#ffactions-app-bar-actions) |
+| `trailing` | Widgets after the actions, such as an avatar |
+| `destinations`, `currentRoute`, `onRouteSelected` | Links after the title, with dropdown groups. Respects `FFDestination.visible`. Links are hidden if `onRouteSelected` is not provided |
+| `leading`, `automaticallyImplyLeading`, `bottom`, `toolbarHeight` | Same as in `AppBar` |
+| `responsive` | Cascading `FFValue<FFAppBarStyle>` |
 
 **`FFAppBarStyle`**
 
-| Propiedad | Qué cambia |
+| Property | What it changes |
 |---|---|
-| `visible` | `false` oculta el app bar completo y el contenido sube |
-| `showBrand`, `showTitle` | `false` oculta la marca o el título |
-| `centerTitle` | Marca y título al centro. Por defecto a la izquierda en todas las plataformas; con enlaces, siempre a la izquierda |
-| `backgroundColor`, `foregroundColor` | Fondo; color del título y los íconos (`FFColor`) |
-| `elevation` | Sombra |
-| `linkColor`, `selectedLinkColor`, `selectedLinkBackgroundColor` | Colores de los enlaces y del enlace de la ruta actual |
+| `visible` | `false` hides the entire app bar and moves the content up |
+| `showBrand`, `showTitle` | `false` hides the branding or title |
+| `centerTitle` | Centers the branding and title. Defaults to left-aligned on all platforms; with links, they always remain left-aligned |
+| `backgroundColor`, `foregroundColor` | Background; title and icon colors (`FFColor`) |
+| `elevation` | Shadow |
+| `linkColor`, `selectedLinkColor`, `selectedLinkBackgroundColor` | Link colors and the current route's link colors |
 
-**Dentro de `FFScaffold`**
+**Inside `FFScaffold`**
 
-Si lo pasas como `appBar` de un `FFScaffold`, toma de él lo que no definas:
-- La marca del scaffold, si el `FFAppBar` no tiene `brand` ni `title` y la navegación no es rail.
-- Con `FFNavigation.appBar`, los destinos y la ruta para los enlaces, y el fondo de la navegación.
-- Los colores de los enlaces, desde el `FFNavStyle`.
+When passed as the `appBar` of an `FFScaffold`, it inherits any properties you do not define:
+- The scaffold's branding, if `FFAppBar` has neither `brand` nor `title`, and navigation is not a rail.
+- With `FFNavigationEnum.appBar`, the destinations and route for the links, and the navigation background.
+- Link colors from `FFNavStyle`.
 
-Lo que pongas en `responsive` siempre gana. Si lo ocultas con `visible: false` y la navegación es drawer, se va también el ☰.
-
+Values set in `responsive` always take precedence. If you hide the app bar with `visible: false` while using drawer navigation, ☰ is hidden as well.

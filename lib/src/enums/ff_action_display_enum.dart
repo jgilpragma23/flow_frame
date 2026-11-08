@@ -1,14 +1,14 @@
-/// Cómo se muestra un [FFAction] en un breakpoint.
+/// How an [FFAction] is displayed at a breakpoint.
 enum FFActionDisplayEnum {
-  /// Ícono y texto, como botón.
+  /// Icon and text, like a button.
   full,
 
-  /// Solo el ícono; el texto queda como tooltip.
+  /// Icon only; the text is used as a tooltip.
   icon,
 
-  /// Dentro del menú ⋮, con ícono y texto.
+  /// In the ⋮ menu, with icon and text.
   menu,
 
-  /// No se muestra.
+  /// Hidden.
   hidden,
 }

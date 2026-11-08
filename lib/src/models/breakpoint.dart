@@ -4,10 +4,10 @@ import '../enums/breakpoint_enum.dart';
 
 export '../enums/breakpoint_enum.dart';
 
-/// Ancho mínimo (en píxeles lógicos) desde el que empieza cada breakpoint.
+/// Minimum width (in logical pixels) at which each breakpoint starts.
 ///
-/// `xs` siempre empieza en 0. Para cambiar las medidas, asigna
-/// [current] una vez antes de `runApp`:
+/// `xs` always starts at 0. To customize the thresholds, assign [current]
+/// once before `runApp`:
 ///
 /// ```dart
 /// void main() {
@@ -24,7 +24,10 @@ class FFBreakpoints {
     this.xl = 1600,
   }) : assert(0 < sm && sm < md && md < lg && lg < xl);
 
-  /// Medidas que usa la librería. Por defecto 600 / 840 / 1200 / 1600.
+  /// Thresholds used by all responsive widgets in the package.
+  ///
+  /// This configuration is global to the process. Assign it before `runApp`
+  /// to keep breakpoints consistent throughout the application.
   static FFBreakpoints current = const FFBreakpoints();
 
   final double sm;
@@ -32,7 +35,7 @@ class FFBreakpoints {
   final double lg;
   final double xl;
 
-  /// Devuelve el breakpoint que corresponde a [width].
+  /// Returns the breakpoint for [width].
   BreakpointEnum of(double width) {
     if (width >= xl) return BreakpointEnum.xl;
     if (width >= lg) return BreakpointEnum.lg;

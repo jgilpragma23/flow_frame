@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 
 import 'main.dart';
 
-/// Páginas de la sección "Librería": una por tema, para ver cómo cambia
-/// cada cosa según el breakpoint (y para las imágenes del README).
+/// Pages in the "Library" section, one per topic, demonstrating how each
+/// feature adapts per breakpoint and providing images for the README.
 
-/// Título, texto de ayuda y el contenido de la página.
+/// Page title, explanatory text, and content.
 class _DemoPage extends StatelessWidget {
   const _DemoPage({
     required this.title,
@@ -48,7 +48,7 @@ class _DemoPage extends StatelessWidget {
   }
 }
 
-/// Un texto chico y apagado, para anotar los valores.
+/// Small, subdued text for labeling values.
 class _Note extends StatelessWidget {
   const _Note(this.text);
 
@@ -67,7 +67,7 @@ class _Note extends StatelessWidget {
 String _px(FFValue<double> value, BuildContext context) =>
     '${(value.resolve(context.breakpoint) ?? 0).round()} px';
 
-// ─── Espaciado ──────────────────────────────────────────────────────────
+// ─── Spacing ─────────────────────────────────────────────────────────────
 
 const _marginColor = FFColor.adaptive(
   light: Color(0xFFFDE7C8),
@@ -78,16 +78,16 @@ const _paddingColor = FFColor.adaptive(
   dark: Color(0xFF173B26),
 );
 
-class EspaciadoDemo extends StatelessWidget {
-  const EspaciadoDemo({super.key});
+class SpacingDemo extends StatelessWidget {
+  const SpacingDemo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return _DemoPage(
-      title: 'Espaciado',
+      title: 'Spacing',
       intro:
-          'FFSpacing con un valor por breakpoint. Naranja = margin, '
-          'verde = padding, azul = contenido.',
+          'FFSpacing with a value per breakpoint. Orange = margin, '
+          'green = padding, blue = content.',
       children: [
         _legend(context),
         _box(
@@ -104,7 +104,7 @@ class EspaciadoDemo extends StatelessWidget {
         ),
         _box(
           context,
-          'margin left: xs 0 · md 64 · lg 160 (sangría)',
+          'margin left: xs 0 · md 64 · lg 160 (indentation)',
           padding: const FFValue.all(12),
           marginLeft: const FFValue(xs: 0, md: 64, lg: 160),
         ),
@@ -119,7 +119,7 @@ class EspaciadoDemo extends StatelessWidget {
       for (final (name, color) in [
         ('margin', _marginColor),
         ('padding', _paddingColor),
-        ('contenido', AppColors.primarySoft),
+        ('content', AppColors.primarySoft),
       ])
         Row(
           mainAxisSize: MainAxisSize.min,
@@ -168,7 +168,7 @@ class EspaciadoDemo extends StatelessWidget {
                 style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
               ),
               const SizedBox(height: 6),
-              _Note('ahora: $now'),
+              _Note('now: $now'),
             ],
           ),
         ),
@@ -177,7 +177,7 @@ class EspaciadoDemo extends StatelessWidget {
   }
 }
 
-// ─── Estilos ────────────────────────────────────────────────────────────
+// ─── Styles ─────────────────────────────────────────────────────────────
 
 const _badge = FFStyle(
   padding: FFSpacing(
@@ -192,14 +192,14 @@ const _badge = FFStyle(
 const _variants = [
   ('base', FFStyle()),
   (
-    'primario',
+    'primary',
     FFStyle(
       backgroundColor: FFValue(xs: AppColors.primarySoft),
       color: AppColors.primary,
     ),
   ),
   (
-    'éxito',
+    'success',
     FFStyle(
       backgroundColor: FFValue(
         xs: FFColor.adaptive(light: Color(0xFFDCFCE7), dark: Color(0xFF14361F)),
@@ -211,7 +211,7 @@ const _variants = [
     ),
   ),
   (
-    'peligro',
+    'danger',
     FFStyle(
       backgroundColor: FFValue(
         xs: FFColor.adaptive(light: Color(0xFFFEE2E2), dark: Color(0xFF451A1A)),
@@ -224,20 +224,20 @@ const _variants = [
   ),
 ];
 
-class EstilosDemo extends StatelessWidget {
-  const EstilosDemo({super.key});
+class StylesDemo extends StatelessWidget {
+  const StylesDemo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return _DemoPage(
-      title: 'Estilos',
+      title: 'Styles',
       intro:
-          'FFStyle junta texto, color, fondo, tamaño y espaciado. Cada valor '
-          'puede cambiar por breakpoint y los estilos se combinan con merge.',
+          'FFStyle combines text, color, background, size, and spacing. Each '
+          'value can change per breakpoint, and styles can be combined with merge.',
       children: [
         _section(
           context,
-          'Texto: fontSize xs 20 · md 28 · lg 40, centrado en xs',
+          'Text: fontSize xs 20 · md 28 · lg 40, centered on xs',
           const FFItem(
             style: FFStyle(
               fontSize: FFValue(xs: 20, md: 28, lg: 40),
@@ -245,28 +245,28 @@ class EstilosDemo extends StatelessWidget {
               textAlign: FFValue(xs: TextAlign.center, md: TextAlign.start),
               color: AppColors.primary,
             ),
-            child: Text('Ventas del mes'),
+            child: Text('Sales this month'),
           ),
         ),
         _section(
           context,
-          'Párrafo: fontSize xs 14 · lg 18, lineHeight xs 1.3 · lg 1.7',
+          'Paragraph: fontSize xs 14 · lg 18, lineHeight xs 1.3 · lg 1.7',
           const FFItem(
             style: FFStyle(
               fontSize: FFValue(xs: 14, lg: 18),
               lineHeight: FFValue(xs: 1.3, lg: 1.7),
             ),
             child: Text(
-              'En pantallas grandes el texto crece y respira más; en el '
-              'teléfono es más compacto para que quepa sin hacer scroll. '
-              'Todo sale del mismo FFStyle.',
+              'Text grows and has more breathing room on larger screens; on '
+              'phones it is more compact to fit without scrolling. '
+              'All of this comes from the same FFStyle.',
             ),
           ),
         ),
         _section(
           context,
-          'Variantes con _badge.merge(variante): padding y tamaño cambian '
-          'por breakpoint, el color lo pone cada variante',
+          'Variants with _badge.merge(variant): padding and size change per '
+          'breakpoint, while each variant provides its color',
           Wrap(
             spacing: 12,
             runSpacing: 12,
@@ -279,7 +279,7 @@ class EstilosDemo extends StatelessWidget {
         ),
         _section(
           context,
-          'Tamaño: width xs 100% · md 360 · lg 480, height xs 64 · md 96',
+          'Size: width xs 100% · md 360 · lg 480, height xs 64 · md 96',
           const FFItem(
             style: FFStyle(
               width: FFValue(xs: double.infinity, md: 360, lg: 480),
@@ -288,7 +288,7 @@ class EstilosDemo extends StatelessWidget {
               padding: FFSpacing(all: FFValue.all(12)),
               color: AppColors.primary,
             ),
-            child: Text('Tarjeta'),
+            child: Text('Card'),
           ),
           natural: true,
         ),
@@ -296,8 +296,8 @@ class EstilosDemo extends StatelessWidget {
     );
   }
 
-  /// Con [natural] el hijo queda con su propio ancho, a la izquierda; si no,
-  /// usa todo el ancho (para que se note el textAlign).
+  /// With [natural], the child keeps its natural width and aligns left;
+  /// otherwise it uses the full width to demonstrate `textAlign`.
   Widget _section(
     BuildContext context,
     String note,
@@ -313,10 +313,10 @@ class EstilosDemo extends StatelessWidget {
   );
 }
 
-// ─── Colores ────────────────────────────────────────────────────────────
+// ─── Colors ─────────────────────────────────────────────────────────────
 
-class ColoresDemo extends StatelessWidget {
-  const ColoresDemo({super.key});
+class ColorsDemo extends StatelessWidget {
+  const ColorsDemo({super.key});
 
   static const _palette = [
     ('background', AppColors.background),
@@ -330,10 +330,10 @@ class ColoresDemo extends StatelessWidget {
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
     return _DemoPage(
-      title: 'Colores',
+      title: 'Colors',
       intro:
-          'FFColor.adaptive(light: ..., dark: ...) elige solo según el '
-          'Theme. Ahora: modo ${dark ? 'oscuro' : 'claro'}.',
+          'FFColor.adaptive(light: ..., dark: ...) selects a color based on '
+          'the Theme. Current mode: ${dark ? 'dark' : 'light'}.',
       children: [
         FFFlex(
           direction: const FFValue.all(FFDirectionEnum.horizontal),
@@ -389,15 +389,17 @@ class ColoresDemo extends StatelessWidget {
                   fontWeight: FFValue.all(FontWeight.w700),
                   color: AppColors.primary,
                 ),
-                child: Text('Una tarjeta con la paleta'),
+                child: Text('A card using the palette'),
               ),
               const SizedBox(height: 6),
               const FFItem(
                 style: FFStyle(color: AppColors.muted),
-                child: Text('Fondo surface, título primary y texto muted.'),
+                child: Text(
+                  'Surface background, primary title, and muted text.',
+                ),
               ),
               const SizedBox(height: 12),
-              FilledButton(onPressed: () {}, child: const Text('Acción')),
+              FilledButton(onPressed: () {}, child: const Text('Action')),
             ],
           ),
         ),
@@ -409,18 +411,18 @@ class ColoresDemo extends StatelessWidget {
       '#${c.toARGB32().toRadixString(16).substring(2).toUpperCase()}';
 }
 
-// ─── Contenedor ─────────────────────────────────────────────────────────
+// ─── Container ──────────────────────────────────────────────────────────
 
-class ContenedorDemo extends StatelessWidget {
-  const ContenedorDemo({super.key});
+class ContainerDemo extends StatelessWidget {
+  const ContainerDemo({super.key});
 
   @override
   Widget build(BuildContext context) {
     return _DemoPage(
-      title: 'Contenedor',
+      title: 'Container',
       intro:
-          'FFContainer ocupa todo el ancho hasta maxSize y se centra. El '
-          'fondo gris es el espacio libre a los lados.',
+          'FFContainer uses the available width up to maxSize and centers '
+          'itself. The gray background is the free space on the sides.',
       children: [
         for (final max in [480.0, 800.0, 1100.0])
           LayoutBuilder(
@@ -435,7 +437,7 @@ class ContenedorDemo extends StatelessWidget {
                   fontWeight: FFValue.all(FontWeight.w600),
                 ),
                 child: Text(
-                  'maxSize: ${max.round()} · ancho ahora: '
+                  'maxSize: ${max.round()} · current width: '
                   '${constraints.maxWidth.clamp(0, max).round()} px',
                 ),
               ),
@@ -453,48 +455,48 @@ class AppBarDemo extends StatelessWidget {
 
   static const _brand = FFBrand(
     logo: Icon(Icons.storefront, color: Color(0xFF2563EB)),
-    title: Text('Mi Tienda'),
+    title: Text('My Store'),
   );
 
-  /// Los enlaces aparecen desde md.
+  /// Links are shown from md onward.
   static const _links = [
     FFDestination(
-      id: 'inicio',
+      id: 'home',
       icon: Icon(Icons.home_outlined),
-      label: 'Inicio',
+      label: 'Home',
       visible: FFValue(xs: false, md: true),
     ),
     FFDestination(
-      id: 'productos',
+      id: 'products',
       icon: Icon(Icons.category_outlined),
-      label: 'Productos',
+      label: 'Products',
       visible: FFValue(xs: false, md: true),
       children: [
         FFDestination(
-          id: 'productos/nuevos',
+          id: 'products/new',
           icon: Icon(Icons.fiber_new_outlined),
-          label: 'Nuevos',
+          label: 'New',
         ),
         FFDestination(
-          id: 'productos/ofertas',
+          id: 'products/offers',
           icon: Icon(Icons.local_offer_outlined),
-          label: 'Ofertas',
+          label: 'Offers',
         ),
       ],
     ),
     FFDestination(
-      id: 'contacto',
+      id: 'contact',
       icon: Icon(Icons.mail_outline),
-      label: 'Contacto',
+      label: 'Contact',
       visible: FFValue(xs: false, lg: true),
     ),
   ];
 
   static final _actions = [
-    FFAction(icon: const Icon(Icons.search), label: 'Buscar', onPressed: () {}),
+    FFAction(icon: const Icon(Icons.search), label: 'Search', onPressed: () {}),
     FFAction(
       icon: const Icon(Icons.shopping_cart),
-      label: 'Carrito',
+      label: 'Cart',
       onPressed: () {},
       display: const FFValue(
         xs: FFActionDisplayEnum.icon,
@@ -503,7 +505,7 @@ class AppBarDemo extends StatelessWidget {
     ),
     FFAction(
       icon: const Icon(Icons.help_outline),
-      label: 'Ayuda',
+      label: 'Help',
       onPressed: () {},
       display: const FFValue(
         xs: FFActionDisplayEnum.menu,
@@ -517,17 +519,17 @@ class AppBarDemo extends StatelessWidget {
     return _DemoPage(
       title: 'App bar',
       intro:
-          'FFAppBar va en el appBar de cualquier Scaffold, sin FFScaffold. '
-          'Cada caja de abajo es un Scaffold normal.',
+          'FFAppBar can be used in the appBar of any Scaffold, without '
+          'FFScaffold. Each example below is a regular Scaffold.',
       children: [
         _frame(
           context,
-          'Marca, enlaces y acciones: en xs solo la marca al centro; los '
-          'enlaces aparecen desde md y "Contacto" desde lg.',
+          'Branding, links, and actions: on xs only centered branding is '
+          'shown; links appear from md onward and "Contact" from lg.',
           FFAppBar(
             brand: _brand,
             destinations: _links,
-            currentRoute: 'inicio',
+            currentRoute: 'home',
             onRouteSelected: (_) {},
             actions: _actions,
             responsive: const FFValue(
@@ -540,11 +542,11 @@ class AppBarDemo extends StatelessWidget {
         ),
         _frame(
           context,
-          'Título de la página: en xs reemplaza a la marca; desde md van '
-          'los dos.',
+          'Page title: on xs it replaces the branding; from md onward both '
+          'are shown.',
           FFAppBar(
             brand: _brand,
-            title: const Text('Pedidos'),
+            title: const Text('Orders'),
             actions: _actions,
             responsive: const FFValue(
               xs: FFAppBarStyle(showBrand: false),
@@ -554,9 +556,9 @@ class AppBarDemo extends StatelessWidget {
         ),
         _frame(
           context,
-          'visible: oculto en xs (el contenido sube) y de color desde md.',
+          'visible: hidden on xs (content moves up) and colored from md onward.',
           const FFAppBar(
-            title: Text('Solo en tablet y escritorio'),
+            title: Text('Tablet and desktop only'),
             responsive: FFValue(
               xs: FFAppBarStyle(visible: false),
               md: FFAppBarStyle(
@@ -585,7 +587,7 @@ class AppBarDemo extends StatelessWidget {
             backgroundColor: AppColors.primarySoft.resolve(context),
             body: const Padding(
               padding: EdgeInsets.all(16),
-              child: Text('Contenido de la página'),
+              child: Text('Page content'),
             ),
           ),
         ),

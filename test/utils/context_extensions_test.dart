@@ -58,6 +58,26 @@ void main() {
     }
   });
 
+  testWidgets('usa los umbrales personalizados por el consumidor', (
+    tester,
+  ) async {
+    final previousBreakpoints = FFBreakpoints.current;
+    addTearDown(() => FFBreakpoints.current = previousBreakpoints);
+    FFBreakpoints.current = const FFBreakpoints(
+      sm: 500,
+      md: 700,
+      lg: 900,
+      xl: 1100,
+    );
+    size = Size(800, 600);
+    sut = buildSut();
+    setViewport(tester, size);
+
+    await tester.pumpWidget(sut);
+
+    expect(find.text(BreakpointEnum.md.name), findsOneWidget);
+  });
+
   testWidgets('responsive hereda el último valor definido y permite null', (
     tester,
   ) async {

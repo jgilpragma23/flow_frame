@@ -1,6 +1,6 @@
 import '../models/breakpoint.dart';
 
-/// Rangos de ancho de pantalla, ordenados de menor a mayor.
+/// Screen-width ranges, ordered from smallest to largest.
 enum BreakpointEnum {
   xs,
   sm,
@@ -8,7 +8,7 @@ enum BreakpointEnum {
   lg,
   xl;
 
-  /// El breakpoint que corresponde a [width], según [FFBreakpoints.current].
+  /// The breakpoint for [width], according to [FFBreakpoints.current].
   static BreakpointEnum fromWidth(double width) =>
       FFBreakpoints.current.of(width);
 

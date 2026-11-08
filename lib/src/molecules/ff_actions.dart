@@ -4,11 +4,11 @@ import '../enums/ff_action_display_enum.dart';
 import '../models/ff_action.dart';
 import '../utils/context_extensions.dart';
 
-/// Acciones que cambian de forma según el breakpoint: ícono y texto, solo
-/// ícono, dentro del menú ⋮ u ocultas.
+/// Actions that adapt per breakpoint: icon and text, icon only, in the ⋮
+/// menu, or hidden.
 ///
-/// Va en `AppBar.actions` (o en cualquier fila). El ⋮ aparece solo si
-/// alguna acción está en [FFActionDisplayEnum.menu] en el breakpoint actual.
+/// Use in `AppBar.actions` (or any row). The ⋮ appears only if an action uses
+/// [FFActionDisplayEnum.menu] at the current breakpoint.
 class FFActions extends StatelessWidget {
   const FFActions({
     super.key,
@@ -19,7 +19,7 @@ class FFActions extends StatelessWidget {
 
   final List<FFAction> actions;
 
-  /// Ícono del botón que abre el menú.
+  /// Icon of the button that opens the menu.
   final Widget menuIcon;
   final String menuTooltip;
 

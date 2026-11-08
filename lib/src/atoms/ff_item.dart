@@ -4,14 +4,15 @@ import '../models/ff_style.dart';
 import '../models/ff_value.dart';
 import '../utils/ff_style_builder.dart';
 
-/// Un elemento con estilo responsive, como un `div` con clases.
+/// A responsive item with styling, like a `div` with classes.
 ///
-/// Dentro de un `FFFlex`, [col] y [fill] definen su ancho y [order] cambia
-/// la posición. Fuera de un `FFFlex` esos tres se ignoran y solo se aplica
-/// [style].
+/// Inside an `FFFlex`, [col] and [fill] define its width, and [order] changes
+/// its position. Outside an `FFFlex`, these three properties are ignored and
+/// only [style] is applied.
 ///
-/// Si en un breakpoint hay [col] y [fill], gana el que esté definido en el
-/// breakpoint más cercano al actual; si están en el mismo, gana [col].
+/// If [col] and [fill] are both defined, the value from the breakpoint closest
+/// to the current one takes precedence; if both are defined at the same
+/// breakpoint, [col] takes precedence.
 class FFItem extends StatelessWidget {
   const FFItem({
     super.key,
@@ -22,18 +23,18 @@ class FFItem extends StatelessWidget {
     required this.child,
   });
 
-  /// Cuántas de las 12 columnas ocupa en un `FFFlex` horizontal (como
-  /// `col-md-6`). Lo que no cabe en la fila baja a la siguiente. Valores de
-  /// 1 a 12. Sin `col` ni [fill] ocupa la fila completa (12). En un
-  /// `FFFlex` vertical se ignora.
+  /// How many of the 12 columns this item occupies in a horizontal `FFFlex`
+  /// (like `col-md-6`). Items that do not fit wrap to the next row. Values
+  /// range from 1 to 12. Without `col` or [fill], it occupies the full row
+  /// (12). Ignored in a vertical `FFFlex`.
   final FFValue<int>? col;
 
-  /// `true`: ocupa el espacio libre en su fila (o en la columna, si el
-  /// `FFFlex` es vertical); si varios lo tienen, se lo reparten en partes
-  /// iguales. `false`: toma su tamaño natural, como `col-auto`.
+  /// `true`: occupies the remaining space in its row (or column, for a
+  /// vertical `FFFlex`); if multiple items use it, they split the space
+  /// equally. `false`: uses its natural size, like `col-auto`.
   final FFValue<bool>? fill;
 
-  /// Posición dentro del `FFFlex`; los menores van primero. Por defecto 0.
+  /// Position within the `FFFlex`; lower values come first. Defaults to 0.
   final FFValue<int>? order;
   final FFStyle? style;
   final Widget child;
@@ -44,9 +45,9 @@ class FFItem extends StatelessWidget {
     if (s == null || (s.width == null && s.maxWidth == null)) {
       return buildFFStyle(context, style, child);
     }
-    // En un `FFFlex` la columna llega con un ancho fijo. Se suelta para que
-    // el ancho del style limite la caja, al inicio de su columna, y el
-    // contenido llena ese ancho como un bloque.
+    // The column has a fixed width in `FFFlex`. Release it so the style can
+    // constrain the box at the start of its column, while the content fills
+    // that width like a block.
     return Align(
       alignment: AlignmentDirectional.topStart,
       heightFactor: 1,

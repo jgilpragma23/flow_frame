@@ -1,3 +1,10 @@
-# flow_frame_example
+# flow_frame example
 
-A new Flutter project.
+This Flutter app demonstrates the responsive widgets and navigation provided
+by the `flow_frame` package.
+
+Run the example with:
+
+```bash
+flutter run
+```

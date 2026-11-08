@@ -2,15 +2,15 @@ import 'package:flutter/widgets.dart';
 
 import 'breakpoint.dart';
 
-/// Un valor que cambia según el breakpoint, con cascada mobile-first.
+/// A value that changes per breakpoint, with mobile-first cascading.
 ///
-/// Cada valor aplica desde su breakpoint hacia arriba hasta que otro lo
-/// reemplace: `FFValue(xs: 8, md: 16)` da 8 en `xs`/`sm` y 16 en `md`/`lg`/`xl`.
+/// Each value applies from its breakpoint upward until another one replaces
+/// it: `FFValue(xs: 8, md: 16)` gives 8 on `xs`/`sm` and 16 on `md`/`lg`/`xl`.
 @immutable
 class FFValue<T> {
   const FFValue({this.xs, this.sm, this.md, this.lg, this.xl});
 
-  /// El mismo valor en todos los breakpoints.
+  /// The same value at every breakpoint.
   const FFValue.all(T value)
     : xs = value,
       sm = null,
@@ -24,7 +24,7 @@ class FFValue<T> {
   final T? lg;
   final T? xl;
 
-  /// Valor definido exactamente en [breakpoint], sin cascada.
+  /// Value defined exactly at [breakpoint], without cascading.
   T? at(BreakpointEnum breakpoint) => switch (breakpoint) {
     BreakpointEnum.xs => xs,
     BreakpointEnum.sm => sm,
@@ -33,8 +33,8 @@ class FFValue<T> {
     BreakpointEnum.xl => xl,
   };
 
-  /// Valor para [breakpoint], o `null` si no hay ninguno definido en él
-  /// ni en los breakpoints menores.
+  /// Value for [breakpoint], or `null` if none is defined there or at a
+  /// smaller breakpoint.
   T? resolve(BreakpointEnum breakpoint) {
     for (var i = breakpoint.index; i >= 0; i--) {
       final value = at(BreakpointEnum.values[i]);
@@ -43,7 +43,8 @@ class FFValue<T> {
     return null;
   }
 
-  /// Combina breakpoint por breakpoint; [other] gana donde define un valor.
+  /// Merges breakpoint by breakpoint; [other] takes precedence where it
+  /// defines a value.
   FFValue<T> merge(FFValue<T>? other) {
     if (other == null) return this;
     return FFValue(
@@ -55,7 +56,7 @@ class FFValue<T> {
     );
   }
 
-  /// Como [merge], pero acepta que cualquiera de los dos sea `null`.
+  /// Like [merge], but accepts either value being `null`.
   static FFValue<T>? combine<T>(FFValue<T>? a, FFValue<T>? b) =>
       a == null ? b : a.merge(b);
 
@@ -73,8 +74,8 @@ class FFValue<T> {
 }
 
 extension FFTextStyleValue on FFValue<TextStyle> {
-  /// Combina los estilos desde `xs` hasta [breakpoint]; en cada propiedad
-  /// gana el breakpoint mayor.
+  /// Merges styles from `xs` through [breakpoint]; the value from the largest
+  /// breakpoint takes precedence for each property.
   TextStyle? resolveMerged(BreakpointEnum breakpoint) {
     TextStyle? result;
     for (var i = 0; i <= breakpoint.index; i++) {
@@ -84,8 +85,8 @@ extension FFTextStyleValue on FFValue<TextStyle> {
     return result;
   }
 
-  /// Combina breakpoint por breakpoint; en el mismo breakpoint los estilos
-  /// se mezclan y [other] gana en lo que define.
+  /// Merges breakpoint by breakpoint; styles defined at the same breakpoint
+  /// are merged, with [other] taking precedence where it defines a value.
   FFValue<TextStyle> mergeStyles(FFValue<TextStyle>? other) {
     if (other == null) return this;
     TextStyle? m(TextStyle? a, TextStyle? b) => a?.merge(b) ?? b;

@@ -11,17 +11,16 @@ import 'ff_actions.dart';
 
 const _duration = Duration(milliseconds: 220);
 
-/// Un `AppBar` responsive que se usa solo, en el `appBar` de cualquier
-/// `Scaffold`, sin el layout de `FFScaffold`.
+/// A standalone responsive `AppBar` for the `appBar` of any `Scaffold`,
+/// without the `FFScaffold` layout.
 ///
-/// Junta la marca, el título, enlaces de navegación (con grupos en
-/// dropdown) y acciones que se acomodan por breakpoint. Con [responsive]
-/// se oculta completo, se quita la marca o el título y se cambian los
-/// colores en cada breakpoint.
+/// Combines branding, a title, navigation links (with dropdown groups), and
+/// actions that adapt per breakpoint. [responsive] can hide the entire bar
+/// or its branding or title, and change its colors at each breakpoint.
 ///
-/// Dentro de un `FFScaffold` recibe de él lo que no defina: la marca (si
-/// no tiene [title]), los destinos y la ruta para los enlaces con
-/// `FFNavigationEnum.appBar`, y los colores del `FFNavStyle`.
+/// Inside an `FFScaffold`, inherits any unspecified values: branding (if it
+/// has no [title]), destinations and route for links with
+/// `FFNavigationEnum.appBar`, and colors from `FFNavStyle`.
 class FFAppBar extends StatelessWidget implements PreferredSizeWidget {
   const FFAppBar({
     super.key,
@@ -39,29 +38,29 @@ class FFAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.toolbarHeight,
   });
 
-  /// Logo y nombre de la app, al inicio.
+  /// App logo and name, at the beginning.
   final FFBrand? brand;
 
-  /// Después de la marca, por ejemplo el nombre de la página.
+  /// After the branding, for example, the page name.
   final Widget? title;
   final Widget? leading;
   final bool automaticallyImplyLeading;
 
-  /// Acciones que cambian de forma por breakpoint, como en `FFActions`.
+  /// Actions that adapt per breakpoint, as in `FFActions`.
   final List<FFAction> actions;
 
-  /// Widgets después de [actions], por ejemplo un avatar.
+  /// Widgets after [actions], such as an avatar.
   final List<Widget> trailing;
 
-  /// Enlaces después del título. Se muestran solo si hay
-  /// [onRouteSelected]; respetan `FFDestination.visible`.
+  /// Links after the title. Shown only if [onRouteSelected] is provided;
+  /// respects `FFDestination.visible`.
   final List<FFDestination> destinations;
 
-  /// `id` de la ruta actual, para marcar su enlace.
+  /// `id` of the current route, used to highlight its link.
   final String? currentRoute;
   final ValueChanged<String>? onRouteSelected;
 
-  /// Visibilidad, marca, título y colores por breakpoint, en cascada.
+  /// Visibility, branding, title, and colors per breakpoint, with cascading.
   final FFValue<FFAppBarStyle>? responsive;
   final PreferredSizeWidget? bottom;
   final double? toolbarHeight;
@@ -71,7 +70,7 @@ class FFAppBar extends StatelessWidget implements PreferredSizeWidget {
     (toolbarHeight ?? kToolbarHeight) + (bottom?.preferredSize.height ?? 0),
   );
 
-  /// Una copia con los valores dados reemplazados.
+  /// A copy with the provided values replaced.
   FFAppBar copyWith({
     FFBrand? brand,
     Widget? title,
@@ -100,8 +99,8 @@ class FFAppBar extends StatelessWidget implements PreferredSizeWidget {
     final breakpoint = context.breakpoint;
     final style =
         responsive?.resolveMerged(breakpoint) ?? const FFAppBarStyle();
-    // Oculto deja solo el espacio de la barra de estado, que el Scaffold
-    // ya no agrega al cuerpo.
+    // When hidden, keep only the status bar space, which Scaffold no longer
+    // adds to the body.
     if (style.visible == false) {
       return SizedBox(height: MediaQuery.paddingOf(context).top);
     }
@@ -174,8 +173,8 @@ class FFAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-/// Quita los destinos ocultos en [breakpoint] y los grupos que se quedan
-/// sin subrutas visibles.
+/// Removes destinations hidden at [breakpoint] and groups with no visible
+/// subroutes.
 List<FFDestination> visibleDestinations(
   List<FFDestination> destinations,
   BreakpointEnum breakpoint,
@@ -207,7 +206,7 @@ List<FFDestination> visibleDestinations(
   ];
 }
 
-/// Logo y título de [brand] en una fila, para el app bar.
+/// Logo and title from [brand] in a row for the app bar.
 class FFBrandBar extends StatelessWidget {
   const FFBrandBar({super.key, required this.brand});
 
@@ -228,13 +227,13 @@ class FFBrandBar extends StatelessWidget {
   );
 }
 
-/// [logo] en un cuadrado de [size].
+/// Fits [logo] into a square of [size].
 Widget brandLogo(Widget logo, double size) => SizedBox.square(
   dimension: size,
   child: FittedBox(child: logo),
 );
 
-/// [child] con efecto al tocar si hay [onTap].
+/// Makes [child] tappable if [onTap] is provided.
 Widget brandTappable(VoidCallback? onTap, Widget child) => onTap == null
     ? child
     : InkWell(
@@ -243,8 +242,8 @@ Widget brandTappable(VoidCallback? onTap, Widget child) => onTap == null
         child: child,
       );
 
-/// Enlaces en fila, como en un sitio web. Un grupo es un botón con ▾ que
-/// abre un dropdown con sus subrutas.
+/// Links in a row, like on a website. A group is a button with ▾ that opens a
+/// dropdown containing its subroutes.
 class FFNavLinks extends StatelessWidget {
   const FFNavLinks({
     super.key,
@@ -258,7 +257,7 @@ class FFNavLinks extends StatelessWidget {
     this.selectedBackgroundColor,
   });
 
-  /// Ya filtrados con [visibleDestinations].
+  /// Already filtered by [visibleDestinations].
   final List<FFDestination> items;
   final String? currentRoute;
   final ValueChanged<String> onSelected;

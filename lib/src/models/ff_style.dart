@@ -5,10 +5,10 @@ import 'ff_color.dart';
 import 'ff_spacing.dart';
 import 'ff_value.dart';
 
-/// Estilo responsive reutilizable, parecido a una clase de CSS.
+/// Reusable responsive style, similar to a CSS class.
 ///
-/// Para el texto, [textStyle] es la base y [color], [fontWeight], [fontSize]
-/// y [lineHeight] se aplican encima.
+/// For text, [textStyle] is the base, with [color], [fontWeight], [fontSize],
+/// and [lineHeight] applied on top.
 @immutable
 class FFStyle {
   const FFStyle({
@@ -38,43 +38,43 @@ class FFStyle {
   final FFSpacing? padding;
   final FFSpacing? margin;
 
-  /// Estilo de texto base. En cada breakpoint se combinan los estilos desde
-  /// `xs`, así que lo que se define en `xs` no se pierde en `md`.
+  /// Base text style. Styles are merged from `xs` at each breakpoint, so
+  /// values defined at `xs` are retained at `md`.
   final FFValue<TextStyle>? textStyle;
 
-  /// Color del texto; sigue al modo claro/oscuro.
+  /// Text color; adapts to light and dark modes.
   final FFColor? color;
   final FFValue<FontWeight>? fontWeight;
   final FFValue<double>? fontSize;
 
-  /// Alto de línea, como múltiplo del tamaño de la fuente.
+  /// Line height as a multiple of the font size.
   final FFValue<double>? lineHeight;
   final FFValue<TextAlign>? textAlign;
 
-  /// Color de fondo por breakpoint; cada `FFColor` sigue al modo
-  /// claro/oscuro.
+  /// Background color per breakpoint; each `FFColor` adapts to light and dark
+  /// modes.
   final FFValue<FFColor>? backgroundColor;
 
-  /// Imagen de fondo por breakpoint, encima de [backgroundColor]. Con
-  /// `DecorationImage` se elige `fit`, `alignment`, opacidad, etc.
+  /// Background image per breakpoint, painted over [backgroundColor]. Use
+  /// `DecorationImage` to configure `fit`, `alignment`, opacity, and more.
   final FFValue<DecorationImage>? backgroundImage;
 
-  /// Sombra por breakpoint. Hay listas en `FFShadow`; `FFShadow.none` la
-  /// quita en un breakpoint mayor.
+  /// Shadow per breakpoint. `FFShadow` provides lists of shadows;
+  /// `FFShadow.none` removes the shadow at a larger breakpoint.
   final FFValue<List<BoxShadow>>? shadow;
 
-  /// Esquinas por breakpoint, con un `BorderRadius` de Flutter: iguales
-  /// (`BorderRadius.all(Radius.circular(12))`), solo arriba
-  /// (`BorderRadius.vertical(top: ...)`) o una por esquina
-  /// (`BorderRadius.only(...)`, o `BorderRadiusDirectional` para inicio y
-  /// fin). Redondea el fondo, la sombra y el borde, y recorta el contenido
-  /// a esa forma.
+  /// Corners per breakpoint, using Flutter's `BorderRadius`: all equal
+  /// (`BorderRadius.all(Radius.circular(12))`), top only
+  /// (`BorderRadius.vertical(top: ...)`), or independently configured
+  /// (`BorderRadius.only(...)` or `BorderRadiusDirectional` for start and
+  /// end). Rounds the background, shadow, and border, and clips content to
+  /// that shape.
   final FFValue<BorderRadiusGeometry>? borderRadius;
 
-  /// Grosor del borde. Se suma al padding, así el contenido no lo tapa.
+  /// Border width. Added to the padding so the content does not overlap it.
   final FFValue<double>? borderWidth;
 
-  /// Color del borde. Por defecto `outlineVariant` del tema.
+  /// Border color. Defaults to the theme's `outlineVariant`.
   final FFColor? borderColor;
 
   final FFValue<double>? width;
@@ -82,20 +82,20 @@ class FFStyle {
   final FFValue<double>? maxWidth;
   final FFValue<double>? height;
 
-  /// Alto máximo. Lo que no quepa se desborda, así que para contenido largo
-  /// conviene que el hijo tenga scroll (por ejemplo un `ListView`).
+  /// Maximum height. Content that does not fit overflows, so long content
+  /// should use a scrollable child (for example, a `ListView`).
   final FFValue<double>? maxHeight;
 
-  /// `false` oculta el widget en ese breakpoint (equivale a `d-none`).
+  /// `false` hides the widget at that breakpoint (equivalent to `d-none`).
   final FFValue<bool>? visible;
 
-  /// `true` recorta lo que no quepa, como `overflow: hidden`: el contenido
-  /// toma su alto natural y lo que pase de [height] o [maxHeight] se corta
-  /// en el borde del padding, siguiendo [borderRadius]. No sirve para hijos
-  /// con scroll (`ListView`), que necesitan un alto fijo.
+  /// `true` clips overflowing content, like `overflow: hidden`: content uses
+  /// its natural height, and anything beyond [height] or [maxHeight] is
+  /// clipped at the padding edge, following [borderRadius]. Not suitable for
+  /// scrollable children (`ListView`), which need a fixed height.
   final FFValue<bool>? clip;
 
-  /// Combina dos estilos; [other] gana donde define algo.
+  /// Combines two styles; [other] takes precedence where it defines a value.
   FFStyle merge(FFStyle? other) {
     if (other == null) return this;
     return FFStyle(
@@ -123,9 +123,9 @@ class FFStyle {
     );
   }
 
-  /// `TextStyle` de Flutter con lo que define este estilo para el breakpoint
-  /// y el modo actuales. No incluye lo heredado de los contenedores, así que
-  /// al usarlo en un `Text` se combina con el estilo del contenedor.
+  /// Flutter `TextStyle` with the values defined by this style for the
+  /// current breakpoint and theme mode. Does not include inherited container
+  /// styles, so a `Text` using it combines with its container's style.
   TextStyle toTextStyle(BuildContext context) {
     final breakpoint = context.breakpoint;
     final base = textStyle?.resolveMerged(breakpoint) ?? const TextStyle();
@@ -137,7 +137,7 @@ class FFStyle {
     );
   }
 
-  /// Todos los valores ya calculados para el breakpoint y el modo actuales.
+  /// All values resolved for the current breakpoint and theme mode.
   FFResolvedStyle resolve(BuildContext context) {
     final breakpoint = context.breakpoint;
     return FFResolvedStyle(
@@ -168,7 +168,7 @@ class FFStyle {
   }
 }
 
-/// Un [FFStyle] con valores normales de Flutter, ya calculados.
+/// An [FFStyle] with values resolved to standard Flutter types.
 @immutable
 class FFResolvedStyle {
   const FFResolvedStyle({

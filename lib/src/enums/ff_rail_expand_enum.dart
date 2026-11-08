@@ -1,10 +1,10 @@
-/// Cómo se abre el menú completo (con textos y acordeón) desde el rail.
+/// How the full menu (with labels and accordion groups) opens from the rail.
 enum FFRailExpandEnum {
-  /// Se abre un drawer encima del contenido, que no se mueve. Se cierra al
-  /// elegir una opción o al tocar fuera.
+  /// Opens a drawer over the content without moving it. Closes when a
+  /// destination is selected or the area outside is tapped.
   overlay,
 
-  /// El rail se ensancha y empuja el contenido. Queda abierto hasta que se
-  /// cierre con ☰.
+  /// The rail expands and pushes the content. It remains open until closed
+  /// with ☰.
   sidebar,
 }

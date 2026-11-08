@@ -1,21 +1,21 @@
 import 'ff_rail_expand_enum.dart';
 
-/// Tipo de navegación de un `FFScaffold`. Se elige uno por breakpoint.
+/// Navigation type for an `FFScaffold`. Choose one per breakpoint.
 enum FFNavigationEnum {
-  /// Barra abajo con íconos y textos (`NavigationBar`). Las subrutas no se
-  /// muestran: tocar un grupo lleva a su última subruta visitada (o a la
-  /// primera).
+  /// Bottom bar with icons and labels (`NavigationBar`). Subroutes are not
+  /// shown; tapping a group navigates to its last visited subroute (or the
+  /// first one).
   bottom,
 
-  /// Barra lateral fija de íconos con un botón ☰ que abre el menú completo,
-  /// encima del contenido o empujándolo según [FFRailExpandEnum].
+  /// Fixed icon rail with a ☰ button that opens the full menu over the
+  /// content or pushes it, depending on [FFRailExpandEnum].
   rail,
 
-  /// Menú oculto que sale desde el lado al tocar ☰ en el app bar.
+  /// Hidden menu that slides in from the side when ☰ is tapped in the app bar.
   drawer,
 
-  /// Enlaces dentro del app bar, después del título, como en un sitio web.
-  /// Un grupo es un botón con ▾ que abre un dropdown con sus subrutas.
-  /// Pensado para pantallas medianas y grandes.
+  /// Links inside the app bar, after the title, like on a website. A group is
+  /// a button with ▾ that opens a dropdown containing its subroutes.
+  /// Intended for medium and large screens.
   appBar,
 }

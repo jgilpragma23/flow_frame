@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-/// Un color, opcionalmente con una versión para el modo oscuro.
+/// A color, optionally with a dark-mode variant.
 ///
-/// El modo se lee del `Theme` de la app (`MaterialApp.themeMode`); la
-/// librería no tiene configuración propia de colores.
+/// The mode is read from the app's `Theme` (`MaterialApp.themeMode`); the
+/// package has no separate color configuration.
 @immutable
 class FFColor {
-  /// Un color que no cambia con el modo.
+  /// A color that does not change with the mode.
   const FFColor.fixed(Color color) : this.adaptive(light: color, dark: color);
 
-  /// Un color con su versión para el modo claro y para el oscuro.
+  /// A color with light- and dark-mode variants.
   const FFColor.adaptive({required Color light, required Color dark})
     : _light = light,
       _dark = dark;

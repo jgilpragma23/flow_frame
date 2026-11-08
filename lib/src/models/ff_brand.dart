@@ -1,17 +1,17 @@
 import 'package:flutter/widgets.dart';
 
-/// La marca de la app (logo y nombre) que acompaña al botón ☰ de un
-/// `FFScaffold`. Se define una vez y cada tipo de navegación la acomoda:
+/// App branding (logo and name) displayed alongside the ☰ button in an
+/// `FFScaffold`. Define it once; each navigation type positions it:
 ///
-/// - sidebar y overlay: logo, [title] y [subtitle] en el encabezado del menú;
-/// - rail cerrado: solo el [logo], debajo del ☰;
-/// - drawer: logo y [title] en el app bar, y la marca completa arriba del
-///   drawer (si [showInDrawer]);
-/// - appBar: logo y [title] antes de los enlaces;
-/// - bottom: logo y [title] en el app bar.
+/// - sidebar and overlay: logo, [title], and [subtitle] in the menu header;
+/// - collapsed rail: only the [logo], below ☰;
+/// - drawer: logo and [title] in the app bar, and full branding at the top of
+///   the drawer (if [showInDrawer]);
+/// - appBar: logo and [title] before the links;
+/// - bottom: logo and [title] in the app bar.
 ///
-/// En el app bar solo se usa si el `AppBar` no tiene `title`; el título
-/// propio siempre manda.
+/// In the app bar, branding is used only if the `AppBar` has no `title`; its
+/// own title takes precedence.
 @immutable
 class FFBrand {
   const FFBrand({
@@ -22,17 +22,17 @@ class FFBrand {
     this.showInDrawer = true,
   }) : assert(logo != null || title != null);
 
-  /// Ícono o imagen; en el rail cerrado es lo único que se muestra.
+  /// Icon or image; the only element displayed in a collapsed rail.
   final Widget? logo;
   final Widget? title;
 
-  /// Debajo de [title], solo en el menú (sidebar, overlay y drawer).
+  /// Below [title], only in the menu (sidebar, overlay, and drawer).
   final Widget? subtitle;
 
-  /// Por ejemplo, ir al inicio.
+  /// For example, to navigate to the home page.
   final VoidCallback? onTap;
 
-  /// Con `FFNavigationEnum.drawer`, si se repite arriba dentro del drawer
-  /// además del app bar.
+  /// With `FFNavigationEnum.drawer`, whether to repeat branding at the top of
+  /// the drawer in addition to the app bar.
   final bool showInDrawer;
 }

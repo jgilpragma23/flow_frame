@@ -4,9 +4,9 @@ import 'breakpoint.dart';
 import 'ff_color.dart';
 import 'ff_value.dart';
 
-/// Cómo se ve un `FFAppBar` en un breakpoint. Se usa dentro de un
-/// `FFValue`, en cascada: cada breakpoint pone solo lo que cambia y hereda
-/// el resto de los menores.
+/// Appearance of an `FFAppBar` at a breakpoint. Used inside an `FFValue` with
+/// cascading behavior: each breakpoint defines only what changes and
+/// inherits the rest from smaller breakpoints.
 @immutable
 class FFAppBarStyle {
   const FFAppBarStyle({
@@ -22,33 +22,33 @@ class FFAppBarStyle {
     this.selectedLinkBackgroundColor,
   });
 
-  /// `false` oculta el app bar completo y el contenido sube. Por defecto
-  /// visible.
+  /// `false` hides the entire app bar and moves the content up. Visible by
+  /// default.
   final bool? visible;
 
-  /// `false` oculta la marca. Por defecto visible.
+  /// `false` hides the branding. Visible by default.
   final bool? showBrand;
 
-  /// `false` oculta el título. Por defecto visible.
+  /// `false` hides the title. Visible by default.
   final bool? showTitle;
 
-  /// Si la marca y el título van al centro. Por defecto a la izquierda, en
-  /// todas las plataformas; con enlaces siempre van a la izquierda.
+  /// Whether to center the branding and title. Defaults to left-aligned on
+  /// all platforms; with links, they always remain left-aligned.
   final bool? centerTitle;
   final FFColor? backgroundColor;
 
-  /// Color de los íconos y del texto del título.
+  /// Color of the icons and title text.
   final FFColor? foregroundColor;
   final double? elevation;
 
-  /// Texto e íconos de los enlaces.
+  /// Link text and icons.
   final FFColor? linkColor;
   final FFColor? selectedLinkColor;
 
-  /// Fondo del enlace de la ruta actual.
+  /// Background of the current route's link.
   final FFColor? selectedLinkBackgroundColor;
 
-  /// Los valores de [other] reemplazan a los de este, salvo los `null`.
+  /// Values from [other] replace these values, except when they are `null`.
   FFAppBarStyle merge(FFAppBarStyle? other) {
     if (other == null) return this;
     return FFAppBarStyle(
@@ -95,9 +95,9 @@ class FFAppBarStyle {
   );
 }
 
-/// Combina en cascada los [FFAppBarStyle] de un `FFValue`.
+/// Cascading merge of [FFAppBarStyle] values from an `FFValue`.
 extension FFAppBarStyleValue on FFValue<FFAppBarStyle> {
-  /// Une los estilos desde `xs` hasta [breakpoint]; los mayores ganan.
+  /// Merges styles from `xs` through [breakpoint]; larger breakpoints win.
   FFAppBarStyle resolveMerged(BreakpointEnum breakpoint) {
     var result = const FFAppBarStyle();
     for (var i = 0; i <= breakpoint.index; i++) {

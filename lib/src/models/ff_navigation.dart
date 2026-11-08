@@ -9,9 +9,9 @@ import 'ff_value.dart';
 export '../enums/ff_navigation_enum.dart';
 export '../enums/ff_rail_expand_enum.dart';
 
-/// Cómo se ve y se comporta la navegación de un `FFScaffold` en un
-/// breakpoint. Se usa dentro de un `FFValue`, en cascada: cada breakpoint
-/// pone solo lo que cambia y hereda el resto de los menores.
+/// Appearance and behavior of an `FFScaffold`'s navigation at a breakpoint.
+/// Used inside an `FFValue` with cascading behavior: each breakpoint defines
+/// only what changes and inherits the rest from smaller breakpoints.
 @immutable
 class FFNavStyle {
   const FFNavStyle({
@@ -29,39 +29,39 @@ class FFNavStyle {
     this.shadowColor,
   });
 
-  /// Barra abajo, rail, drawer o enlaces en el app bar.
+  /// Bottom bar, rail, drawer, or links in the app bar.
   final FFNavigationEnum? type;
 
-  /// Con rail, si el menú completo se abre encima o como sidebar.
+  /// For a rail, whether the full menu opens over the content or as a sidebar.
   final FFRailExpandEnum? expandMode;
 
-  /// Con [FFRailExpandEnum.sidebar], si el menú empieza abierto. Al cambiar de
-  /// breakpoint vuelve a este valor.
+  /// With [FFRailExpandEnum.sidebar], whether the menu starts open. Resets to
+  /// this value when the breakpoint changes.
   final bool? expanded;
 
-  /// Si los grupos están siempre abiertos, sin flecha.
-  /// `FFDestination.alwaysOpen` tiene prioridad.
+  /// Whether groups are always open, with no arrow.
+  /// `FFDestination.alwaysOpen` takes precedence.
   final bool? subRoutesAlwaysVisible;
 
-  /// Fondo de la barra, el rail y el menú. Con [FFNavigationEnum.appBar], fondo
-  /// del app bar si este no define el suyo.
+  /// Background of the bar, rail, and menu. With [FFNavigationEnum.appBar],
+  /// used as the app bar background if it does not define one.
   final FFColor? backgroundColor;
   final FFColor? iconColor;
   final FFColor? labelColor;
 
-  /// Fondo del indicador del destino seleccionado.
+  /// Background of the selected destination indicator.
   final FFColor? selectedBackgroundColor;
   final FFColor? selectedIconColor;
   final FFColor? selectedLabelColor;
 
-  /// Sombra que separa la navegación del contenido: a la derecha del rail
-  /// y del sidebar, y arriba de la barra. Por defecto sin sombra.
+  /// Shadow separating navigation from content: to the right of the rail and
+  /// sidebar, and above the bar. No shadow by default.
   final bool? shadow;
 
-  /// Color de la sombra. Por defecto el `shadow` del `ColorScheme`, suave.
+  /// Shadow color. Defaults to a subtle `ColorScheme.shadow`.
   final FFColor? shadowColor;
 
-  /// Los valores de [other] reemplazan a los de este, salvo los `null`.
+  /// Values from [other] replace these values, except when they are `null`.
   FFNavStyle merge(FFNavStyle? other) {
     if (other == null) return this;
     return FFNavStyle(
@@ -115,9 +115,9 @@ class FFNavStyle {
   );
 }
 
-/// Combina en cascada los [FFNavStyle] de un `FFValue`.
+/// Cascading merge of [FFNavStyle] values from an `FFValue`.
 extension FFNavStyleValue on FFValue<FFNavStyle> {
-  /// Une los estilos desde `xs` hasta [breakpoint]; los mayores ganan.
+  /// Merges styles from `xs` through [breakpoint]; larger breakpoints win.
   FFNavStyle resolveMerged(BreakpointEnum breakpoint) {
     var result = const FFNavStyle();
     for (var i = 0; i <= breakpoint.index; i++) {
@@ -127,8 +127,8 @@ extension FFNavStyleValue on FFValue<FFNavStyle> {
   }
 }
 
-/// Un destino de la navegación. Si tiene [children], es un grupo: en el
-/// menú completo se muestra como acordeón y no es una página por sí mismo.
+/// A navigation destination. If it has [children], it is a group: it appears
+/// as an accordion in the full menu and is not a page itself.
 @immutable
 class FFDestination {
   const FFDestination({
@@ -141,23 +141,22 @@ class FFDestination {
     this.alwaysOpen,
   });
 
-  /// Identificador único; es lo que reciben `currentRoute` y
-  /// `onRouteSelected`.
+  /// Unique identifier, passed to `currentRoute` and `onRouteSelected`.
   final String id;
   final Widget icon;
 
-  /// Ícono cuando está seleccionado. Si es `null` se usa [icon].
+  /// Icon when selected. If `null`, [icon] is used.
   final Widget? selectedIcon;
   final String label;
 
-  /// Subrutas (un solo nivel). Las subrutas de las subrutas se ignoran.
+  /// Subroutes (one level only). Nested subroutes are ignored.
   final List<FFDestination> children;
 
-  /// `false` lo oculta en ese breakpoint. Por defecto visible.
+  /// `false` hides it at that breakpoint. Visible by default.
   final FFValue<bool>? visible;
 
-  /// Si el grupo está siempre abierto, sin flecha para cerrarlo. Si es
-  /// `null` se usa `FFNavStyle.subRoutesAlwaysVisible`.
+  /// Whether the group is always open, with no arrow to close it. If `null`,
+  /// `FFNavStyle.subRoutesAlwaysVisible` is used.
   final bool? alwaysOpen;
 
   bool get isGroup => children.isNotEmpty;

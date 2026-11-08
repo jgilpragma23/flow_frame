@@ -1,9 +1,9 @@
 import 'package:flutter/painting.dart';
 
-/// Sombras listas para `FFStyle.shadow`, como `shadow-sm`, `shadow` y
-/// `shadow-lg` de Bootstrap. Se puede usar cualquier `List<BoxShadow>`.
+/// Ready-to-use shadows for `FFStyle.shadow`, similar to Bootstrap's
+/// `shadow-sm`, `shadow`, and `shadow-lg`. Any `List<BoxShadow>` can be used.
 abstract final class FFShadow {
-  /// Sin sombra, para quitarla en un breakpoint mayor.
+  /// No shadow, to remove it at a larger breakpoint.
   static const none = <BoxShadow>[];
 
   static const sm = [

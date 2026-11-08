@@ -3,7 +3,7 @@ import 'package:flutter/widgets.dart';
 import '../enums/ff_action_display_enum.dart';
 import 'ff_value.dart';
 
-/// Una acción de un `FFActions`, como las del app bar.
+/// An action in `FFActions`, such as an app bar action.
 @immutable
 class FFAction {
   const FFAction({
@@ -16,10 +16,10 @@ class FFAction {
   final Widget icon;
   final String label;
 
-  /// `null` la muestra deshabilitada.
+  /// `null` displays it as disabled.
   final VoidCallback? onPressed;
 
-  /// Cómo se muestra en cada breakpoint, en cascada. Por defecto
-  /// [FFActionDisplayEnum.icon].
+  /// How it is displayed at each breakpoint, with cascading behavior.
+  /// Defaults to [FFActionDisplayEnum.icon].
   final FFValue<FFActionDisplayEnum>? display;
 }

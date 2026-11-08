@@ -3,7 +3,15 @@ import 'package:flow_frame/flow_frame.dart';
 
 import 'demos.dart';
 
-void main() => runApp(const ExampleApp());
+void main() {
+  FFBreakpoints.current = const FFBreakpoints(
+    sm: 640,
+    md: 900,
+    lg: 1200,
+    xl: 1600,
+  );
+  runApp(const ExampleApp());
+}
 
 class ExampleApp extends StatelessWidget {
   const ExampleApp({super.key});
@@ -21,7 +29,7 @@ class ExampleApp extends StatelessWidget {
   }
 }
 
-/// Colores de esta página, con su versión clara y oscura.
+/// Colors used on this page, with light- and dark-mode variants.
 class AppColors {
   static const background = FFColor.adaptive(
     light: Color(0xFFFFFFFF),
@@ -59,12 +67,12 @@ const label = FFStyle(
   color: AppColors.primary,
 );
 
-/// La app con su navegación: barra abajo en teléfono, rail en tablet (el
-/// menú se abre encima) y menú abierto en escritorio (empuja el contenido).
+/// App navigation: bottom bar on phones, rail on tablets (the menu overlays
+/// the content), and an open menu on desktops (which pushes the content).
 ///
-/// Para los screenshots: ?nav=drawer usa drawer en teléfono, ?nav=top
-/// usa enlaces en el app bar desde md, `?sel=id`
-/// elige la ruta inicial y ?open=1 abre el menú al iniciar.
+/// For screenshots: `?nav=drawer` uses a drawer on phones, `?nav=top` uses
+/// app bar links from md onward, `?sel=id` selects the initial route, and
+/// `?open=1` opens the menu on startup.
 class ExampleShell extends StatefulWidget {
   const ExampleShell({super.key});
 
@@ -73,98 +81,98 @@ class ExampleShell extends StatefulWidget {
 }
 
 class _ExampleShellState extends State<ExampleShell> {
-  String _selected = Uri.base.queryParameters['sel'] ?? 'ejemplos';
+  String _selected = Uri.base.queryParameters['sel'] ?? 'examples';
 
   static const _destinations = [
     FFDestination(
-      id: 'ejemplos',
+      id: 'examples',
       icon: Icon(Icons.grid_view_outlined),
       selectedIcon: Icon(Icons.grid_view),
-      label: 'Ejemplos',
+      label: 'Examples',
     ),
     FFDestination(
-      id: 'libreria',
+      id: 'library',
       icon: Icon(Icons.auto_awesome_outlined),
       selectedIcon: Icon(Icons.auto_awesome),
-      label: 'Librería',
+      label: 'Library',
       children: [
         FFDestination(
-          id: 'libreria/estilos',
+          id: 'library/styles',
           icon: Icon(Icons.text_fields),
-          label: 'Estilos',
+          label: 'Styles',
         ),
         FFDestination(
-          id: 'libreria/espaciado',
+          id: 'library/spacing',
           icon: Icon(Icons.padding_outlined),
-          label: 'Espaciado',
+          label: 'Spacing',
         ),
         FFDestination(
-          id: 'libreria/colores',
+          id: 'library/colors',
           icon: Icon(Icons.palette_outlined),
-          label: 'Colores',
+          label: 'Colors',
         ),
         FFDestination(
-          id: 'libreria/contenedor',
+          id: 'library/container',
           icon: Icon(Icons.crop_free),
-          label: 'Contenedor',
+          label: 'Container',
         ),
         FFDestination(
-          id: 'libreria/app-bar',
+          id: 'library/app-bar',
           icon: Icon(Icons.web_asset),
           label: 'App bar',
         ),
       ],
     ),
     FFDestination(
-      id: 'ventas',
+      id: 'sales',
       icon: Icon(Icons.storefront_outlined),
       selectedIcon: Icon(Icons.storefront),
-      label: 'Ventas',
+      label: 'Sales',
       children: [
         FFDestination(
-          id: 'ventas/pedidos',
+          id: 'sales/orders',
           icon: Icon(Icons.receipt_long_outlined),
-          label: 'Pedidos',
+          label: 'Orders',
         ),
         FFDestination(
-          id: 'ventas/clientes',
+          id: 'sales/customers',
           icon: Icon(Icons.people_outline),
-          label: 'Clientes',
+          label: 'Customers',
         ),
         FFDestination(
-          id: 'ventas/facturas',
+          id: 'sales/invoices',
           icon: Icon(Icons.request_quote_outlined),
-          label: 'Facturas',
+          label: 'Invoices',
         ),
       ],
     ),
     FFDestination(
-      id: 'reportes',
+      id: 'reports',
       icon: Icon(Icons.bar_chart_outlined),
-      label: 'Reportes',
+      label: 'Reports',
       visible: FFValue(xs: false, md: true),
     ),
     FFDestination(
-      id: 'config',
+      id: 'settings',
       icon: Icon(Icons.settings_outlined),
-      label: 'Configuración',
+      label: 'Settings',
       alwaysOpen: true,
       children: [
         FFDestination(
-          id: 'config/perfil',
+          id: 'settings/profile',
           icon: Icon(Icons.person_outline),
-          label: 'Perfil',
+          label: 'Profile',
         ),
         FFDestination(
-          id: 'config/seguridad',
+          id: 'settings/security',
           icon: Icon(Icons.lock_outline),
-          label: 'Seguridad',
+          label: 'Security',
         ),
       ],
     ),
   ];
 
-  /// Nombre de la ruta actual, buscando también en las subrutas.
+  /// Current route name, including subroutes.
   String get _title {
     for (final d in _destinations) {
       if (d.id == _selected) return d.label;
@@ -195,16 +203,16 @@ class _ExampleShellState extends State<ExampleShell> {
             size: 18,
           ),
         ),
-        title: const Text('Mi Tienda'),
+        title: const Text('My Store'),
         subtitle: const Text('Admin'),
-        onTap: () => setState(() => _selected = 'ejemplos'),
+        onTap: () => setState(() => _selected = 'examples'),
       ),
       appBar: FFAppBar(
         title: Text(_title),
         actions: [
           FFAction(
             icon: const Icon(Icons.add),
-            label: 'Nuevo pedido',
+            label: 'New order',
             onPressed: () {},
             display: const FFValue(
               xs: FFActionDisplayEnum.icon,
@@ -213,7 +221,7 @@ class _ExampleShellState extends State<ExampleShell> {
           ),
           FFAction(
             icon: const Icon(Icons.download_outlined),
-            label: 'Exportar',
+            label: 'Export',
             onPressed: () {},
             display: const FFValue(
               xs: FFActionDisplayEnum.menu,
@@ -222,7 +230,7 @@ class _ExampleShellState extends State<ExampleShell> {
           ),
           FFAction(
             icon: const Icon(Icons.print_outlined),
-            label: 'Imprimir',
+            label: 'Print',
             onPressed: () {},
             display: const FFValue(
               xs: FFActionDisplayEnum.hidden,
@@ -231,7 +239,7 @@ class _ExampleShellState extends State<ExampleShell> {
           ),
           FFAction(
             icon: const Icon(Icons.notifications_outlined),
-            label: 'Notificaciones',
+            label: 'Notifications',
             onPressed: () {},
           ),
         ],
@@ -266,13 +274,13 @@ class _ExampleShellState extends State<ExampleShell> {
         ),
       ),
       body: switch (_selected) {
-        'ejemplos' => const ExamplePage(),
-        'ventas/pedidos' => const PedidosPage(),
-        'libreria/estilos' => const EstilosDemo(),
-        'libreria/espaciado' => const EspaciadoDemo(),
-        'libreria/colores' => const ColoresDemo(),
-        'libreria/contenedor' => const ContenedorDemo(),
-        'libreria/app-bar' => const AppBarDemo(),
+        'examples' => const ExamplePage(),
+        'sales/orders' => const OrdersPage(),
+        'library/styles' => const StylesDemo(),
+        'library/spacing' => const SpacingDemo(),
+        'library/colors' => const ColorsDemo(),
+        'library/container' => const ContainerDemo(),
+        'library/app-bar' => const AppBarDemo(),
         _ => _Placeholder(_selected),
       },
     );
@@ -292,7 +300,7 @@ class _Placeholder extends StatelessWidget {
 class ExamplePage extends StatelessWidget {
   const ExamplePage({super.key});
 
-  /// Con ?open=1 abre el menú al iniciar (para los screenshots).
+  /// Opens the menu on startup with `?open=1` (for screenshots).
   static bool _openedMenu = false;
 
   @override
@@ -324,16 +332,16 @@ class ExamplePage extends StatelessWidget {
                 textAlign: FFValue(xs: TextAlign.center, md: TextAlign.start),
               ),
               child: Text(
-                'Breakpoint actual: ${context.breakpoint.name} '
+                'Current breakpoint: ${context.breakpoint.name} '
                 '(${MediaQuery.sizeOf(context).width.round()} px)',
               ),
             ),
             const FFItem(
               style: FFStyle(color: AppColors.muted),
               child: Text(
-                'Grilla con col: FFValue(xs: 12, md: 6, lg: 4). '
-                'Uno por fila en xs, dos en md y tres en lg; '
-                'lo que no cabe baja a la siguiente fila.',
+                'Grid with col: FFValue(xs: 12, md: 6, lg: 4). '
+                'One per row on xs, two on md, and three on lg; '
+                'items that do not fit wrap to the next row.',
               ),
             ),
             FFFlex(
@@ -344,15 +352,15 @@ class ExamplePage extends StatelessWidget {
                   FFItem(
                     col: const FFValue(xs: 12, md: 6, lg: 4),
                     style: card.merge(const FFStyle(height: FFValue.all(80))),
-                    child: _CardBody('Producto $i', 'col: xs 12, md 6, lg 4'),
+                    child: _CardBody('Product $i', 'col: xs 12, md 6, lg 4'),
                   ),
               ],
             ),
             const FFItem(
               style: FFStyle(color: AppColors.muted),
               child: Text(
-                'Mezcla en una fila: col 3, fill y un ícono de tamaño natural. '
-                'En xs el col 12 ocupa toda la fila y los otros bajan.',
+                'Mixed in one row: col 3, fill, and a naturally sized icon. '
+                'On xs, col 12 uses the full row and the others wrap below.',
               ),
             ),
             FFFlex(
@@ -363,12 +371,12 @@ class ExamplePage extends StatelessWidget {
                 FFItem(
                   col: const FFValue(xs: 12, md: 3),
                   style: card.merge(const FFStyle(height: FFValue.all(80))),
-                  child: const _CardBody('Filtros', 'col: xs 12, md 3'),
+                  child: const _CardBody('Filters', 'col: xs 12, md 3'),
                 ),
                 FFItem(
                   fill: const FFValue.all(true),
                   style: card.merge(const FFStyle(height: FFValue.all(80))),
-                  child: const _CardBody('Buscador', 'fill: true'),
+                  child: const _CardBody('Search', 'fill: true'),
                 ),
                 FFItem(
                   fill: const FFValue.all(false),
@@ -380,8 +388,8 @@ class ExamplePage extends StatelessWidget {
             const FFItem(
               style: FFStyle(color: AppColors.muted),
               child: Text(
-                'FFFlex vertical en xs/sm y horizontal desde md. '
-                'La tarjeta B tiene visible: FFValue(xs: false, md: true).',
+                'FFFlex is vertical on xs/sm and horizontal from md onward. '
+                'Card B uses visible: FFValue(xs: false, md: true).',
               ),
             ),
             FFFlex(
@@ -405,7 +413,7 @@ class ExamplePage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  child: const _CardBody('B', 'oculta en xs/sm'),
+                  child: const _CardBody('B', 'hidden on xs/sm'),
                 ),
                 _card('C', 'fill: md true'),
               ],
@@ -413,7 +421,7 @@ class ExamplePage extends StatelessWidget {
             const FFItem(
               style: FFStyle(color: AppColors.muted),
               child: Text(
-                'Sidebar de 260 px y el contenido llena el resto, desde md',
+                'A 260 px sidebar with the content filling the rest, from md onward',
               ),
             ),
             FFFlex(
@@ -431,7 +439,7 @@ class ExamplePage extends StatelessWidget {
                 FFItem(
                   fill: const FFValue(md: true),
                   style: card,
-                  child: const _CardBody('Contenido', 'fill: md true'),
+                  child: const _CardBody('Content', 'fill: md true'),
                 ),
               ],
             ),
@@ -470,10 +478,9 @@ class _CardBody extends StatelessWidget {
   }
 }
 
-/// Página de pedidos: resumen en grilla, filtros con buscador y lista con
-/// detalle.
-class PedidosPage extends StatelessWidget {
-  const PedidosPage({super.key});
+/// Orders page: grid summary, filters with search, and a list with details.
+class OrdersPage extends StatelessWidget {
+  const OrdersPage({super.key});
 
   static const _card = FFStyle(
     padding: FFSpacing(all: FFValue(xs: 12, md: 20)),
@@ -496,17 +503,17 @@ class PedidosPage extends StatelessWidget {
                   md: TextStyle(fontSize: 30),
                 ),
               ),
-              child: Text('Pedidos'),
+              child: Text('Orders'),
             ),
             FFFlex(
               direction: const FFValue.all(FFDirectionEnum.horizontal),
               gap: const FFValue(xs: 12, md: 16),
               children: [
                 for (final (title, value) in [
-                  ('Hoy', '24'),
-                  ('Semana', '183'),
-                  ('Pendientes', '7'),
-                  ('Ingresos', '\$4.2k'),
+                  ('Today', '24'),
+                  ('This week', '183'),
+                  ('Pending', '7'),
+                  ('Revenue', '\$4.2k'),
                 ])
                   FFItem(
                     col: const FFValue(xs: 12, sm: 6, lg: 3),
@@ -523,18 +530,18 @@ class PedidosPage extends StatelessWidget {
                 const FFItem(
                   col: FFValue(xs: 12, md: 3),
                   style: _card,
-                  child: _CardBody('Filtros', 'col: xs 12, md 3'),
+                  child: _CardBody('Filters', 'col: xs 12, md 3'),
                 ),
                 const FFItem(
                   fill: FFValue.all(true),
                   style: _card,
-                  child: _CardBody('Buscar pedido…', 'fill: true'),
+                  child: _CardBody('Search orders…', 'fill: true'),
                 ),
                 FFItem(
                   fill: const FFValue.all(false),
                   child: FilledButton(
                     onPressed: () {},
-                    child: const Text('Nuevo'),
+                    child: const Text('New'),
                   ),
                 ),
               ],
@@ -552,7 +559,7 @@ class PedidosPage extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const _CardBody('Lista de pedidos', 'col: md 7, xl 8'),
+                      const _CardBody('Order list', 'col: md 7, xl 8'),
                       for (var i = 1; i <= 4; i++)
                         ListTile(
                           contentPadding: EdgeInsets.zero,
@@ -571,7 +578,7 @@ class PedidosPage extends StatelessWidget {
                     visible: FFValue(xs: false, md: true),
                   ),
                   child: _CardBody(
-                    'Detalle del pedido',
+                    'Order details',
                     'fill: md true · oculto en xs/sm',
                   ),
                 ),

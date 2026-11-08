@@ -9,12 +9,12 @@ import '../models/ff_value.dart';
 import '../utils/context_extensions.dart';
 import 'ff_app_bar.dart';
 
-/// Un `Scaffold` cuya navegación cambia según el breakpoint: barra abajo,
-/// rail lateral o drawer, con subrutas en acordeón en el menú completo.
+/// A `Scaffold` whose navigation adapts per breakpoint: bottom bar, side rail,
+/// or drawer, with subroutes in an accordion in the full menu.
 ///
-/// Recibe los mismos parámetros principales que `Scaffold` y los pasa tal
-/// cual. La ruta se identifica por `id`, así que no cambia al cambiar de
-/// navegación ni al ocultarse destinos.
+/// Accepts the same main parameters as `Scaffold` and passes them through.
+/// Routes are identified by `id`, so they do not change when navigation
+/// changes or destinations are hidden.
 class FFScaffold extends StatefulWidget {
   const FFScaffold({
     super.key,
@@ -30,9 +30,9 @@ class FFScaffold extends StatefulWidget {
     this.backgroundColor,
   });
 
-  /// Lo que se usa en lo que [responsive] no define: barra abajo en
-  /// `xs`/`sm`, rail con el menú encima en `md` y rail con el menú abierto
-  /// como sidebar desde `lg`.
+  /// Values used when [responsive] does not define them: bottom bar on
+  /// `xs`/`sm`, rail with the menu overlaid on `md`, and rail with the menu
+  /// open as a sidebar from `lg`.
   static const defaults = FFValue(
     xs: FFNavStyle(
       type: FFNavigationEnum.bottom,
@@ -46,29 +46,30 @@ class FFScaffold extends StatefulWidget {
 
   final List<FFDestination> destinations;
 
-  /// `id` de la ruta actual (puede ser una subruta).
+  /// `id` of the current route (may be a subroute).
   final String currentRoute;
 
-  /// Recibe el `id` elegido. Nunca recibe el `id` de un grupo.
+  /// Receives the selected `id`. Never receives a group's `id`.
   final ValueChanged<String> onRouteSelected;
 
-  /// Tipo, comportamiento y colores de la navegación por breakpoint, en
-  /// cascada. Lo que no se define sale de [defaults].
+  /// Navigation type, behavior, and colors per breakpoint, with cascading.
+  /// Unspecified values come from [defaults].
   final FFValue<FFNavStyle>? responsive;
 
-  /// Logo y nombre de la app junto al ☰. Ver [FFBrand] para dónde aparece
-  /// en cada tipo de navegación.
+  /// App logo and name next to ☰. See [FFBrand] for its position with each
+  /// navigation type.
   final FFBrand? brand;
 
-  /// Con [FFNavigationEnum.drawer] muestra el botón ☰. Si es `null` y la
-  /// navegación es drawer, se usa un `AppBar` vacío para tener el botón.
+  /// Displays the ☰ button with [FFNavigationEnum.drawer]. If `null` and
+  /// navigation uses a drawer, an empty `AppBar` is used to provide the
+  /// button.
   final PreferredSizeWidget? appBar;
   final Widget body;
   final Widget? floatingActionButton;
   final FloatingActionButtonLocation? floatingActionButtonLocation;
   final Color? backgroundColor;
 
-  /// El estado del [FFScaffold] más cercano, para abrir o cerrar el menú.
+  /// State of the nearest [FFScaffold], used to open or close the menu.
   static FFScaffoldState of(BuildContext context) =>
       context.findAncestorStateOfType<FFScaffoldState>()!;
 
@@ -90,8 +91,8 @@ class FFScaffoldState extends State<FFScaffold> {
       _style.expandMode ?? FFRailExpandEnum.overlay;
   bool get _expandedByDefault => _style.expanded ?? false;
 
-  /// Lo que eligió el usuario con ☰ en modo sidebar; se descarta al cambiar
-  /// de breakpoint.
+  /// What the user selected with ☰ in sidebar mode; discarded when the
+  /// breakpoint changes.
   bool? _sidebarOpen;
   bool _overlayOpen = false;
 
@@ -99,7 +100,7 @@ class FFScaffoldState extends State<FFScaffold> {
   final Map<String, String> _lastChild = {};
   String? _trackedRoute;
 
-  /// Si el menú completo (con textos) está abierto.
+  /// Whether the full menu (with labels) is open.
   bool get isMenuOpen => switch (_navigation) {
     FFNavigationEnum.bottom || FFNavigationEnum.appBar => false,
     FFNavigationEnum.drawer => _scaffoldKey.currentState?.isDrawerOpen ?? false,
@@ -181,14 +182,14 @@ class FFScaffoldState extends State<FFScaffold> {
           : null,
       body: widget.body,
     );
-    // El rail y el sidebar van por fuera del Scaffold para ocupar toda la
-    // altura; el app bar queda solo sobre el contenido.
+    // Keep the rail and sidebar outside the Scaffold so they use the full
+    // height; the app bar remains above the content only.
     return _navigation == FFNavigationEnum.rail
         ? _railLayout(items, scaffold)
         : scaffold;
   }
 
-  /// Alto del app bar, para alinear el ☰ del rail y del menú con él.
+  /// App bar height, used to align ☰ in the rail and menu with it.
   double get _toolbarHeight {
     final height = switch (widget.appBar) {
       final AppBar bar => bar.toolbarHeight,
@@ -199,8 +200,8 @@ class FFScaffoldState extends State<FFScaffold> {
     return Theme.of(context).appBarTheme.toolbarHeight ?? kToolbarHeight;
   }
 
-  /// Recuerda la última subruta de cada grupo y abre el grupo de la ruta
-  /// actual cuando esta cambia.
+  /// Remembers each group's last subroute and opens the group containing the
+  /// current route when it changes.
   void _trackRoute(List<FFDestination> items) {
     if (widget.currentRoute == _trackedRoute) return;
     _trackedRoute = widget.currentRoute;
@@ -211,7 +212,7 @@ class FFScaffoldState extends State<FFScaffold> {
     }
   }
 
-  /// El destino de primer nivel que es o contiene [id].
+  /// The top-level destination that is or contains [id].
   FFDestination? _groupOf(List<FFDestination> items, String id) {
     for (final d in items) {
       if (d.id == id || d.children.any((c) => c.id == id)) return d;
@@ -225,8 +226,8 @@ class FFScaffoldState extends State<FFScaffold> {
   bool _isOpen(FFDestination group) =>
       _isAlwaysOpen(group) || _openGroups.contains(group.id);
 
-  /// Para la barra y el rail cerrado: un grupo va a su última subruta
-  /// visitada (o a la primera).
+  /// For the bar and collapsed rail: a group navigates to its last visited
+  /// subroute (or the first one).
   String _targetOf(FFDestination d) {
     if (!d.isGroup) return d.id;
     final last = _lastChild[d.id];
@@ -300,8 +301,8 @@ class FFScaffoldState extends State<FFScaffold> {
     );
   }
 
-  /// El app bar del usuario con los enlaces después del título. Si no es un
-  /// `AppBar`, los enlaces van en una franja debajo.
+  /// User-provided app bar with links after the title. If it is not an
+  /// `AppBar`, links appear in a strip below it.
   PreferredSizeWidget _appBarWithNav(List<FFDestination> items) {
     final source = widget.appBar ?? AppBar();
     final nav = FFNavLinks(
@@ -346,7 +347,7 @@ class FFScaffoldState extends State<FFScaffold> {
     );
   }
 
-  /// El app bar con la marca como título, si es un `AppBar` sin título.
+  /// App bar with branding as the title, if it is an `AppBar` without a title.
   PreferredSizeWidget? _appBarWithBrand(PreferredSizeWidget? source) {
     final brand = _brandBar;
     if (source is! AppBar || source.title != null || brand == null) {
@@ -355,13 +356,13 @@ class FFScaffoldState extends State<FFScaffold> {
     return _copyAppBar(source, title: brand);
   }
 
-  /// La marca para el app bar; `null` sin marca.
+  /// Branding for the app bar; `null` if there is no branding.
   Widget? get _brandBar =>
       widget.brand == null ? null : FFBrandBar(brand: widget.brand!);
 
-  /// Un [FFAppBar] con lo que no define tomado de este scaffold: la marca
-  /// (si no tiene título y la navegación no es rail), los destinos con
-  /// [FFNavigationEnum.appBar] y los colores de la navegación como base.
+  /// An [FFAppBar] that inherits any unspecified values from this scaffold:
+  /// branding (if it has no title and navigation is not a rail), destinations
+  /// with [FFNavigationEnum.appBar], and navigation colors as a base.
   FFAppBar _adapt(FFAppBar bar) {
     final linksInBar = _navigation == FFNavigationEnum.appBar;
     final base = FFAppBarStyle(
@@ -385,7 +386,7 @@ class FFScaffoldState extends State<FFScaffold> {
       onRouteSelected: linksInBar && bar.onRouteSelected == null
           ? widget.onRouteSelected
           : null,
-      // La base va en xs para que cualquier breakpoint del app bar la pise.
+      // Set the base at xs so any app bar breakpoint can override it.
       responsive: FFValue(
         xs: base.merge(own?.xs),
         sm: own?.sm,
@@ -396,7 +397,7 @@ class FFScaffoldState extends State<FFScaffold> {
     );
   }
 
-  /// Copia de [source] con otro título.
+  /// Copy of [source] with a different title.
   AppBar _copyAppBar(
     AppBar source, {
     required Widget title,
@@ -462,7 +463,7 @@ class FFScaffoldState extends State<FFScaffold> {
           child: Stack(
             children: [
               Positioned.fill(child: content),
-              // Encima del contenido, para que un fondo propio no la tape.
+              // Keep it over the content so a custom background does not hide it.
               if (_style.shadow ?? false)
                 Positioned(
                   left: 0,
@@ -533,8 +534,8 @@ class FFScaffoldState extends State<FFScaffold> {
     );
   }
 
-  /// El menú del sidebar y del overlay, con [_menuHeader] fijo arriba a la
-  /// altura del app bar.
+  /// Sidebar and overlay menu, with [_menuHeader] fixed at the top at app bar
+  /// height.
   Widget _menuWithHeader(
     List<FFDestination> items, {
     required bool closeOnSelect,
@@ -548,7 +549,7 @@ class FFScaffoldState extends State<FFScaffold> {
     ),
   );
 
-  /// ☰ para cerrar el menú, con la marca al lado.
+  /// ☰ button to close the menu, with branding alongside it.
   Widget _menuHeader() => Padding(
     padding: const EdgeInsets.only(left: 16, right: 12),
     child: Row(
@@ -567,7 +568,7 @@ class FFScaffoldState extends State<FFScaffold> {
     ),
   );
 
-  /// Arriba dentro del drawer: la marca con su subtítulo y una línea.
+  /// Top of the drawer: branding with its subtitle and a divider.
   Widget _drawerHeader() => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Column(
@@ -581,7 +582,7 @@ class FFScaffoldState extends State<FFScaffold> {
     ),
   );
 
-  /// Logo, título y subtítulo para el menú, con los colores del estilo.
+  /// Logo, title, and subtitle for the menu, using the style's colors.
   Widget _brandTile(
     FFBrand brand, {
     required bool subtitle,
@@ -645,14 +646,14 @@ class FFScaffoldState extends State<FFScaffold> {
       onDestinationSelected: (i) {
         final d = items[i];
         if (!d.isGroup) return widget.onRouteSelected(d.id);
-        // Un grupo abre el menú completo con ese grupo desplegado.
+        // A group opens the full menu with that group expanded.
         _openGroups.add(d.id);
         openMenu();
       },
       leading: Column(
         children: [
-          // El rail ya deja 8 arriba; el ☰ (40 de alto) queda centrado con
-          // el título del app bar.
+          // The rail already has 8 px of top padding; the 40 px ☰ button
+          // aligns with the app bar title.
           SizedBox(
             height: _toolbarHeight - 8,
             child: Align(
@@ -691,7 +692,7 @@ class FFScaffoldState extends State<FFScaffold> {
     );
   }
 
-  /// Menú completo con textos y acordeón (sidebar, overlay y drawer).
+  /// Full menu with labels and accordion groups (sidebar, overlay, and drawer).
   Widget _menu(
     List<FFDestination> items, {
     required bool closeOnSelect,
@@ -763,8 +764,8 @@ class FFScaffoldState extends State<FFScaffold> {
   }) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
-    // Un grupo con la ruta actual adentro usa los colores de seleccionado,
-    // pero sin fondo.
+    // A group containing the current route uses selected colors, but no
+    // background.
     final iconColor = selected || emphasized
         ? _color(_style.selectedIconColor) ??
               (selected ? scheme.onSecondaryContainer : scheme.primary)
