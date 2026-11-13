@@ -89,8 +89,20 @@ The example is a multi-screen catalog of Flow Frame's capabilities. Open the
 Library section to explore breakpoints, the grid, styles, typography, spacing,
 colors, themes, containers, navigation, and the standalone app bar. The theme
 action switches between light and dark mode so you can see `FFColor.adaptive`
-update live. The app shell is in [`example/lib/main.dart`](example/lib/main.dart);
-the topic pages are in [`example/lib/demos.dart`](example/lib/demos.dart).
+update live. The example uses a small feature-oriented structure:
+
+```text
+example/lib/
+  app/        app setup, theme state, and navigation shell
+  models/     typed route identifiers and labels
+  screens/    home, orders, and one screen per library topic
+  theme/      adaptive palette and reusable example styles
+  utils/      small responsive display helpers
+  widgets/    shared demo sections, code samples, and card content
+```
+
+The code below is a compact illustration of composing navigation and grid
+capabilities. The runnable, organized example is in `example/lib/`.
 
 ```dart
 class AppColors {
@@ -248,7 +260,9 @@ The same screen in dark mode, with no code changes (`FFColor` selects a variant 
 cd example && flutter run -d chrome
 ```
 
-The **Library** menu has a page for each topic (styles, spacing, colors, and containers); these pages are the source of the images in this README. Resize the window to see how each element adapts.
+The **Library** menu has a dedicated page for each capability, including
+breakpoints, grid, typography, spacing, colors, themes, containers, and
+navigation. Resize the window and switch themes to see each element adapt.
 
 ## Breakpoints
 
