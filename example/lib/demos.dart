@@ -23,25 +23,29 @@ class _DemoPage extends StatelessWidget {
     return SingleChildScrollView(
       child: FFContainer(
         maxSize: 1280,
-        style: const FFStyle(padding: FFSpacing(all: FFValue(xs: 16, md: 32))),
-        child: FFFlex(
-          gap: const FFValue(xs: 16, md: 24),
-          children: [
-            FFItem(
-              style: const FFStyle(
-                textStyle: FFValue(
-                  xs: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
-                  md: TextStyle(fontSize: 30),
+        child: FFStyled(
+          style: const FFStyle(
+            padding: FFSpacing(all: FFValue(xs: 16, md: 32)),
+          ),
+          child: FFFlex(
+            gap: const FFValue(xs: 16, md: 24),
+            children: [
+              FFStyledItem(
+                style: const FFStyle(
+                  textStyle: FFValue(
+                    xs: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                    md: TextStyle(fontSize: 30),
+                  ),
                 ),
+                child: Text('$title · ${context.breakpoint.name}'),
               ),
-              child: Text('$title · ${context.breakpoint.name}'),
-            ),
-            FFItem(
-              style: const FFStyle(color: AppColors.muted),
-              child: Text(intro),
-            ),
-            ...children,
-          ],
+              FFStyledItem(
+                style: const FFStyle(color: AppColors.muted),
+                child: Text(intro),
+              ),
+              ...children,
+            ],
+          ),
         ),
       ),
     );
@@ -66,6 +70,463 @@ class _Note extends StatelessWidget {
 
 String _px(FFValue<double> value, BuildContext context) =>
     '${(value.resolve(context.breakpoint) ?? 0).round()} px';
+
+class _TopicSection extends StatelessWidget {
+  const _TopicSection({
+    required this.title,
+    required this.description,
+    required this.child,
+  });
+
+  final String title;
+  final String description;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) => Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(title, style: Theme.of(context).textTheme.titleMedium),
+      const SizedBox(height: 4),
+      _Note(description),
+      const SizedBox(height: 10),
+      child,
+    ],
+  );
+}
+
+class _CodeSample extends StatelessWidget {
+  const _CodeSample(this.code);
+
+  final String code;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(12),
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: SelectableText(
+      code,
+      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+        fontFamily: 'monospace',
+        height: 1.5,
+      ),
+    ),
+  );
+}
+
+// ─── Breakpoints ─────────────────────────────────────────────────────────
+
+class BreakpointsDemo extends StatelessWidget {
+  const BreakpointsDemo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final width = MediaQuery.sizeOf(context).width;
+    return _DemoPage(
+      title: 'Breakpoints',
+      intro:
+          'FFBreakpointScope sets responsive thresholds for a subtree. '
+          'FFValue cascades from xs to the active breakpoint.',
+      children: [
+        _TopicSection(
+          title: 'Active breakpoint',
+          description:
+              'Current viewport: ${width.round()} px · '
+              'resolved as ${context.breakpoint.name}.',
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              for (final breakpoint in BreakpointEnum.values)
+                Chip(
+                  avatar: Icon(
+                    breakpoint == context.breakpoint
+                        ? Icons.radio_button_checked
+                        : Icons.radio_button_unchecked,
+                    size: 16,
+                  ),
+                  label: Text(breakpoint.name),
+                ),
+            ],
+          ),
+        ),
+        _CodeSample('''FFBreakpointScope(
+  breakpoints: const FFBreakpoints(
+    sm: 640, md: 900, lg: 1200, xl: 1600,
+  ),
+  child: const MyApp(),
+)
+
+final columns = FFValue(xs: 12, md: 6, lg: 4);'''),
+        _TopicSection(
+          title: 'One value, responsive layout',
+          description:
+              'The cards change from one column to two and then three '
+              'without duplicating the page.',
+          child: FFFlex(
+            direction: const FFValue.all(FFDirectionEnum.horizontal),
+            gap: const FFValue.all(12),
+            children: [
+              for (var i = 1; i <= 3; i++)
+                FFStyledItem(
+                  col: const FFValue(xs: 12, md: 6, lg: 4),
+                  style: const FFStyle(
+                    padding: FFSpacing(all: FFValue.all(16)),
+                    backgroundColor: FFValue(xs: AppColors.primarySoft),
+                    color: AppColors.primary,
+                  ),
+                  child: Text('FFValue(xs: 12, md: 6, lg: 4) · $i'),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Grid ────────────────────────────────────────────────────────────────
+
+class GridDemo extends StatelessWidget {
+  const GridDemo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return _DemoPage(
+      title: 'Grid',
+      intro:
+          'FFFlex arranges children. FFItem controls column width, fill, '
+          'order, and visibility; it does not apply visual styles.',
+      children: [
+        _TopicSection(
+          title: 'Grid without the styling API',
+          description:
+              'These cells use only FFFlex and FFItem. Their decoration is '
+              'ordinary Flutter UI, independent of the grid.',
+          child: FFFlex(
+            direction: const FFValue.all(FFDirectionEnum.horizontal),
+            gap: const FFValue.all(12),
+            children: [
+              for (final (col, title) in [
+                (const FFValue(xs: 12, md: 6, lg: 4), 'One third'),
+                (const FFValue(xs: 12, md: 6, lg: 4), 'One third'),
+                (const FFValue(xs: 12, md: 6, lg: 4), 'One third'),
+              ])
+                FFItem(
+                  col: col,
+                  child: _GridTile(title, 'FFItem · col: xs 12, md 6, lg 4'),
+                ),
+            ],
+          ),
+        ),
+        const _CodeSample('''FFFlex(
+  direction: const FFValue.all(FFDirectionEnum.horizontal),
+  gap: const FFValue.all(12),
+  children: [
+    FFItem(
+      col: const FFValue(xs: 12, md: 6, lg: 4),
+      child: const MyCard(),
+    ),
+  ],
+)'''),
+        _TopicSection(
+          title: 'Opt in to styling when you need it',
+          description:
+              'FFStyledItem composes grid sizing with independent text, '
+              'decoration, and layout styles.',
+          child: FFFlex(
+            direction: const FFValue.all(FFDirectionEnum.horizontal),
+            gap: const FFValue.all(12),
+            children: [
+              FFStyledItem.compose(
+                col: const FFValue(xs: 12, md: 6),
+                text: const FFTextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FFValue.all(FontWeight.w700),
+                ),
+                decoration: const FFDecorationStyle(
+                  backgroundColor: FFValue(xs: AppColors.primarySoft),
+                ),
+                layout: const FFLayoutStyle(
+                  padding: FFSpacing(all: FFValue.all(16)),
+                ),
+                child: const Text('Grid + decoration + typography'),
+              ),
+              const FFItem(
+                fill: FFValue.all(true),
+                child: _GridTile('Flexible', 'FFItem(fill: true)'),
+              ),
+            ],
+          ),
+        ),
+        const _CodeSample('''FFStyledItem.compose(
+  col: const FFValue(xs: 12, md: 6),
+  text: const FFTextStyle(color: AppColors.primary),
+  decoration: const FFDecorationStyle(
+    backgroundColor: FFValue(xs: AppColors.primarySoft),
+  ),
+  child: const Text('Styled column'),
+)'''),
+      ],
+    );
+  }
+}
+
+class _GridTile extends StatelessWidget {
+  const _GridTile(this.title, this.subtitle);
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) => DecoratedBox(
+    decoration: BoxDecoration(
+      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: 4),
+          Text(subtitle, style: Theme.of(context).textTheme.bodySmall),
+        ],
+      ),
+    ),
+  );
+}
+
+// ─── Typography ──────────────────────────────────────────────────────────
+
+class TypographyDemo extends StatelessWidget {
+  const TypographyDemo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return _DemoPage(
+      title: 'Typography',
+      intro:
+          'FFTextStyle owns text properties only. Apply it directly with '
+          'FFStyled, or combine it with other style responsibilities.',
+      children: [
+        _TopicSection(
+          title: 'Responsive heading',
+          description:
+              'Font size, weight, alignment, and color can be selected '
+              'independently at each breakpoint.',
+          child: FFStyled(
+            text: const FFTextStyle(
+              color: AppColors.primary,
+              fontSize: FFValue(xs: 22, md: 30, lg: 38),
+              fontWeight: FFValue.all(FontWeight.w800),
+              textAlign: FFValue(xs: TextAlign.center, md: TextAlign.start),
+            ),
+            child: const Text('Readable at every size'),
+          ),
+        ),
+        const _CodeSample('''FFStyled(
+  text: const FFTextStyle(
+    color: AppColors.primary,
+    fontSize: FFValue(xs: 22, md: 30, lg: 38),
+    fontWeight: FFValue.all(FontWeight.w800),
+    textAlign: FFValue(xs: TextAlign.center, md: TextAlign.start),
+  ),
+  child: const Text('Readable at every size'),
+)'''),
+        _TopicSection(
+          title: 'Line height for body copy',
+          description:
+              'Use lineHeight as a multiplier; longer text gets more '
+              'breathing room at larger breakpoints.',
+          child: FFStyled(
+            text: const FFTextStyle(
+              fontSize: FFValue(xs: 14, lg: 18),
+              lineHeight: FFValue(xs: 1.35, lg: 1.7),
+            ),
+            child: const Text(
+              'Flow Frame resolves responsive text values using the same '
+              'breakpoint scope as the grid. This paragraph adapts its size '
+              'and line spacing while the rest of the interface can remain '
+              'completely independent.',
+            ),
+          ),
+        ),
+        _TopicSection(
+          title: 'Combine responsibilities only when useful',
+          description:
+              'FFStyle remains a convenience composition; each part can '
+              'also be applied on its own.',
+          child: FFStyled(
+            text: const FFTextStyle(
+              color: AppColors.primary,
+              fontWeight: FFValue.all(FontWeight.w700),
+            ),
+            decoration: const FFDecorationStyle(
+              backgroundColor: FFValue(xs: AppColors.primarySoft),
+            ),
+            layout: const FFLayoutStyle(
+              padding: FFSpacing(all: FFValue.all(12)),
+            ),
+            child: const Text('Text + decoration + layout'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ─── Themes ──────────────────────────────────────────────────────────────
+
+class ThemeDemo extends StatelessWidget {
+  const ThemeDemo({super.key, required this.onToggleTheme});
+
+  final VoidCallback onToggleTheme;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    const adaptive = FFColor.adaptive(
+      light: Color(0xFF2563EB),
+      dark: Color(0xFF93C5FD),
+    );
+    return _DemoPage(
+      title: 'Themes',
+      intro:
+          'FFColor reads Theme brightness; use Flutter ThemeMode to switch '
+          'the app and every adaptive color together.',
+      children: [
+        _TopicSection(
+          title: 'Current mode: ${isDark ? 'dark' : 'light'}',
+          description:
+              'Switch the app theme here or from the app-bar action. The '
+              'colors on this page and the rest of the example update live.',
+          child: FilledButton.icon(
+            onPressed: onToggleTheme,
+            icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode),
+            label: Text(isDark ? 'Use light theme' : 'Use dark theme'),
+          ),
+        ),
+        _TopicSection(
+          title: 'One semantic color, two values',
+          description:
+              'The same FFColor resolves to a different Flutter Color '
+              'according to the active Theme.',
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              Container(
+                width: 84,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: adaptive.resolve(context),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              Text(
+                'Resolved: ${ColorsDemo._hex(adaptive.resolve(context))}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
+        const _CodeSample('''MaterialApp(
+  theme: ThemeData(brightness: Brightness.light),
+  darkTheme: ThemeData(brightness: Brightness.dark),
+  themeMode: isDark ? ThemeMode.dark : ThemeMode.light,
+)
+
+const brand = FFColor.adaptive(
+  light: Color(0xFF2563EB),
+  dark: Color(0xFF93C5FD),
+);'''),
+      ],
+    );
+  }
+}
+
+// ─── Navigation ──────────────────────────────────────────────────────────
+
+class NavigationDemo extends StatelessWidget {
+  const NavigationDemo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return _DemoPage(
+      title: 'Navigation',
+      intro:
+          'FFScaffold adapts navigation to available width. This example '
+          'uses its bottom bar on phones, rail on tablets, and sidebar on '
+          'desktop; try resizing the window.',
+      children: [
+        _TopicSection(
+          title: 'The current screen is the live demo',
+          description:
+              'Select pages from the Library section. On narrow screens '
+              'the destinations move to the bottom bar; nested destinations '
+              'become a drawer, rail, or expanded sidebar as space allows.',
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: [
+              for (final (icon, label) in [
+                (Icons.smartphone, 'Phone · bottom navigation'),
+                (Icons.tablet, 'Tablet · navigation rail'),
+                (Icons.desktop_windows, 'Desktop · sidebar'),
+              ])
+                Chip(avatar: Icon(icon, size: 18), label: Text(label)),
+            ],
+          ),
+        ),
+        const _CodeSample('''FFScaffold(
+  currentRoute: selectedRoute,
+  onRouteSelected: (id) => setState(() => selectedRoute = id),
+  destinations: const [
+    FFDestination(id: 'home', icon: Icon(Icons.home), label: 'Home'),
+    FFDestination(
+      id: 'library',
+      icon: Icon(Icons.auto_awesome),
+      label: 'Library',
+      children: [
+        FFDestination(
+          id: 'library/colors',
+          icon: Icon(Icons.palette_outlined),
+          label: 'Colors',
+        ),
+      ],
+    ),
+  ],
+  responsive: const FFValue(
+    xs: FFNavStyle(type: FFNavigationEnum.bottom),
+    md: FFNavStyle(type: FFNavigationEnum.rail),
+    lg: FFNavStyle(expandMode: FFRailExpandEnum.sidebar),
+  ),
+)'''),
+        _TopicSection(
+          title: 'Customize destinations per breakpoint',
+          description:
+              'Visibility and navigation styles are responsive values too. '
+              'The app-bar demo shows how FFAppBar can also be used alone.',
+          child: const _CodeSample(
+            "FFDestination(\n"
+            "  id: 'reports',\n"
+            "  icon: Icon(Icons.bar_chart),\n"
+            "  label: 'Reports',\n"
+            "  visible: FFValue(xs: false, md: true),\n"
+            ')',
+          ),
+        ),
+      ],
+    );
+  }
+}
 
 // ─── Spacing ─────────────────────────────────────────────────────────────
 
@@ -147,7 +608,7 @@ class SpacingDemo extends StatelessWidget {
     ].join(' · ');
     return ColoredBox(
       color: _marginColor.resolve(context),
-      child: FFContainer(
+      child: FFStyled(
         style: FFStyle(
           margin: FFSpacing(all: margin, left: marginLeft),
           padding: vertical == null
@@ -156,20 +617,22 @@ class SpacingDemo extends StatelessWidget {
           backgroundColor: FFValue(xs: _paddingColor),
         ),
         child: FFContainer(
-          style: const FFStyle(
-            padding: FFSpacing(all: FFValue.all(12)),
-            backgroundColor: FFValue(xs: AppColors.primarySoft),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                code,
-                style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
-              ),
-              const SizedBox(height: 6),
-              _Note('now: $now'),
-            ],
+          child: FFStyled(
+            style: const FFStyle(
+              padding: FFSpacing(all: FFValue.all(12)),
+              backgroundColor: FFValue(xs: AppColors.primarySoft),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  code,
+                  style: const TextStyle(fontFamily: 'monospace', fontSize: 13),
+                ),
+                const SizedBox(height: 6),
+                _Note('now: $now'),
+              ],
+            ),
           ),
         ),
       ),
@@ -238,7 +701,7 @@ class StylesDemo extends StatelessWidget {
         _section(
           context,
           'Text: fontSize xs 20 · md 28 · lg 40, centered on xs',
-          const FFItem(
+          const FFStyledItem(
             style: FFStyle(
               fontSize: FFValue(xs: 20, md: 28, lg: 40),
               fontWeight: FFValue(xs: FontWeight.w600, lg: FontWeight.w900),
@@ -251,7 +714,7 @@ class StylesDemo extends StatelessWidget {
         _section(
           context,
           'Paragraph: fontSize xs 14 · lg 18, lineHeight xs 1.3 · lg 1.7',
-          const FFItem(
+          const FFStyledItem(
             style: FFStyle(
               fontSize: FFValue(xs: 14, lg: 18),
               lineHeight: FFValue(xs: 1.3, lg: 1.7),
@@ -272,7 +735,7 @@ class StylesDemo extends StatelessWidget {
             runSpacing: 12,
             children: [
               for (final (name, variant) in _variants)
-                FFItem(style: _badge.merge(variant), child: Text(name)),
+                FFStyledItem(style: _badge.merge(variant), child: Text(name)),
             ],
           ),
           natural: true,
@@ -280,7 +743,7 @@ class StylesDemo extends StatelessWidget {
         _section(
           context,
           'Size: width xs 100% · md 360 · lg 480, height xs 64 · md 96',
-          const FFItem(
+          const FFStyledItem(
             style: FFStyle(
               width: FFValue(xs: double.infinity, md: 360, lg: 480),
               height: FFValue(xs: 64, md: 96),
@@ -340,7 +803,7 @@ class ColorsDemo extends StatelessWidget {
           gap: const FFValue.all(12),
           children: [
             for (final (name, color) in _palette)
-              FFItem(
+              FFStyledItem(
                 col: const FFValue(xs: 6, md: 4, lg: 2),
                 style: const FFStyle(
                   backgroundColor: FFValue(xs: AppColors.surface),
@@ -375,32 +838,34 @@ class ColorsDemo extends StatelessWidget {
               ),
           ],
         ),
-        FFContainer(
+        FFStyled(
           style: const FFStyle(
             padding: FFSpacing(all: FFValue(xs: 16, md: 24)),
             backgroundColor: FFValue(xs: AppColors.surface),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const FFItem(
-                style: FFStyle(
-                  fontSize: FFValue.all(20),
-                  fontWeight: FFValue.all(FontWeight.w700),
-                  color: AppColors.primary,
+          child: FFContainer(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const FFStyledItem(
+                  style: FFStyle(
+                    fontSize: FFValue.all(20),
+                    fontWeight: FFValue.all(FontWeight.w700),
+                    color: AppColors.primary,
+                  ),
+                  child: Text('A card using the palette'),
                 ),
-                child: Text('A card using the palette'),
-              ),
-              const SizedBox(height: 6),
-              const FFItem(
-                style: FFStyle(color: AppColors.muted),
-                child: Text(
-                  'Surface background, primary title, and muted text.',
+                const SizedBox(height: 6),
+                const FFStyledItem(
+                  style: FFStyle(color: AppColors.muted),
+                  child: Text(
+                    'Surface background, primary title, and muted text.',
+                  ),
                 ),
-              ),
-              const SizedBox(height: 12),
-              FilledButton(onPressed: () {}, child: const Text('Action')),
-            ],
+                const SizedBox(height: 12),
+                FilledButton(onPressed: () {}, child: const Text('Action')),
+              ],
+            ),
           ),
         ),
       ],
@@ -428,17 +893,19 @@ class ContainerDemo extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) => ColoredBox(
               color: AppColors.surface.resolve(context),
-              child: FFContainer(
-                maxSize: max,
+              child: FFStyled(
                 style: const FFStyle(
                   padding: FFSpacing(all: FFValue(xs: 12, md: 16)),
                   backgroundColor: FFValue(xs: AppColors.primarySoft),
                   color: AppColors.primary,
                   fontWeight: FFValue.all(FontWeight.w600),
                 ),
-                child: Text(
-                  'maxSize: ${max.round()} · current width: '
-                  '${constraints.maxWidth.clamp(0, max).round()} px',
+                child: FFContainer(
+                  maxSize: max,
+                  child: Text(
+                    'maxSize: ${max.round()} · current width: '
+                    '${constraints.maxWidth.clamp(0, max).round()} px',
+                  ),
                 ),
               ),
             ),

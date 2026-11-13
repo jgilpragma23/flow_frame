@@ -17,11 +17,7 @@ void main() {
   setUp(() {
     child = const SizedBox(key: Key('container-child'), height: 20);
     fullWidthContainer = FFContainer(child: child);
-    constrainedContainer = FFContainer(
-      maxSize: 360,
-      style: const FFStyle(maxWidth: FFValue.all(240)),
-      child: child,
-    );
+    constrainedContainer = FFContainer(maxSize: 240, child: child);
     invalidContainer = () => FFContainer(maxSize: 0, child: child);
     sut = MaterialApp(home: Scaffold(body: fullWidthContainer));
   });
@@ -45,9 +41,7 @@ void main() {
     expect(childRect.top, 0);
   });
 
-  testWidgets('limita el ancho y aplica el maxWidth del estilo', (
-    tester,
-  ) async {
+  testWidgets('limita el ancho a maxSize', (tester) async {
     tester.view.physicalSize = const Size(800, 600);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
@@ -65,7 +59,7 @@ void main() {
           ),
         )
         .map((box) => box.constraints.maxWidth);
-    expect(constraints, containsAll(<double>[360, 240]));
+    expect(constraints, contains(240));
     expect(tester.getRect(find.byKey(const Key('container-child'))).width, 240);
   });
 

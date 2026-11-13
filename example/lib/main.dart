@@ -4,27 +4,32 @@ import 'package:flow_frame/flow_frame.dart';
 import 'demos.dart';
 
 void main() {
-  FFBreakpoints.current = const FFBreakpoints(
-    sm: 640,
-    md: 900,
-    lg: 1200,
-    xl: 1600,
-  );
   runApp(const ExampleApp());
 }
 
-class ExampleApp extends StatelessWidget {
+class ExampleApp extends StatefulWidget {
   const ExampleApp({super.key});
 
   @override
+  State<ExampleApp> createState() => _ExampleAppState();
+}
+
+class _ExampleAppState extends State<ExampleApp> {
+  bool _dark = Uri.base.queryParameters['dark'] == '1';
+
+  void _toggleTheme() => setState(() => _dark = !_dark);
+
+  @override
   Widget build(BuildContext context) {
-    final dark = Uri.base.queryParameters['dark'] == '1';
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      themeMode: dark ? ThemeMode.dark : ThemeMode.light,
-      theme: ThemeData(brightness: Brightness.light),
-      darkTheme: ThemeData(brightness: Brightness.dark),
-      home: const ExampleShell(),
+    return FFBreakpointScope(
+      breakpoints: const FFBreakpoints(sm: 640, md: 900, lg: 1200, xl: 1600),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        themeMode: _dark ? ThemeMode.dark : ThemeMode.light,
+        theme: ThemeData(brightness: Brightness.light),
+        darkTheme: ThemeData(brightness: Brightness.dark),
+        home: ExampleShell(isDarkMode: _dark, onToggleTheme: _toggleTheme),
+      ),
     );
   }
 }
@@ -74,7 +79,14 @@ const label = FFStyle(
 /// app bar links from md onward, `?sel=id` selects the initial route, and
 /// `?open=1` opens the menu on startup.
 class ExampleShell extends StatefulWidget {
-  const ExampleShell({super.key});
+  const ExampleShell({
+    super.key,
+    required this.isDarkMode,
+    required this.onToggleTheme,
+  });
+
+  final bool isDarkMode;
+  final VoidCallback onToggleTheme;
 
   @override
   State<ExampleShell> createState() => _ExampleShellState();
@@ -97,9 +109,24 @@ class _ExampleShellState extends State<ExampleShell> {
       label: 'Library',
       children: [
         FFDestination(
+          id: 'library/breakpoints',
+          icon: Icon(Icons.devices_outlined),
+          label: 'Breakpoints',
+        ),
+        FFDestination(
+          id: 'library/grid',
+          icon: Icon(Icons.grid_on_outlined),
+          label: 'Grid',
+        ),
+        FFDestination(
           id: 'library/styles',
           icon: Icon(Icons.text_fields),
           label: 'Styles',
+        ),
+        FFDestination(
+          id: 'library/typography',
+          icon: Icon(Icons.format_size),
+          label: 'Typography',
         ),
         FFDestination(
           id: 'library/spacing',
@@ -112,9 +139,19 @@ class _ExampleShellState extends State<ExampleShell> {
           label: 'Colors',
         ),
         FFDestination(
+          id: 'library/themes',
+          icon: Icon(Icons.dark_mode_outlined),
+          label: 'Themes',
+        ),
+        FFDestination(
           id: 'library/container',
           icon: Icon(Icons.crop_free),
           label: 'Container',
+        ),
+        FFDestination(
+          id: 'library/navigation',
+          icon: Icon(Icons.navigation_outlined),
+          label: 'Navigation',
         ),
         FFDestination(
           id: 'library/app-bar',
@@ -242,6 +279,19 @@ class _ExampleShellState extends State<ExampleShell> {
             label: 'Notifications',
             onPressed: () {},
           ),
+          FFAction(
+            icon: Icon(
+              widget.isDarkMode
+                  ? Icons.light_mode_outlined
+                  : Icons.dark_mode_outlined,
+            ),
+            label: widget.isDarkMode ? 'Light theme' : 'Dark theme',
+            onPressed: widget.onToggleTheme,
+            display: const FFValue(
+              xs: FFActionDisplayEnum.icon,
+              md: FFActionDisplayEnum.full,
+            ),
+          ),
         ],
         trailing: const [SizedBox(width: 8)],
       ),
@@ -276,10 +326,15 @@ class _ExampleShellState extends State<ExampleShell> {
       body: switch (_selected) {
         'examples' => const ExamplePage(),
         'sales/orders' => const OrdersPage(),
+        'library/breakpoints' => const BreakpointsDemo(),
+        'library/grid' => const GridDemo(),
         'library/styles' => const StylesDemo(),
+        'library/typography' => const TypographyDemo(),
         'library/spacing' => const SpacingDemo(),
         'library/colors' => const ColorsDemo(),
+        'library/themes' => ThemeDemo(onToggleTheme: widget.onToggleTheme),
         'library/container' => const ContainerDemo(),
+        'library/navigation' => const NavigationDemo(),
         'library/app-bar' => const AppBarDemo(),
         _ => _Placeholder(_selected),
       },
@@ -314,142 +369,148 @@ class ExamplePage extends StatelessWidget {
     return SingleChildScrollView(
       child: FFContainer(
         maxSize: 1280,
-        style: const FFStyle(
-          padding: FFSpacing(
-            horizontal: FFValue(xs: 16, md: 32),
-            vertical: FFValue(xs: 16, md: 32),
+        child: FFStyled(
+          style: const FFStyle(
+            padding: FFSpacing(
+              horizontal: FFValue(xs: 16, md: 32),
+              vertical: FFValue(xs: 16, md: 32),
+            ),
           ),
-        ),
-        child: FFFlex(
-          gap: const FFValue(xs: 16, md: 24),
-          children: [
-            FFItem(
-              style: const FFStyle(
-                textStyle: FFValue(
-                  xs: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
-                  md: TextStyle(fontSize: 34),
-                ),
-                textAlign: FFValue(xs: TextAlign.center, md: TextAlign.start),
-              ),
-              child: Text(
-                'Current breakpoint: ${context.breakpoint.name} '
-                '(${MediaQuery.sizeOf(context).width.round()} px)',
-              ),
-            ),
-            const FFItem(
-              style: FFStyle(color: AppColors.muted),
-              child: Text(
-                'Grid with col: FFValue(xs: 12, md: 6, lg: 4). '
-                'One per row on xs, two on md, and three on lg; '
-                'items that do not fit wrap to the next row.',
-              ),
-            ),
-            FFFlex(
-              direction: const FFValue.all(FFDirectionEnum.horizontal),
-              gap: const FFValue(xs: 12, md: 16),
-              children: [
-                for (var i = 1; i <= 5; i++)
-                  FFItem(
-                    col: const FFValue(xs: 12, md: 6, lg: 4),
-                    style: card.merge(const FFStyle(height: FFValue.all(80))),
-                    child: _CardBody('Product $i', 'col: xs 12, md 6, lg 4'),
+          child: FFFlex(
+            gap: const FFValue(xs: 16, md: 24),
+            children: [
+              FFStyledItem(
+                style: const FFStyle(
+                  textStyle: FFValue(
+                    xs: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+                    md: TextStyle(fontSize: 34),
                   ),
-              ],
-            ),
-            const FFItem(
-              style: FFStyle(color: AppColors.muted),
-              child: Text(
-                'Mixed in one row: col 3, fill, and a naturally sized icon. '
-                'On xs, col 12 uses the full row and the others wrap below.',
-              ),
-            ),
-            FFFlex(
-              direction: const FFValue.all(FFDirectionEnum.horizontal),
-              gap: const FFValue(xs: 12, md: 16),
-              crossAxisAlignment: const FFValue.all(CrossAxisAlignment.center),
-              children: [
-                FFItem(
-                  col: const FFValue(xs: 12, md: 3),
-                  style: card.merge(const FFStyle(height: FFValue.all(80))),
-                  child: const _CardBody('Filters', 'col: xs 12, md 3'),
+                  textAlign: FFValue(xs: TextAlign.center, md: TextAlign.start),
                 ),
-                FFItem(
-                  fill: const FFValue.all(true),
-                  style: card.merge(const FFStyle(height: FFValue.all(80))),
-                  child: const _CardBody('Search', 'fill: true'),
+                child: Text(
+                  'Current breakpoint: ${context.breakpoint.name} '
+                  '(${MediaQuery.sizeOf(context).width.round()} px)',
                 ),
-                FFItem(
-                  fill: const FFValue.all(false),
-                  style: const FFStyle(color: AppColors.primary),
-                  child: const Icon(Icons.tune, size: 32),
+              ),
+              const FFStyledItem(
+                style: FFStyle(color: AppColors.muted),
+                child: Text(
+                  'Grid with col: FFValue(xs: 12, md: 6, lg: 4). '
+                  'One per row on xs, two on md, and three on lg; '
+                  'items that do not fit wrap to the next row.',
                 ),
-              ],
-            ),
-            const FFItem(
-              style: FFStyle(color: AppColors.muted),
-              child: Text(
-                'FFFlex is vertical on xs/sm and horizontal from md onward. '
-                'Card B uses visible: FFValue(xs: false, md: true).',
               ),
-            ),
-            FFFlex(
-              direction: const FFValue(
-                xs: FFDirectionEnum.vertical,
-                md: FFDirectionEnum.horizontal,
+              FFFlex(
+                direction: const FFValue.all(FFDirectionEnum.horizontal),
+                gap: const FFValue(xs: 12, md: 16),
+                children: [
+                  for (var i = 1; i <= 5; i++)
+                    FFStyledItem(
+                      col: const FFValue(xs: 12, md: 6, lg: 4),
+                      style: card.merge(
+                        const FFStyle(height: FFValue.all(100)),
+                      ),
+                      child: _CardBody('Product $i', 'col: xs 12, md 6, lg 4'),
+                    ),
+                ],
               ),
-              gap: const FFValue(xs: 12, md: 16),
-              children: [
-                _card('A', 'fill: md true'),
-                FFItem(
-                  fill: const FFValue(md: true),
-                  style: card.merge(
-                    const FFStyle(
-                      visible: FFValue(xs: false, md: true),
-                      backgroundColor: FFValue(
-                        xs: FFColor.adaptive(
-                          light: Color(0xFFFFF4D6),
-                          dark: Color(0xFF3A2E14),
+              const FFStyledItem(
+                style: FFStyle(color: AppColors.muted),
+                child: Text(
+                  'Mixed in one row: col 3, fill, and a naturally sized icon. '
+                  'On xs, col 12 uses the full row and the others wrap below.',
+                ),
+              ),
+              FFFlex(
+                direction: const FFValue.all(FFDirectionEnum.horizontal),
+                gap: const FFValue(xs: 12, md: 16),
+                crossAxisAlignment: const FFValue.all(
+                  CrossAxisAlignment.center,
+                ),
+                children: [
+                  FFStyledItem(
+                    col: const FFValue(xs: 12, md: 3),
+                    style: card.merge(const FFStyle(height: FFValue.all(100))),
+                    child: const _CardBody('Filters', 'col: xs 12, md 3'),
+                  ),
+                  FFStyledItem(
+                    fill: const FFValue.all(true),
+                    style: card.merge(const FFStyle(height: FFValue.all(100))),
+                    child: const _CardBody('Search', 'fill: true'),
+                  ),
+                  FFStyledItem(
+                    fill: const FFValue.all(false),
+                    style: const FFStyle(color: AppColors.primary),
+                    child: const Icon(Icons.tune, size: 32),
+                  ),
+                ],
+              ),
+              const FFStyledItem(
+                style: FFStyle(color: AppColors.muted),
+                child: Text(
+                  'FFFlex is vertical on xs/sm and horizontal from md onward. '
+                  'Card B uses visible: FFValue(xs: false, md: true).',
+                ),
+              ),
+              FFFlex(
+                direction: const FFValue(
+                  xs: FFDirectionEnum.vertical,
+                  md: FFDirectionEnum.horizontal,
+                ),
+                gap: const FFValue(xs: 12, md: 16),
+                children: [
+                  _card('A', 'fill: md true'),
+                  FFStyledItem(
+                    fill: const FFValue(md: true),
+                    style: card.merge(
+                      const FFStyle(
+                        visible: FFValue(xs: false, md: true),
+                        backgroundColor: FFValue(
+                          xs: FFColor.adaptive(
+                            light: Color(0xFFFFF4D6),
+                            dark: Color(0xFF3A2E14),
+                          ),
                         ),
                       ),
                     ),
+                    child: const _CardBody('B', 'hidden on xs/sm'),
                   ),
-                  child: const _CardBody('B', 'hidden on xs/sm'),
-                ),
-                _card('C', 'fill: md true'),
-              ],
-            ),
-            const FFItem(
-              style: FFStyle(color: AppColors.muted),
-              child: Text(
-                'A 260 px sidebar with the content filling the rest, from md onward',
+                  _card('C', 'fill: md true'),
+                ],
               ),
-            ),
-            FFFlex(
-              direction: const FFValue(
-                xs: FFDirectionEnum.vertical,
-                md: FFDirectionEnum.horizontal,
+              const FFStyledItem(
+                style: FFStyle(color: AppColors.muted),
+                child: Text(
+                  'A 260 px sidebar with the content filling the rest, from md onward',
+                ),
               ),
-              gap: const FFValue(xs: 12, md: 16),
-              children: [
-                FFItem(
-                  fill: const FFValue.all(false),
-                  style: card.merge(const FFStyle(width: FFValue(md: 260))),
-                  child: const _CardBody('Sidebar', 'width: md 260'),
+              FFFlex(
+                direction: const FFValue(
+                  xs: FFDirectionEnum.vertical,
+                  md: FFDirectionEnum.horizontal,
                 ),
-                FFItem(
-                  fill: const FFValue(md: true),
-                  style: card,
-                  child: const _CardBody('Content', 'fill: md true'),
-                ),
-              ],
-            ),
-          ],
+                gap: const FFValue(xs: 12, md: 16),
+                children: [
+                  FFStyledItem(
+                    fill: const FFValue.all(false),
+                    style: card.merge(const FFStyle(width: FFValue(md: 260))),
+                    child: const _CardBody('Sidebar', 'width: md 260'),
+                  ),
+                  FFStyledItem(
+                    fill: const FFValue(md: true),
+                    style: card,
+                    child: const _CardBody('Content', 'fill: md true'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  FFItem _card(String title, String note) => FFItem(
+  FFStyledItem _card(String title, String note) => FFStyledItem(
     fill: const FFValue(md: true),
     style: card,
     child: _CardBody(title, note),
@@ -492,99 +553,105 @@ class OrdersPage extends StatelessWidget {
     return SingleChildScrollView(
       child: FFContainer(
         maxSize: 1280,
-        style: const FFStyle(padding: FFSpacing(all: FFValue(xs: 16, md: 32))),
-        child: FFFlex(
-          gap: const FFValue(xs: 16, md: 24),
-          children: [
-            const FFItem(
-              style: FFStyle(
-                textStyle: FFValue(
-                  xs: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
-                  md: TextStyle(fontSize: 30),
+        child: FFStyled(
+          style: const FFStyle(
+            padding: FFSpacing(all: FFValue(xs: 16, md: 32)),
+          ),
+          child: FFFlex(
+            gap: const FFValue(xs: 16, md: 24),
+            children: [
+              const FFStyledItem(
+                style: FFStyle(
+                  textStyle: FFValue(
+                    xs: TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+                    md: TextStyle(fontSize: 30),
+                  ),
                 ),
+                child: Text('Orders'),
               ),
-              child: Text('Orders'),
-            ),
-            FFFlex(
-              direction: const FFValue.all(FFDirectionEnum.horizontal),
-              gap: const FFValue(xs: 12, md: 16),
-              children: [
-                for (final (title, value) in [
-                  ('Today', '24'),
-                  ('This week', '183'),
-                  ('Pending', '7'),
-                  ('Revenue', '\$4.2k'),
-                ])
-                  FFItem(
-                    col: const FFValue(xs: 12, sm: 6, lg: 3),
+              FFFlex(
+                direction: const FFValue.all(FFDirectionEnum.horizontal),
+                gap: const FFValue(xs: 12, md: 16),
+                children: [
+                  for (final (title, value) in [
+                    ('Today', '24'),
+                    ('This week', '183'),
+                    ('Pending', '7'),
+                    ('Revenue', '\$4.2k'),
+                  ])
+                    FFStyledItem(
+                      col: const FFValue(xs: 12, sm: 6, lg: 3),
+                      style: _card,
+                      child: _CardBody(value, title),
+                    ),
+                ],
+              ),
+              FFFlex(
+                direction: const FFValue.all(FFDirectionEnum.horizontal),
+                gap: const FFValue.all(12),
+                crossAxisAlignment: const FFValue.all(
+                  CrossAxisAlignment.center,
+                ),
+                children: [
+                  const FFStyledItem(
+                    col: FFValue(xs: 12, md: 3),
                     style: _card,
-                    child: _CardBody(value, title),
+                    child: _CardBody('Filters', 'col: xs 12, md 3'),
                   ),
-              ],
-            ),
-            FFFlex(
-              direction: const FFValue.all(FFDirectionEnum.horizontal),
-              gap: const FFValue.all(12),
-              crossAxisAlignment: const FFValue.all(CrossAxisAlignment.center),
-              children: [
-                const FFItem(
-                  col: FFValue(xs: 12, md: 3),
-                  style: _card,
-                  child: _CardBody('Filters', 'col: xs 12, md 3'),
-                ),
-                const FFItem(
-                  fill: FFValue.all(true),
-                  style: _card,
-                  child: _CardBody('Search orders…', 'fill: true'),
-                ),
-                FFItem(
-                  fill: const FFValue.all(false),
-                  child: FilledButton(
-                    onPressed: () {},
-                    child: const Text('New'),
+                  const FFStyledItem(
+                    fill: FFValue.all(true),
+                    style: _card,
+                    child: _CardBody('Search orders…', 'fill: true'),
                   ),
-                ),
-              ],
-            ),
-            FFFlex(
-              direction: const FFValue(
-                xs: FFDirectionEnum.vertical,
-                md: FFDirectionEnum.horizontal,
+                  FFItem(
+                    fill: const FFValue.all(false),
+                    child: FilledButton(
+                      onPressed: () {},
+                      child: const Text('New'),
+                    ),
+                  ),
+                ],
               ),
-              gap: const FFValue(xs: 12, md: 16),
-              children: [
-                FFItem(
-                  col: const FFValue(md: 7, xl: 8),
-                  style: _card,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const _CardBody('Order list', 'col: md 7, xl 8'),
-                      for (var i = 1; i <= 4; i++)
-                        ListTile(
-                          contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.receipt_long_outlined),
-                          title: Text('Pedido #10$i'),
-                          trailing: Text('\$${i * 35}.00'),
-                        ),
-                    ],
-                  ),
+              FFFlex(
+                direction: const FFValue(
+                  xs: FFDirectionEnum.vertical,
+                  md: FFDirectionEnum.horizontal,
                 ),
-                const FFItem(
-                  fill: FFValue(md: true),
-                  style: FFStyle(
-                    padding: FFSpacing(all: FFValue(xs: 12, md: 20)),
-                    backgroundColor: FFValue(xs: AppColors.primarySoft),
-                    visible: FFValue(xs: false, md: true),
+                gap: const FFValue(xs: 12, md: 16),
+                children: [
+                  FFStyledItem(
+                    col: const FFValue(md: 7, xl: 8),
+                    style: _card,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const _CardBody('Order list', 'col: md 7, xl 8'),
+                        for (var i = 1; i <= 4; i++)
+                          ListTile(
+                            contentPadding: EdgeInsets.zero,
+                            leading: const Icon(Icons.receipt_long_outlined),
+                            title: Text('Pedido #10$i'),
+                            trailing: Text('\$${i * 35}.00'),
+                          ),
+                      ],
+                    ),
                   ),
-                  child: _CardBody(
-                    'Order details',
-                    'fill: md true · oculto en xs/sm',
+                  const FFStyledItem(
+                    fill: FFValue(md: true),
+                    style: FFStyle(
+                      padding: FFSpacing(all: FFValue(xs: 12, md: 20)),
+                      backgroundColor: FFValue(xs: AppColors.primarySoft),
+                      visible: FFValue(xs: false, md: true),
+                    ),
+                    child: _CardBody(
+                      'Order details',
+                      'fill: md true · oculto en xs/sm',
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

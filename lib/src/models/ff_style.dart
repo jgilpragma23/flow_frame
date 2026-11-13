@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../utils/context_extensions.dart';
 import 'ff_color.dart';
+import 'ff_decoration_style.dart';
+import 'ff_layout_style.dart';
 import 'ff_spacing.dart';
+import 'ff_text_style.dart';
 import 'ff_value.dart';
 
-/// Reusable responsive style, similar to a CSS class.
+/// Optional composition of text, decoration, and layout styles.
 ///
-/// For text, [textStyle] is the base, with [color], [fontWeight], [fontSize],
-/// and [lineHeight] applied on top.
+/// Use [FFTextStyle], [FFDecorationStyle], or [FFLayoutStyle] directly when
+/// only one concern is needed. This aggregate is a convenience for combining
+/// them on a widget subtree.
 @immutable
 class FFStyle {
   const FFStyle({
@@ -35,14 +39,42 @@ class FFStyle {
     this.visible,
   });
 
+  /// Builds a composed style from independent responsibility-specific styles.
+  factory FFStyle.compose({
+    FFTextStyle text = const FFTextStyle(),
+    FFDecorationStyle decoration = const FFDecorationStyle(),
+    FFLayoutStyle layout = const FFLayoutStyle(),
+  }) => FFStyle(
+    padding: layout.padding,
+    margin: layout.margin,
+    textStyle: text.textStyle,
+    color: text.color,
+    fontWeight: text.fontWeight,
+    fontSize: text.fontSize,
+    lineHeight: text.lineHeight,
+    textAlign: text.textAlign,
+    backgroundColor: decoration.backgroundColor,
+    backgroundImage: decoration.backgroundImage,
+    shadow: decoration.shadow,
+    borderRadius: decoration.borderRadius,
+    borderWidth: decoration.borderWidth,
+    borderColor: decoration.borderColor,
+    width: layout.width,
+    minWidth: layout.minWidth,
+    maxWidth: layout.maxWidth,
+    height: layout.height,
+    maxHeight: layout.maxHeight,
+    clip: layout.clip,
+    visible: layout.visible,
+  );
+
   final FFSpacing? padding;
   final FFSpacing? margin;
 
-  /// Base text style. Styles are merged from `xs` at each breakpoint, so
-  /// values defined at `xs` are retained at `md`.
+  /// Base text style. Values merge from `xs` through the active breakpoint.
   final FFValue<TextStyle>? textStyle;
 
-  /// Text color; adapts to light and dark modes.
+  /// Text color that adapts to the current theme brightness.
   final FFColor? color;
   final FFValue<FontWeight>? fontWeight;
   final FFValue<double>? fontSize;
@@ -51,124 +83,102 @@ class FFStyle {
   final FFValue<double>? lineHeight;
   final FFValue<TextAlign>? textAlign;
 
-  /// Background color per breakpoint; each `FFColor` adapts to light and dark
-  /// modes.
+  /// Background color per breakpoint, with optional light/dark variants.
   final FFValue<FFColor>? backgroundColor;
 
-  /// Background image per breakpoint, painted over [backgroundColor]. Use
-  /// `DecorationImage` to configure `fit`, `alignment`, opacity, and more.
+  /// Image painted over [backgroundColor].
   final FFValue<DecorationImage>? backgroundImage;
 
-  /// Shadow per breakpoint. `FFShadow` provides lists of shadows;
-  /// `FFShadow.none` removes the shadow at a larger breakpoint.
   final FFValue<List<BoxShadow>>? shadow;
-
-  /// Corners per breakpoint, using Flutter's `BorderRadius`: all equal
-  /// (`BorderRadius.all(Radius.circular(12))`), top only
-  /// (`BorderRadius.vertical(top: ...)`), or independently configured
-  /// (`BorderRadius.only(...)` or `BorderRadiusDirectional` for start and
-  /// end). Rounds the background, shadow, and border, and clips content to
-  /// that shape.
   final FFValue<BorderRadiusGeometry>? borderRadius;
-
-  /// Border width. Added to the padding so the content does not overlap it.
   final FFValue<double>? borderWidth;
 
-  /// Border color. Defaults to the theme's `outlineVariant`.
+  /// Defaults to the theme's `outlineVariant`.
   final FFColor? borderColor;
 
   final FFValue<double>? width;
   final FFValue<double>? minWidth;
   final FFValue<double>? maxWidth;
   final FFValue<double>? height;
-
-  /// Maximum height. Content that does not fit overflows, so long content
-  /// should use a scrollable child (for example, a `ListView`).
   final FFValue<double>? maxHeight;
 
-  /// `false` hides the widget at that breakpoint (equivalent to `d-none`).
+  /// `false` hides the widget at that breakpoint.
   final FFValue<bool>? visible;
 
-  /// `true` clips overflowing content, like `overflow: hidden`: content uses
-  /// its natural height, and anything beyond [height] or [maxHeight] is
-  /// clipped at the padding edge, following [borderRadius]. Not suitable for
-  /// scrollable children (`ListView`), which need a fixed height.
+  /// Clips content to the resolved bounds.
   final FFValue<bool>? clip;
 
-  /// Combines two styles; [other] takes precedence where it defines a value.
+  FFTextStyle get text => FFTextStyle(
+    textStyle: textStyle,
+    color: color,
+    fontWeight: fontWeight,
+    fontSize: fontSize,
+    lineHeight: lineHeight,
+    textAlign: textAlign,
+  );
+
+  FFDecorationStyle get decoration => FFDecorationStyle(
+    backgroundColor: backgroundColor,
+    backgroundImage: backgroundImage,
+    shadow: shadow,
+    borderRadius: borderRadius,
+    borderWidth: borderWidth,
+    borderColor: borderColor,
+  );
+
+  FFLayoutStyle get layout => FFLayoutStyle(
+    padding: padding,
+    margin: margin,
+    width: width,
+    minWidth: minWidth,
+    maxWidth: maxWidth,
+    height: height,
+    maxHeight: maxHeight,
+    visible: visible,
+    clip: clip,
+  );
+
+  /// Combines styles; values from [other] take precedence where defined.
   FFStyle merge(FFStyle? other) {
     if (other == null) return this;
-    return FFStyle(
-      padding: padding?.merge(other.padding) ?? other.padding,
-      margin: margin?.merge(other.margin) ?? other.margin,
-      textStyle: textStyle?.mergeStyles(other.textStyle) ?? other.textStyle,
-      color: other.color ?? color,
-      fontWeight: FFValue.combine(fontWeight, other.fontWeight),
-      fontSize: FFValue.combine(fontSize, other.fontSize),
-      lineHeight: FFValue.combine(lineHeight, other.lineHeight),
-      textAlign: FFValue.combine(textAlign, other.textAlign),
-      backgroundColor: FFValue.combine(backgroundColor, other.backgroundColor),
-      backgroundImage: FFValue.combine(backgroundImage, other.backgroundImage),
-      shadow: FFValue.combine(shadow, other.shadow),
-      borderRadius: FFValue.combine(borderRadius, other.borderRadius),
-      borderWidth: FFValue.combine(borderWidth, other.borderWidth),
-      borderColor: other.borderColor ?? borderColor,
-      width: FFValue.combine(width, other.width),
-      minWidth: FFValue.combine(minWidth, other.minWidth),
-      maxWidth: FFValue.combine(maxWidth, other.maxWidth),
-      height: FFValue.combine(height, other.height),
-      maxHeight: FFValue.combine(maxHeight, other.maxHeight),
-      visible: FFValue.combine(visible, other.visible),
-      clip: FFValue.combine(clip, other.clip),
+    return FFStyle.compose(
+      text: text.merge(other.text),
+      decoration: decoration.merge(other.decoration),
+      layout: layout.merge(other.layout),
     );
   }
 
-  /// Flutter `TextStyle` with the values defined by this style for the
-  /// current breakpoint and theme mode. Does not include inherited container
-  /// styles, so a `Text` using it combines with its container's style.
-  TextStyle toTextStyle(BuildContext context) {
-    final breakpoint = context.breakpoint;
-    final base = textStyle?.resolveMerged(breakpoint) ?? const TextStyle();
-    return base.copyWith(
-      color: color?.resolve(context),
-      fontWeight: fontWeight?.resolve(breakpoint),
-      fontSize: fontSize?.resolve(breakpoint),
-      height: lineHeight?.resolve(breakpoint),
-    );
-  }
+  /// Flutter [TextStyle] with the values defined for the current context.
+  TextStyle toTextStyle(BuildContext context) => text.resolve(context);
 
   /// All values resolved for the current breakpoint and theme mode.
   FFResolvedStyle resolve(BuildContext context) {
-    final breakpoint = context.breakpoint;
+    final resolvedText = text.resolve(context);
+    final resolvedDecoration = decoration.resolve(context);
+    final resolvedLayout = layout.resolve(context);
     return FFResolvedStyle(
-      padding: padding?.resolve(breakpoint) ?? EdgeInsets.zero,
-      margin: margin?.resolve(breakpoint) ?? EdgeInsets.zero,
-      textStyle: toTextStyle(context),
-      textAlign: textAlign?.resolve(breakpoint),
-      backgroundColor: backgroundColor?.resolve(breakpoint)?.resolve(context),
-      backgroundImage: backgroundImage?.resolve(breakpoint),
-      shadow: shadow?.resolve(breakpoint) ?? const [],
-      borderRadius:
-          borderRadius
-              ?.resolve(breakpoint)
-              ?.resolve(Directionality.of(context)) ??
-          BorderRadius.zero,
-      borderWidth: borderWidth?.resolve(breakpoint) ?? 0,
-      borderColor:
-          borderColor?.resolve(context) ??
-          Theme.of(context).colorScheme.outlineVariant,
-      width: width?.resolve(breakpoint),
-      minWidth: minWidth?.resolve(breakpoint),
-      maxWidth: maxWidth?.resolve(breakpoint),
-      height: height?.resolve(breakpoint),
-      maxHeight: maxHeight?.resolve(breakpoint),
-      visible: visible?.resolve(breakpoint) ?? true,
-      clip: clip?.resolve(breakpoint) ?? false,
+      padding: resolvedLayout.padding,
+      margin: resolvedLayout.margin,
+      textStyle: resolvedText,
+      textAlign: textAlign?.resolve(context.breakpoint),
+      backgroundColor: resolvedDecoration.backgroundColor,
+      backgroundImage: resolvedDecoration.backgroundImage,
+      shadow: resolvedDecoration.shadow,
+      borderRadius: resolvedDecoration.borderRadius,
+      borderWidth: resolvedDecoration.borderWidth,
+      borderColor: resolvedDecoration.borderColor,
+      width: resolvedLayout.width,
+      minWidth: resolvedLayout.minWidth,
+      maxWidth: resolvedLayout.maxWidth,
+      height: resolvedLayout.height,
+      maxHeight: resolvedLayout.maxHeight,
+      visible: resolvedLayout.visible,
+      clip: resolvedLayout.clip,
     );
   }
 }
 
-/// An [FFStyle] with values resolved to standard Flutter types.
+/// An [FFStyle] resolved to standard Flutter types.
 @immutable
 class FFResolvedStyle {
   const FFResolvedStyle({
