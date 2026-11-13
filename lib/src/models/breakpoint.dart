@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 import '../enums/breakpoint_enum.dart';
 
@@ -6,14 +6,14 @@ export '../enums/breakpoint_enum.dart';
 
 /// Minimum width (in logical pixels) at which each breakpoint starts.
 ///
-/// `xs` always starts at 0. To customize the thresholds, assign [current]
-/// once before `runApp`:
+/// `xs` always starts at 0. To customize the thresholds for an app or a
+/// subtree, wrap it in [FFBreakpointScope]:
 ///
 /// ```dart
-/// void main() {
-///   FFBreakpoints.current = const FFBreakpoints(md: 900);
-///   runApp(const MyApp());
-/// }
+/// FFBreakpointScope(
+///   breakpoints: const FFBreakpoints(md: 900),
+///   child: const MyApp(),
+/// )
 /// ```
 @immutable
 class FFBreakpoints {
@@ -24,11 +24,8 @@ class FFBreakpoints {
     this.xl = 1600,
   }) : assert(0 < sm && sm < md && md < lg && lg < xl);
 
-  /// Thresholds used by all responsive widgets in the package.
-  ///
-  /// This configuration is global to the process. Assign it before `runApp`
-  /// to keep breakpoints consistent throughout the application.
-  static FFBreakpoints current = const FFBreakpoints();
+  /// Default responsive thresholds.
+  static const defaults = FFBreakpoints();
 
   final double sm;
   final double md;
@@ -54,4 +51,30 @@ class FFBreakpoints {
 
   @override
   int get hashCode => Object.hash(sm, md, lg, xl);
+}
+
+/// Provides responsive thresholds to descendants.
+///
+/// Nested scopes can customize one part of an app without changing the
+/// breakpoints used elsewhere. Descendants outside a scope use
+/// [FFBreakpoints.defaults].
+class FFBreakpointScope extends InheritedWidget {
+  const FFBreakpointScope({
+    super.key,
+    this.breakpoints = FFBreakpoints.defaults,
+    required super.child,
+  });
+
+  final FFBreakpoints breakpoints;
+
+  /// Returns the nearest thresholds, or [FFBreakpoints.defaults] if absent.
+  static FFBreakpoints of(BuildContext context) =>
+      context
+          .dependOnInheritedWidgetOfExactType<FFBreakpointScope>()
+          ?.breakpoints ??
+      FFBreakpoints.defaults;
+
+  @override
+  bool updateShouldNotify(FFBreakpointScope oldWidget) =>
+      breakpoints != oldWidget.breakpoints;
 }

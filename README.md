@@ -34,9 +34,75 @@ dependencies:
 import 'package:flow_frame/flow_frame.dart';
 ```
 
+Import only the capability you need when you do not want the complete API:
+
+```dart
+import 'package:flow_frame/responsive.dart'; // Breakpoints and FFValue
+import 'package:flow_frame/grid.dart';       // FFFlex and FFItem
+import 'package:flow_frame/colors.dart';     // FFColor
+import 'package:flow_frame/containers.dart'; // FFContainer
+import 'package:flow_frame/styling.dart';    // FFStyle and FFStyled
+import 'package:flow_frame/navigation.dart'; // Navigation and app bars
+```
+
+`flow_frame.dart` remains the convenience import that combines these
+capabilities. The grid and container widgets do not require `FFStyle`; use
+`FFStyled` or `FFStyledItem` only when style composition is desired.
+
+Styling is also split by concern: `FFTextStyle` handles typography,
+`FFDecorationStyle` handles colors, borders and shadows, and `FFLayoutStyle`
+handles spacing, size and visibility. Use just one, or compose them with
+`FFStyle.compose`:
+
+```dart
+final cardStyle = FFStyle.compose(
+  text: FFTextStyle(color: FFColor.fixed(Colors.blue)),
+  decoration: FFDecorationStyle(
+    backgroundColor: FFValue(xs: FFColor.fixed(Color(0xFFE3F2FD))),
+  ),
+  layout: FFLayoutStyle(
+    padding: FFSpacing(all: FFValue.all(16)),
+  ),
+);
+```
+
+Apply components directly to a subtree with `FFStyled`, or to a grid column
+with `FFStyledItem.compose`:
+
+```dart
+FFFlex(
+  children: [
+    FFStyledItem.compose(
+      col: const FFValue(xs: 12, md: 6),
+      decoration: const FFDecorationStyle(
+        backgroundColor: FFValue(xs: FFColor.fixed(Color(0xFFE3F2FD))),
+      ),
+      child: const Text('Blue column'),
+    ),
+  ],
+)
+```
+
 ## Complete example
 
-An app with responsive navigation, branding, actions, and a grid-based page. This is a condensed version of the screen shown above; the full code is in [`example/`](example/lib/main.dart).
+The example is a multi-screen catalog of Flow Frame's capabilities. Open the
+Library section to explore breakpoints, the grid, styles, typography, spacing,
+colors, themes, containers, navigation, and the standalone app bar. The theme
+action switches between light and dark mode so you can see `FFColor.adaptive`
+update live. The example uses a small feature-oriented structure:
+
+```text
+example/lib/
+  app/        app setup, theme state, and navigation shell
+  models/     typed route identifiers and labels
+  screens/    home, orders, and one screen per library topic
+  theme/      adaptive palette and reusable example styles
+  utils/      small responsive display helpers
+  widgets/    shared demo sections, code samples, and card content
+```
+
+The code below is a compact illustration of composing navigation and grid
+capabilities. The runnable, organized example is in `example/lib/`.
 
 ```dart
 class AppColors {
@@ -129,16 +195,22 @@ class OrdersPage extends StatelessWidget {
     return SingleChildScrollView(
       child: FFContainer(
         maxSize: 1280,
-        style: const FFStyle(padding: FFSpacing(all: FFValue(xs: 16, md: 32))),
-        child: FFFlex(
-          gap: const FFValue(xs: 16, md: 24),
-          children: [
+        child: FFStyled(
+          style: const FFStyle(padding: FFSpacing(all: FFValue(xs: 16, md: 32))),
+          child: FFFlex(
+            gap: const FFValue(xs: 16, md: 24),
+            children: [
             // Summary: 1 per row on xs, 2 on sm, and 4 from lg onward.
             FFFlex(
               gap: const FFValue(xs: 12, md: 16),
               children: [
-                for (final (title, value) in [('Today', '24'), ('This week', '183'), ('Pending', '7'), ('Revenue', '\$4.2k')])
-                  FFItem(
+                for (final (title, value) in [
+                  ('Today', '24'),
+                  ('This week', '183'),
+                  ('Pending', '7'),
+                  ('Revenue', '\$4.2k'),
+                ])
+                  FFStyledItem(
                     col: const FFValue(xs: 12, sm: 6, lg: 3),
                     style: card,
                     child: Text('$value  $title'),
@@ -147,16 +219,25 @@ class OrdersPage extends StatelessWidget {
             ),
             // List and details: stacked on xs/sm, side by side from md onward.
             FFFlex(
-              direction: const FFValue(xs: FFDirectionEnum.vertical, md: FFDirectionEnum.horizontal),
+              direction: const FFValue(
+                xs: FFDirectionEnum.vertical,
+                md: FFDirectionEnum.horizontal,
+              ),
               gap: const FFValue(xs: 12, md: 16),
               children: [
-                const FFItem(col: FFValue(md: 7, xl: 8), style: card, child: OrdersList()),
-                FFItem(
+                const FFStyledItem(
+                  col: FFValue(md: 7, xl: 8),
+                  style: card,
+                  child: OrdersList(),
+                ),
+                FFStyledItem(
                   fill: const FFValue(md: true),
-                  style: card.merge(const FFStyle(
-                    backgroundColor: FFValue(xs: AppColors.primarySoft),
-                    visible: FFValue(xs: false, md: true), // Hide details on phones.
-                  )),
+                  visible: const FFValue(xs: false, md: true),
+                  style: card.merge(
+                    const FFStyle(
+                      backgroundColor: FFValue(xs: AppColors.primarySoft),
+                    ),
+                  ),
                   child: const OrderDetails(),
                 ),
               ],
@@ -179,7 +260,9 @@ The same screen in dark mode, with no code changes (`FFColor` selects a variant 
 cd example && flutter run -d chrome
 ```
 
-The **Library** menu has a page for each topic (styles, spacing, colors, and containers); these pages are the source of the images in this README. Resize the window to see how each element adapts.
+The **Library** menu has a dedicated page for each capability, including
+breakpoints, grid, typography, spacing, colors, themes, containers, and
+navigation. Resize the window and switch themes to see each element adapt.
 
 ## Breakpoints
 
@@ -197,21 +280,15 @@ The breakpoint is determined by the screen width.
 if (context.breakpoint >= BreakpointEnum.md) { ... }
 ```
 
-The default thresholds are `600 / 840 / 1200 / 1600` logical pixels.
-Consumers can customize them for the entire app by assigning
-`FFBreakpoints.current` before `runApp`. This configuration affects `context.breakpoint`,
-`context.responsive`, and all responsive widgets in the package:
+The default thresholds are `600 / 840 / 1200 / 1600` logical pixels. Wrap an
+app or a subtree in `FFBreakpointScope` to customize its thresholds. Nested
+scopes can use different values independently:
 
 ```dart
-void main() {
-  FFBreakpoints.current = const FFBreakpoints(
-    sm: 640,
-    md: 900,
-    lg: 1200,
-    xl: 1600,
-  );
-  runApp(const MyApp());
-}
+FFBreakpointScope(
+  breakpoints: const FFBreakpoints(sm: 640, md: 900, lg: 1200, xl: 1600),
+  child: MaterialApp(home: const MyApp()),
+)
 ```
 
 ## `FFValue`: a value per breakpoint
@@ -302,7 +379,7 @@ const card = FFStyle(
 - **`maxHeight` limits height but does not add scrolling:** taller content overflows. For a list or long text, put a `ListView` or `SingleChildScrollView` inside:
 
 ```dart
-FFContainer(
+FFStyled(
   style: const FFStyle(maxHeight: FFValue(xs: 240, lg: 400)),
   child: ListView(shrinkWrap: true, children: [...]),
 )
@@ -311,7 +388,7 @@ FFContainer(
 - **`clip`** clips overflowing content, like `overflow: hidden`. Content uses its natural height, and anything beyond `height` or `maxHeight` is clipped without Flutter's overflow warning. It follows the `borderRadius` corners inside the border:
 
 ```dart
-FFItem(
+FFStyledItem(
   style: const FFStyle(
     maxHeight: FFValue(xs: 120),
     borderRadius: FFValue(xs: BorderRadius.all(Radius.circular(12))),
@@ -340,7 +417,7 @@ TextField(style: title.toTextStyle(context))
 For multiple text widgets, apply the style to a container and its child `Text` widgets inherit it:
 
 ```dart
-FFContainer(
+FFStyled(
   style: const FFStyle(
     textStyle: FFValue(xs: TextStyle(fontSize: 14)),
     color: AppColors.muted,
@@ -402,15 +479,15 @@ Light or dark mode is read from the app's `Theme`, so it follows your `MaterialA
 
 ![Containers with maxSize 480, 800, and 1100 on xs and lg: centered on wide screens](doc/contenedor.png)
 
-It uses the available width up to `maxSize` and centers on wider screens. The `style` is applied inside that width.
+It uses the available width up to `maxSize` and centers on wider screens.
+Style it separately by wrapping it in `FFStyled`.
 
 ```dart
-FFContainer(
-  maxSize: 1280,
+FFStyled(
   style: const FFStyle(
     padding: FFSpacing(horizontal: FFValue(xs: 16, md: 24)),
   ),
-  child: ...,
+  child: FFContainer(maxSize: 1280, child: ...),
 )
 ```
 
@@ -537,21 +614,20 @@ The entire list is reversed: in a row, the last child moves to the left; when st
 - `gap`: spacing between items and, in horizontal layouts, between rows.
 - `mainAxisAlignment`: defaults to `start`. In horizontal layouts, it applies to each row.
 - `crossAxisAlignment`: defaults to `stretch` in vertical layouts (items use the full width) and `start` in horizontal layouts. In horizontal layouts, it applies within each row; `stretch` makes items match the row height.
-- `style`: an `FFStyle` for the container.
 - `children`: can be `FFItem`s or any widgets. In a horizontal layout, a widget that is not an `FFItem` occupies the full row.
 
 **`FFItem`**
 - `col`: how many of the 12 columns it occupies (1 to 12). Horizontal layouts only. Without `col` or `fill`, it occupies the full row.
 - `fill`: `true` uses the remaining space in its row; if multiple items have it, they split that space equally. `false` uses its natural size (`col-auto`). It can change per breakpoint, for example `FFValue(xs: false, sm: true, lg: false)`.
 - `order`: position within `FFFlex`; lower values come first (defaults to 0).
-- `style`: an `FFStyle`. With `visible: false`, the item is removed and leaves no gap.
+- `visible`: whether the item participates in the layout at each breakpoint; hidden items leave no gap.
 
 **Details:**
 - Each child is laid out once, like in a `Row` or `Wrap`, so this is no more expensive than those widgets. As with them, all children are built even when not visible; for lists with hundreds of items, consider `GridView.builder`.
 - If `FFFlex` has an unbounded constraint along its main axis (for example, a vertical layout inside a `SingleChildScrollView`), `fill` and `col` are ignored instead of causing an error.
 - Changing `order` or hiding an item does not make other items lose their state.
 - Respects `TextDirection.rtl`.
-- Outside `FFFlex`, `FFItem` ignores `col`, `fill`, and `order, and only applies its `style`. It works like a `div` with classes.
+- `FFItem` contains layout properties only. Use `FFStyled` for arbitrary widget subtrees or `FFStyledItem` to combine an `FFItem` with `FFStyle`.
 
 ## `FFScaffold`: breakpoint-based navigation
 

@@ -61,21 +61,50 @@ void main() {
   testWidgets('usa los umbrales personalizados por el consumidor', (
     tester,
   ) async {
-    final previousBreakpoints = FFBreakpoints.current;
-    addTearDown(() => FFBreakpoints.current = previousBreakpoints);
-    FFBreakpoints.current = const FFBreakpoints(
-      sm: 500,
-      md: 700,
-      lg: 900,
-      xl: 1100,
-    );
     size = Size(800, 600);
     sut = buildSut();
     setViewport(tester, size);
 
-    await tester.pumpWidget(sut);
+    await tester.pumpWidget(
+      FFBreakpointScope(
+        breakpoints: const FFBreakpoints(sm: 500, md: 700, lg: 900, xl: 1100),
+        child: sut,
+      ),
+    );
 
     expect(find.text(BreakpointEnum.md.name), findsOneWidget);
+  });
+
+  testWidgets('permite um breakpoint independiente en un subárbol', (
+    tester,
+  ) async {
+    setViewport(tester, const Size(800, 600));
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Column(
+          children: [
+            Builder(
+              builder: (context) => Text('outer:${context.breakpoint.name}'),
+            ),
+            FFBreakpointScope(
+              breakpoints: const FFBreakpoints(
+                sm: 500,
+                md: 700,
+                lg: 900,
+                xl: 1100,
+              ),
+              child: Builder(
+                builder: (context) => Text('inner:${context.breakpoint.name}'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    expect(find.text('outer:sm'), findsOneWidget);
+    expect(find.text('inner:md'), findsOneWidget);
   });
 
   testWidgets('responsive hereda el último valor definido y permite null', (

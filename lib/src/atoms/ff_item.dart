@@ -1,14 +1,11 @@
 import 'package:flutter/widgets.dart';
 
-import '../models/ff_style.dart';
 import '../models/ff_value.dart';
-import '../utils/ff_style_builder.dart';
 
-/// A responsive item with styling, like a `div` with classes.
+/// A responsive grid item.
 ///
 /// Inside an `FFFlex`, [col] and [fill] define its width, and [order] changes
-/// its position. Outside an `FFFlex`, these three properties are ignored and
-/// only [style] is applied.
+/// its position. Outside an `FFFlex`, these properties are ignored.
 ///
 /// If [col] and [fill] are both defined, the value from the breakpoint closest
 /// to the current one takes precedence; if both are defined at the same
@@ -19,7 +16,7 @@ class FFItem extends StatelessWidget {
     this.col,
     this.fill,
     this.order,
-    this.style,
+    this.visible,
     required this.child,
   });
 
@@ -36,26 +33,12 @@ class FFItem extends StatelessWidget {
 
   /// Position within the `FFFlex`; lower values come first. Defaults to 0.
   final FFValue<int>? order;
-  final FFStyle? style;
+
+  /// Whether this item participates in the layout at each breakpoint.
+  final FFValue<bool>? visible;
+
   final Widget child;
 
   @override
-  Widget build(BuildContext context) {
-    final s = style?.resolve(context);
-    if (s == null || (s.width == null && s.maxWidth == null)) {
-      return buildFFStyle(context, style, child);
-    }
-    // The column has a fixed width in `FFFlex`. Release it so the style can
-    // constrain the box at the start of its column, while the content fills
-    // that width like a block.
-    return Align(
-      alignment: AlignmentDirectional.topStart,
-      heightFactor: 1,
-      child: buildFFStyle(
-        context,
-        style,
-        SizedBox(width: double.infinity, child: child),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => child;
 }

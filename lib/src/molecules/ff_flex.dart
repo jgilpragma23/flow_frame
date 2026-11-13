@@ -6,10 +6,8 @@ import 'package:flutter/widgets.dart';
 import '../atoms/ff_item.dart';
 import '../models/breakpoint.dart';
 import '../models/ff_direction.dart';
-import '../models/ff_style.dart';
 import '../models/ff_value.dart';
 import '../utils/context_extensions.dart';
-import '../utils/ff_style_builder.dart';
 
 /// A row or column whose direction, spacing, and alignment adapt per
 /// breakpoint (similar to `d-flex flex-column flex-md-row`). The direction
@@ -34,7 +32,6 @@ class FFFlex extends StatelessWidget {
     this.gap,
     this.mainAxisAlignment,
     this.crossAxisAlignment,
-    this.style,
     required this.children,
   });
 
@@ -52,7 +49,6 @@ class FFFlex extends StatelessWidget {
   /// `start` in horizontal layouts. In horizontal layouts, applies within
   /// each row. `baseline` is treated as `start`.
   final FFValue<CrossAxisAlignment>? crossAxisAlignment;
-  final FFStyle? style;
   final List<Widget> children;
 
   @override
@@ -61,22 +57,18 @@ class FFFlex extends StatelessWidget {
     final dir = direction.resolve(breakpoint) ?? FFDirectionEnum.horizontal;
     final axis = dir.axis;
 
-    return buildFFStyle(
-      context,
-      style,
-      _FFFlexLayout(
-        direction: axis,
-        gap: gap?.resolve(breakpoint) ?? 0,
-        mainAxisAlignment:
-            mainAxisAlignment?.resolve(breakpoint) ?? MainAxisAlignment.start,
-        crossAxisAlignment:
-            crossAxisAlignment?.resolve(breakpoint) ??
-            (axis == Axis.vertical
-                ? CrossAxisAlignment.stretch
-                : CrossAxisAlignment.start),
-        textDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
-        children: _slots(breakpoint, reverse: dir.isReverse),
-      ),
+    return _FFFlexLayout(
+      direction: axis,
+      gap: gap?.resolve(breakpoint) ?? 0,
+      mainAxisAlignment:
+          mainAxisAlignment?.resolve(breakpoint) ?? MainAxisAlignment.start,
+      crossAxisAlignment:
+          crossAxisAlignment?.resolve(breakpoint) ??
+          (axis == Axis.vertical
+              ? CrossAxisAlignment.stretch
+              : CrossAxisAlignment.start),
+      textDirection: Directionality.maybeOf(context) ?? TextDirection.ltr,
+      children: _slots(breakpoint, reverse: dir.isReverse),
     );
   }
 
@@ -90,7 +82,7 @@ class FFFlex extends StatelessWidget {
       final child = children[i];
       var order = 0;
       if (child is FFItem) {
-        if (child.style?.visible?.resolve(breakpoint) == false) continue;
+        if (child.visible?.resolve(breakpoint) == false) continue;
         order = child.order?.resolve(breakpoint) ?? 0;
       }
       entries.add((index: i, order: order, child: child));
