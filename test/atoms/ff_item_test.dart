@@ -10,15 +10,15 @@ Finder _ancestorsOfChild(Type type) => find.ancestor(
 void main() {
   late SizedBox child;
   late FFItem plainItem;
-  late FFItem styledItem;
-  late FFItem responsiveWidthItem;
-  late FFItem maxWidthItem;
+  late FFStyledItem styledItem;
+  late FFStyledItem responsiveWidthItem;
+  late FFStyledItem maxWidthItem;
   late Widget sut;
 
   setUp(() {
     child = const SizedBox(key: Key('item-child'), width: 40, height: 20);
     plainItem = FFItem(child: child);
-    styledItem = FFItem(
+    styledItem = FFStyledItem(
       style: const FFStyle(
         backgroundColor: FFValue.all(FFColor.fixed(Colors.blue)),
         padding: FFSpacing(all: FFValue.all(8)),
@@ -28,11 +28,11 @@ void main() {
       order: const FFValue.all(1),
       child: child,
     );
-    responsiveWidthItem = FFItem(
+    responsiveWidthItem = FFStyledItem(
       style: const FFStyle(width: FFValue(xs: 120, md: 240)),
       child: child,
     );
-    maxWidthItem = FFItem(
+    maxWidthItem = FFStyledItem(
       style: const FFStyle(maxWidth: FFValue.all(180)),
       child: child,
     );

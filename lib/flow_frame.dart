@@ -1,7 +1,8 @@
 library;
 
-export 'src/models/models.dart';
-export 'src/molecules/molecules.dart';
-export 'src/utils/utils.dart';
-export 'src/atoms/atoms.dart';
-export 'src/enums/enums.dart';
+export 'colors.dart';
+export 'containers.dart';
+export 'grid.dart';
+export 'navigation.dart';
+export 'responsive.dart';
+export 'styling.dart';

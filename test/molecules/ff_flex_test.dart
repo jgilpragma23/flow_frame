@@ -75,7 +75,7 @@ void main() {
       gap: FFValue.all(12),
       children: [
         SizedBox(key: Key('first'), height: 20),
-        FFItem(
+        FFStyledItem(
           style: FFStyle(visible: FFValue.all(false)),
           child: SizedBox(height: 10),
         ),
